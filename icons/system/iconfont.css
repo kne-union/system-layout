@@ -1,0 +1,248 @@
+@font-face {
+  font-family: 'system'; /* Project id 5022759 */
+  /* Color fonts */
+  src:
+    url('iconfont.woff2?t=1758011291118') format('woff2'),
+    url('iconfont.woff?t=1758011291118') format('woff'),
+    url('iconfont.ttf?t=1758011291118') format('truetype');
+}
+
+.system {
+  font-family: 'system' !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-chart_data:before {
+  content: '\e63d';
+}
+
+.icon-contacts:before {
+  content: '\e63e';
+}
+
+.icon-assignment:before {
+  content: '\e63f';
+}
+
+.icon-manage_accounts:before {
+  content: '\e640';
+}
+
+.icon-assignment_ind:before {
+  content: '\e641';
+}
+
+.icon-network_intelligence:before {
+  content: '\e639';
+}
+
+.icon-automation:before {
+  content: '\e63a';
+}
+
+.icon-groups_2:before {
+  content: '\e63b';
+}
+
+.icon-snippet_folder:before {
+  content: '\e63c';
+}
+
+.icon-home:before {
+  content: '\e637';
+}
+
+.icon-home_line:before {
+  content: '\e638';
+}
+
+.icon-a-Typeedit:before {
+  content: '\e62b';
+}
+
+.icon-a-Typefilter_alt:before {
+  content: '\e62c';
+}
+
+.icon-a-Typearrow_upload_ready:before {
+  content: '\e62d';
+}
+
+.icon-a-Typeadd:before {
+  content: '\e62e';
+}
+
+.icon-a-Typecheck_indeterminate_small:before {
+  content: '\e62f';
+}
+
+.icon-a-Typeclose_small:before {
+  content: '\e630';
+}
+
+.icon-a-Typeadd_2:before {
+  content: '\e631';
+}
+
+.icon-a-Typearrow_forward_ios:before {
+  content: '\e632';
+}
+
+.icon-a-Typearrow_drop_down:before {
+  content: '\e633';
+}
+
+.icon-a-Typedescription:before {
+  content: '\e634';
+}
+
+.icon-a-Typebalance:before {
+  content: '\e635';
+}
+
+.icon-a-Typedelete:before {
+  content: '\e636';
+}
+
+.icon-a-Typelink:before {
+  content: '\e617';
+}
+
+.icon-a-Typeios_share:before {
+  content: '\e618';
+}
+
+.icon-a-Typemobile_2:before {
+  content: '\e619';
+}
+
+.icon-a-Typesend:before {
+  content: '\e61a';
+}
+
+.icon-a-Typecalendar_month:before {
+  content: '\e61b';
+}
+
+.icon-a-Typesettings:before {
+  content: '\e61c';
+}
+
+.icon-a-Typeqr_code:before {
+  content: '\e61d';
+}
+
+.icon-a-Typekeyboard_arrow_down:before {
+  content: '\e61e';
+}
+
+.icon-a-Typehide:before {
+  content: '\e61f';
+}
+
+.icon-a-Typeimagesmode:before {
+  content: '\e620';
+}
+
+.icon-a-Typedrag_handle:before {
+  content: '\e621';
+}
+
+.icon-a-Typeattach_file_add:before {
+  content: '\e622';
+}
+
+.icon-a-Typecontent_copy:before {
+  content: '\e623';
+}
+
+.icon-a-Typecheck_small:before {
+  content: '\e624';
+}
+
+.icon-a-Typechevron_right:before {
+  content: '\e625';
+}
+
+.icon-a-Typechevron_backward:before {
+  content: '\e626';
+}
+
+.icon-a-Typeinfo:before {
+  content: '\e627';
+}
+
+.icon-a-Typeequal:before {
+  content: '\e628';
+}
+
+.icon-a-Typeinstant_mix:before {
+  content: '\e629';
+}
+
+.icon-a-Typeclose:before {
+  content: '\e62a';
+}
+
+.icon-a-Typeupload:before {
+  content: '\e60b';
+}
+
+.icon-a-Typesave:before {
+  content: '\e60c';
+}
+
+.icon-a-Typemail:before {
+  content: '\e609';
+}
+
+.icon-a-Typeeast:before {
+  content: '\e60a';
+}
+
+.icon-a-Typepercent:before {
+  content: '\e60d';
+}
+
+.icon-a-Typecheck:before {
+  content: '\e608';
+}
+
+.icon-a-Typepicture_in_picture_small:before {
+  content: '\e60e';
+}
+
+.icon-a-Typemove_item:before {
+  content: '\e60f';
+}
+
+.icon-a-Typediversity_3:before {
+  content: '\e610';
+}
+
+.icon-a-Typeperson_add:before {
+  content: '\e611';
+}
+
+.icon-a-Typecheck_circle:before {
+  content: '\e612';
+}
+
+.icon-a-Typeedit_off:before {
+  content: '\e613';
+}
+
+.icon-a-Typeopen_in_full:before {
+  content: '\e614';
+}
+
+.icon-a-Typesearch:before {
+  content: '\e615';
+}
+
+.icon-a-Typedownload:before {
+  content: '\e616';
+}

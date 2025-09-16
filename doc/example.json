@@ -1,5 +1,5 @@
 {
-  "isFull": false,
+  "isFull": true,
   "list": [
     {
       "title": "这里填写示例标题",
@@ -10,8 +10,27 @@
           "name": "_SystemLayout",
           "packageName": "@kne/current-lib_system-layout",
           "importStatement": "import * as _SystemLayout from \"@kne/system-layout\""
-        },{
+        },
+        {
           "packageName": "@kne/current-lib_system-layout/dist/index.css"
+        }
+      ]
+    },
+    {
+      "title": "这里填写示例标题",
+      "description": "这里填写示例说明",
+      "code": "./font.js",
+      "scope": [
+        {
+          "name": "_fontList",
+          "packageName": "./src/icons/fonts"
+        },
+        {
+          "packageName": "./src/icons/index"
+        },
+        {
+          "name": "_modulesDev",
+          "packageName": "@kne/modules-dev/dist/create-entry"
         }
       ]
     }

@@ -47,7 +47,9 @@ const Layout = ({ className, menu, background = 'linear-gradient(0deg, #BBCFE7 0
             />
           </div>
           <ExpandIcon
-            className={classnames('expand-btn', style['expand-btn'])}
+            className={classnames('expand-btn', style['expand-btn'], {
+              'is-closed': !menuOpen
+            })}
             onClick={() => {
               setMenuOpen(menuOpen => {
                 localStorage.setItem(LayoutMenuOpenKey, !menuOpen);

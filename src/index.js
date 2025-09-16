@@ -1,4 +1,4 @@
-import './icons/font/iconfont.css';
-import './icons/colorful/iconfont';
+import './icons/index';
+
 export { default } from './Layout';
 export { default as Layout } from './Layout';

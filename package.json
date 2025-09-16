@@ -1,6 +1,6 @@
 {
   "name": "@kne/system-layout",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "description": "用于一个系统初始化布局",
   "syntax": {
     "esmodules": true
@@ -10,6 +10,7 @@
   "source": "src/index.js",
   "scripts": {
     "init": "husky && npm run init-example",
+    "build-icon": "cross-env INPUT=./icons  OUTPUT=./src/icons/ icon-build",
     "start": "run-p start:lib start:md start:example",
     "build": "run-s build:lib build:md build:example",
     "init-example": "modules-dev-libs-init",
@@ -78,8 +79,9 @@
     "react-router-dom": "*"
   },
   "devDependencies": {
+    "@kne/icon-build": "^0.1.7",
     "@kne/microbundle": "^0.15.5",
-    "@kne/modules-dev": "^2.0.33",
+    "@kne/modules-dev": "^2.1.16",
     "antd": "^5.27.3",
     "cross-env": "^7.0.3",
     "husky": "^9.0.11",

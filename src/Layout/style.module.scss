@@ -62,6 +62,10 @@
   z-index: 999;
   transform: translate(0, -32px);
   cursor: pointer;
+  transition: transform 0.3s;
+  &:global(.is-closed) {
+    transform: translate(0, -32px) scaleX(-1);
+  }
 }
 
 .menu-inner {
