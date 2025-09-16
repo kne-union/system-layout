@@ -39,18 +39,7 @@ import '@kne/system-layout/dist/index.css';
 - [x] 完成基础布局
 - [ ] 适配到移动端
 
-### 示例
-
-
-#### 示例样式
-
-```scss
-.ant-card {
-  border-color: black;
-  text-align: center;
-  width: 200px;
-}
-```
+### 示例(全屏)
 
 #### 示例代码
 
@@ -119,6 +108,22 @@ const BaseExample = () => {
       />
     </div>
   );
+};
+
+render(<BaseExample />);
+
+```
+
+- 这里填写示例标题
+- 这里填写示例说明
+- _fontList(./src/icons/fonts),(./src/icons/index),_modulesDev(@kne/modules-dev/dist/create-entry)
+
+```jsx
+const { default: fonts } = _fontList;
+const { FontList } = _modulesDev;
+
+const BaseExample = () => {
+  return <FontList fonts={fonts} />;
 };
 
 render(<BaseExample />);
