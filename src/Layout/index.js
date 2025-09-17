@@ -10,6 +10,10 @@ import defaultLogo from './defaultLogo.svg';
 import { ReactComponent as ExpandIcon } from './expand.svg';
 import style from './style.module.scss';
 import ErrorBoundary from '../ErrorComponent';
+import SimpleBar from 'simplebar-react';
+import 'simplebar-react/dist/simplebar.min.css';
+import LiquidGlass from '@kne/react-liquid-glass';
+import '@kne/react-liquid-glass/dist/index.css';
 
 const LayoutMenuOpenKey = 'LAYOUT_MENU_OPEN';
 
@@ -46,17 +50,21 @@ const Layout = ({ className, menu, background = 'linear-gradient(0deg, #BBCFE7 0
               )}
             />
           </div>
-          <ExpandIcon
-            className={classnames('expand-btn', style['expand-btn'], {
-              'is-closed': !menuOpen
-            })}
+          <LiquidGlass
+            className={classnames('expand-btn-wrapper', style['expand-btn-wrapper'])}
             onClick={() => {
               setMenuOpen(menuOpen => {
                 localStorage.setItem(LayoutMenuOpenKey, !menuOpen);
                 return !menuOpen;
               });
             }}
-          />
+          >
+            <ExpandIcon
+              className={classnames('expand-btn', style['expand-btn'], {
+                'is-closed': !menuOpen
+              })}
+            />
+          </LiquidGlass>
           <div className={classnames('menu-inner', style['menu-inner'])}>
             <div className={classnames('menu-header', style['menu-header'])}>
               <ErrorBoundary>{menuHeader ? typeof menuHeader === 'function' ? menuHeader({ menuOpen }) : menuHeader : <UserCard menuOpen={menuOpen} {...Object.assign({}, userInfo)} />}</ErrorBoundary>
@@ -77,9 +85,9 @@ const Layout = ({ className, menu, background = 'linear-gradient(0deg, #BBCFE7 0
           </div>
         </div>
         <Flex flex={1} className={classnames('page', style['page'])}>
-          <Row gutter={24} className={classnames('page-content', style['page-content'])}>
+          <Row className={classnames('page-content', style['page-content'])}>
             {aiDialog && aiType === 'inner' && (
-              <Col span={8}>
+              <Col span={8} className={classnames('page-dialog-outer', style['page-dialog-outer'])}>
                 <div className={classnames('page-dialog', style['page-dialog'])}>
                   <Flex className={classnames('ai-dialog-window-title', style['ai-dialog-window-title'])}>
                     <div>{aiDialog.title}</div>
@@ -101,7 +109,15 @@ const Layout = ({ className, menu, background = 'linear-gradient(0deg, #BBCFE7 0
               </Col>
             )}
             <Col span={aiType === 'inner' ? 16 : 24}>
-              <ErrorBoundary>{children}</ErrorBoundary>
+              <ErrorBoundary>
+                <SimpleBar
+                  className={classnames('page-children', style['page-children'], {
+                    ['has-left']: aiType === 'inner'
+                  })}
+                >
+                  {children}
+                </SimpleBar>
+              </ErrorBoundary>
             </Col>
           </Row>
         </Flex>

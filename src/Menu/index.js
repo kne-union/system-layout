@@ -8,7 +8,7 @@ import style from './style.module.scss';
 const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const currentPathname = location.pathname.replace(new RegExp(`^/${base}`), '');
+  const currentPathname = base ? location.pathname.replace(new RegExp(`^${base}`), '') : location.pathname;
   return (
     <div className={classnames('menu', className, style['menu-list'])}>
       {items.map((item, index) => {
