@@ -1,6 +1,6 @@
 {
   "name": "@kne/system-layout",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "description": "用于一个系统初始化布局",
   "syntax": {
     "esmodules": true
@@ -20,7 +20,7 @@
     "build:lib-main": "microbundle --no-compress --format modern,cjs --jsxImportSource react --jsx React.createElement --jsxFragment React.Fragment",
     "build:lib": "npm run build-icon && run-s build:locale build:lib-main",
     "start:lib": "npm run build-icon && microbundle watch --no-compress --format modern,cjs --jsxImportSource react --jsx React.createElement --jsxFragment React.Fragment",
-    "build:example": "cd example && npm run build",
+    "build:example": "npm run build-icon && cd example && npm run build",
     "start:example": "cd example && npm run start",
     "test:build": "run-s build",
     "test:lint": "eslint .",
