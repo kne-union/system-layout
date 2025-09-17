@@ -48,7 +48,7 @@ import '@kne/system-layout/dist/index.css';
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css)
 
 ```jsx
-const { default: SystemLayout } = _SystemLayout;
+const { default: SystemLayout, Page } = _SystemLayout;
 
 const BaseExample = () => {
   return (
@@ -60,7 +60,7 @@ const BaseExample = () => {
         }}
         aiDialog={{}}
         menu={{
-          base: 'SystemLayout',
+          base: '/SystemLayout',
           items: [
             {
               path: '/',
@@ -104,8 +104,27 @@ const BaseExample = () => {
               icon: 'icon-network_intelligence'
             }
           ]
-        }}
-      />
+        }}>
+        <Page
+          title="Home"
+          buttonProps={{
+            list: [
+              {
+                type: 'primary',
+                children: 'New'
+              },
+              {
+                children: 'Options'
+              },
+              {
+                loading: true,
+                children: 'Options2'
+              }
+            ]
+          }}>
+          Content
+        </Page>
+      </SystemLayout>
     </div>
   );
 };
