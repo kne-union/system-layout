@@ -50,7 +50,7 @@ const Layout = ({ className, menu, background = 'linear-gradient(0deg, #BBCFE7 0
               )}
             />
           </div>
-          <LiquidGlass
+          <div
             className={classnames('expand-btn-wrapper', style['expand-btn-wrapper'])}
             onClick={() => {
               setMenuOpen(menuOpen => {
@@ -59,12 +59,13 @@ const Layout = ({ className, menu, background = 'linear-gradient(0deg, #BBCFE7 0
               });
             }}
           >
+            <LiquidGlass className={classnames('expand-btn-bg', style['expand-btn-bg'])} responsiveBorder={false} />
             <ExpandIcon
               className={classnames('expand-btn', style['expand-btn'], {
                 'is-closed': !menuOpen
               })}
             />
-          </LiquidGlass>
+          </div>
           <div className={classnames('menu-inner', style['menu-inner'])}>
             <div className={classnames('menu-header', style['menu-header'])}>
               <ErrorBoundary>{menuHeader ? typeof menuHeader === 'function' ? menuHeader({ menuOpen }) : menuHeader : <UserCard menuOpen={menuOpen} {...Object.assign({}, userInfo)} />}</ErrorBoundary>
