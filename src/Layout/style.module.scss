@@ -19,9 +19,8 @@
 
       &:not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(:disabled) {
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        box-shadow:
-          0 5px 10px 0 rgba(0, 0, 0, 0.05),
-          0 15px 30px 0 rgba(0, 0, 0, 0.08);
+        box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05),
+        0 15px 30px 0 rgba(0, 0, 0, 0.08);
         backdrop-filter: blur(10px);
 
         &:hover:not(:disabled):not(.ant-btn-loading) {
@@ -42,9 +41,8 @@
       }
 
       &.ant-btn-primary:not(:disabled) {
-        box-shadow:
-          0 5px 10px 0 rgba(0, 0, 0, 0.05),
-          0 15px 30px 0 rgba(0, 0, 0, 0.08);
+        box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05),
+        0 15px 30px 0 rgba(0, 0, 0, 0.08);
       }
 
       &.ant-btn-loading {
@@ -185,10 +183,9 @@
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.5) 100%);
-  box-shadow:
-    0 5px 10px 0 rgba(0, 0, 0, 0.05),
-    0 15px 30px 0 rgba(0, 0, 0, 0.08),
-    0 20px 40px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05),
+  0 15px 30px 0 rgba(0, 0, 0, 0.08),
+  0 20px 40px 0 rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(10px);
   min-width: 0;
 }
@@ -233,9 +230,8 @@
   position: absolute;
   bottom: 24px;
   left: 16px;
-  box-shadow:
-    0 5px 10px 0 rgba(0, 0, 0, 0.05),
-    0 15px 30px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05),
+  0 15px 30px 0 rgba(0, 0, 0, 0.08);
   transition: box-shadow 0.3s;
   @keyframes pulse-dialog-window {
     0%,
@@ -251,10 +247,9 @@
     animation: pulse-dialog-window 0.4s ease-out;
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(10px) saturate(1.5);
-    box-shadow:
-      0 5px 10px 0 rgba(0, 0, 0, 0.05),
-      0 15px 30px 0 rgba(0, 0, 0, 0.08),
-      0 20px 40px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05),
+    0 15px 30px 0 rgba(0, 0, 0, 0.08),
+    0 20px 40px 0 rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -280,10 +275,9 @@
   &:hover {
     backdrop-filter: blur(40px) saturate(1.2);
     animation: pulse-page-dialog 0.4s ease-out;
-    box-shadow:
-      0 5px 10px 0 rgba(0, 0, 0, 0.05),
-      0 15px 30px 0 rgba(0, 0, 0, 0.08),
-      0 20px 40px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05),
+    0 15px 30px 0 rgba(0, 0, 0, 0.08),
+    0 20px 40px 0 rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -296,6 +290,10 @@
   --container-height: var(--page-content-height);
   height: var(--container-height);
   padding: 24px;
+
+  &.is-scroller {
+    overflow-y: auto;
+  }
 }
 
 .page-content {
