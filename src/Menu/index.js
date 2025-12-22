@@ -58,7 +58,7 @@ const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) =>
                 }
 
                 if (isValidElement(icon)) {
-                  return icon;
+                  return <span className={classnames('menu-item-icon', style['menu-item-icon'])}>{icon}</span>;
                 }
 
                 if (isPlainObject(icon) && typeof icon.type === 'string') {
