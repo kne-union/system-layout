@@ -33,8 +33,12 @@ const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) =>
           <div
             key={item.key || item.path || index}
             title={item.label}
-            onClick={() => {
+            onClick={e => {
               onChange && onChange(item, { menuOpen, base });
+              if (typeof item.onClick === 'function') {
+                item.onClick(item, { menuOpen, base, event: e });
+                return;
+              }
               if (item.path) {
                 navigate(ensureSlash(`${base}${item.path}`));
               }
@@ -52,12 +56,13 @@ const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) =>
                 if (typeof icon === 'string') {
                   return <Icon className={classnames('menu-item-icon', style['menu-item-icon'])} type={icon} fontClassName="system" />;
                 }
-                if (isPlainObject(icon)) {
-                  return <Icon {...icon} className={classnames('menu-item-icon', style['menu-item-icon'])} />;
-                }
 
                 if (isValidElement(icon)) {
                   return icon;
+                }
+
+                if (isPlainObject(icon) && typeof icon.type === 'string') {
+                  return <Icon {...icon} className={classnames('menu-item-icon', style['menu-item-icon'])} />;
                 }
 
                 return null;
