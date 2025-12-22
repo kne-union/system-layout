@@ -1,8 +1,10 @@
 import { Flex } from 'antd';
+import { isValidElement } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import classnames from 'classnames';
 import Icon from '@kne/react-icon';
 import ensureSlash from '@kne/ensure-slash';
+import isPlainObject from 'lodash/isPlainObject';
 import style from './style.module.scss';
 
 const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) => {
@@ -36,9 +38,8 @@ const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) =>
               if (item.path) {
                 navigate(ensureSlash(`${base}${item.path}`));
               }
-            }}
-          >
-            {hasGroup && menuOpen ? <div className={classnames('menu-group', style['menu-group'])}>{item.group}</div> : null}
+            }}>
+            {hasGroup && menuOpen ? <div className={classnames('menu-group', style['menu-group'])}>{item.groupLabel || item.group}</div> : null}
             {hasGroup && !menuOpen ? <div className={classnames('menu-group-split', style['menu-group-split'])} /> : null}
             <Flex
               className={classnames('menu-item', style['menu-item'], {
@@ -46,9 +47,21 @@ const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) =>
                 ['is-closed']: !menuOpen
               })}
               align="center"
-              gap={8}
-            >
-              {typeof icon === 'string' && <Icon className={classnames('menu-item-icon', style['menu-item-icon'])} type={icon} fontClassName="system" />}
+              gap={8}>
+              {(icon => {
+                if (typeof icon === 'string') {
+                  return <Icon className={classnames('menu-item-icon', style['menu-item-icon'])} type={icon} fontClassName="system" />;
+                }
+                if (isPlainObject(icon)) {
+                  return <Icon {...icon} className={classnames('menu-item-icon', style['menu-item-icon'])} />;
+                }
+
+                if (isValidElement(icon)) {
+                  return icon;
+                }
+
+                return null;
+              })(icon)}
               {menuOpen && item.label}
             </Flex>
           </div>
