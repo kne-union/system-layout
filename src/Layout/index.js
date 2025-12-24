@@ -69,8 +69,8 @@ const Layout = ({
         className={classnames(className, 'layout', style['layout'], {
           'is-mobile': deviceIsMobile,
           [style['is-mobile']]: deviceIsMobile,
-          'has-toolbar': toolbarShow,
-          [style['has-toolbar']]: toolbarShow
+          'has-toolbar': deviceIsMobile && toolbarShow,
+          [style['has-toolbar']]: deviceIsMobile && toolbarShow
         })}
         style={{
           '--menu-max-width': menuMaxWidth,
@@ -216,7 +216,7 @@ const Layout = ({
             </div>
           )}
         </Flex>
-        <Toolbar {...menu} className={classnames(style['toolbar'])} show={toolbarShow} target={toolbarTarget} />
+        <Toolbar {...menu} className={classnames(style['toolbar'])} show={deviceIsMobile && toolbarShow} target={toolbarTarget} />
       </div>
     </Provider>
   );
