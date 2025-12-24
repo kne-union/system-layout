@@ -1,0 +1,38 @@
+.toolbar {
+  height: 60px;
+}
+
+.toolbar-list {
+  height: 60px;
+  position: fixed;
+  z-index: 600;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 8px 8px 0 0;
+  background: rgba(249, 249, 249, 0.75);
+  box-shadow: 0 -2px 22.9px 0 rgba(78, 96, 139, 0.13);
+  backdrop-filter: blur(10px);
+}
+
+.toolbar-item {
+  cursor: pointer;
+
+  &:global(.is-active) {
+    .toolbar-item-icon,
+    .toolbar-item-label {
+      color: var(--primary-color);
+    }
+  }
+}
+
+.toolbar-item .toolbar-item-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.toolbar-item-label {
+  font-size: 12px;
+}

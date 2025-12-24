@@ -34,6 +34,9 @@ const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) =>
             key={item.key || item.path || index}
             title={item.label}
             onClick={e => {
+              if (active) {
+                return;
+              }
               onChange && onChange(item, { menuOpen, base });
               if (typeof item.onClick === 'function') {
                 item.onClick(item, { menuOpen, base, event: e });
@@ -42,7 +45,8 @@ const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) =>
               if (item.path) {
                 navigate(ensureSlash(`${base}${item.path}`));
               }
-            }}>
+            }}
+          >
             {hasGroup && menuOpen ? <div className={classnames('menu-group', style['menu-group'])}>{item.groupLabel || item.group}</div> : null}
             {hasGroup && !menuOpen ? <div className={classnames('menu-group-split', style['menu-group-split'])} /> : null}
             <Flex
@@ -51,7 +55,8 @@ const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) =>
                 ['is-closed']: !menuOpen
               })}
               align="center"
-              gap={8}>
+              gap={8}
+            >
               {(icon => {
                 if (typeof icon === 'string') {
                   return <Icon className={classnames('menu-item-icon', style['menu-item-icon'])} type={icon} fontClassName="system" />;

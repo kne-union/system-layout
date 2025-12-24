@@ -1,3 +1,58 @@
+@mixin is-mobile {
+  width: 100%;
+  height: unset;
+  padding: 0;
+  overflow: hidden;
+  .menu {
+    position: absolute;
+    left: calc(var(--menu-min-width) * -1);
+    z-index: 900;
+    background: var(--background);
+    height: 100%;
+
+    &.open {
+      left: 0;
+      box-shadow: 0 -2px 22.9px 0 rgba(78, 96, 139, 0.13);
+    }
+  }
+  .layer-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 800;
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 300ms;
+
+    &.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+  .ai-entry {
+    display: none;
+  }
+  .page {
+    border-radius: 0;
+  }
+  .toolbar {
+    display: block;
+  }
+
+  .page-children {
+    padding: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    @include is-mobile;
+  }
+}
+
 .layout {
   --window-width: calc(100vw);
   --window-height: calc(100vh);
@@ -10,6 +65,14 @@
   padding: 24px 24px 24px 0;
   position: relative;
 
+  &.is-mobile {
+    @include is-mobile;
+  }
+
+  .toolbar {
+    display: none;
+  }
+
   :global {
     .ant-btn {
       &:not(.ant-btn-primary):not(.ant-btn-dangerous):not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(:disabled) {
@@ -19,8 +82,9 @@
 
       &:not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(:disabled) {
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05),
-        0 15px 30px 0 rgba(0, 0, 0, 0.08);
+        box-shadow:
+          0 5px 10px 0 rgba(0, 0, 0, 0.05),
+          0 15px 30px 0 rgba(0, 0, 0, 0.08);
         backdrop-filter: blur(10px);
 
         &:hover:not(:disabled):not(.ant-btn-loading) {
@@ -41,8 +105,9 @@
       }
 
       &.ant-btn-primary:not(:disabled) {
-        box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05),
-        0 15px 30px 0 rgba(0, 0, 0, 0.08);
+        box-shadow:
+          0 5px 10px 0 rgba(0, 0, 0, 0.05),
+          0 15px 30px 0 rgba(0, 0, 0, 0.08);
       }
 
       &.ant-btn-loading {
@@ -94,7 +159,7 @@
   justify-content: flex-start;
 
   img {
-    height: 24px;
+    height: 24px !important;
     object-fit: contain;
     max-width: 100%;
   }
@@ -107,31 +172,18 @@
 
 .expand-btn-wrapper {
   position: absolute;
-  right: -28px;
+  right: -10px;
   top: 20px;
   z-index: 999;
   cursor: pointer;
   width: 36px;
   height: 36px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-
+  transition: transform 0.3s;
   &:hover {
-    .expand-btn-bg {
-      opacity: 1;
-      animation: pulse 0.4s ease-out;
-      @keyframes pulse {
-        0%,
-        100% {
-          transform: scale(1) translate(0, 0);
-        }
-        50% {
-          transform: scale(1.1, 0.9);
-        }
-      }
-    }
+    transform: scale(1.2);
   }
 }
 
@@ -183,9 +235,10 @@
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.72) 100%);
-  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05),
-  0 15px 30px 0 rgba(0, 0, 0, 0.08),
-  0 20px 40px 0 rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 5px 10px 0 rgba(0, 0, 0, 0.05),
+    0 15px 30px 0 rgba(0, 0, 0, 0.08),
+    0 20px 40px 0 rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(10px);
   min-width: 0;
 }
@@ -230,8 +283,9 @@
   position: absolute;
   bottom: 24px;
   left: 16px;
-  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05),
-  0 15px 30px 0 rgba(0, 0, 0, 0.08);
+  box-shadow:
+    0 5px 10px 0 rgba(0, 0, 0, 0.05),
+    0 15px 30px 0 rgba(0, 0, 0, 0.08);
   transition: box-shadow 0.3s;
   @keyframes pulse-dialog-window {
     0%,
@@ -247,9 +301,10 @@
     animation: pulse-dialog-window 0.4s ease-out;
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(10px) saturate(1.5);
-    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05),
-    0 15px 30px 0 rgba(0, 0, 0, 0.08),
-    0 20px 40px 0 rgba(0, 0, 0, 0.08);
+    box-shadow:
+      0 5px 10px 0 rgba(0, 0, 0, 0.05),
+      0 15px 30px 0 rgba(0, 0, 0, 0.08),
+      0 20px 40px 0 rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -275,9 +330,10 @@
   &:hover {
     backdrop-filter: blur(40px) saturate(1.2);
     animation: pulse-page-dialog 0.4s ease-out;
-    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05),
-    0 15px 30px 0 rgba(0, 0, 0, 0.08),
-    0 20px 40px 0 rgba(0, 0, 0, 0.08);
+    box-shadow:
+      0 5px 10px 0 rgba(0, 0, 0, 0.05),
+      0 15px 30px 0 rgba(0, 0, 0, 0.08),
+      0 20px 40px 0 rgba(0, 0, 0, 0.08);
   }
 }
 

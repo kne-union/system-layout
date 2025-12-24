@@ -1,12 +1,47 @@
+@mixin is-mobile {
+  gap: 0 !important;
+  .page-header {
+    height: 48px;
+    padding: 0 16px;
+    background: #ffffff;
+  }
+  .page-title {
+    font-size: 16px;
+    flex: 1;
+    color: var(--primary-color);
+  }
+  .page-title-extra {
+    flex: none;
+  }
+  .page-inner {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    @include is-mobile;
+  }
+}
+
+.page {
+  &.is-mobile {
+    @include is-mobile;
+  }
+}
+
 .page-title {
   font-size: 20px;
   font-weight: 500;
-  justify-content: flex-start;
-  padding-left: 24px;
 }
 
 .page-title-extra {
   display: flex;
   justify-content: flex-end;
   flex: 1;
+}
+
+.back-icon {
+  display: block;
+  transform: rotate(180deg);
 }
