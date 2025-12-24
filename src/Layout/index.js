@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { Flex, Row, Col } from 'antd';
 import classnames from 'classnames';
 import localStorage from '@kne/local-storage';
@@ -15,6 +15,7 @@ import SimpleBar from 'simplebar-react';
 import 'simplebar-react/dist/simplebar.min.css';
 import isMobile from '../isMobile';
 import { Provider } from '../context';
+import { useLocation } from 'react-router-dom';
 
 const LayoutMenuOpenKey = 'LAYOUT_MENU_OPEN';
 
@@ -56,13 +57,20 @@ const Layout = ({
       userAvatar
     };
   }, [deviceIsMobile, logo, userAvatar]);
-
+  const topRef = useRef(null);
+  const location = useLocation();
+  useEffect(() => {
+    topRef.current && topRef.current.scrollIntoView();
+  }, [location]);
   return (
     <Provider value={contextValue}>
+      <div ref={topRef} />
       <div
         className={classnames(className, 'layout', style['layout'], {
           'is-mobile': deviceIsMobile,
-          [style['is-mobile']]: deviceIsMobile
+          [style['is-mobile']]: deviceIsMobile,
+          'has-toolbar': toolbarShow,
+          [style['has-toolbar']]: toolbarShow
         })}
         style={{
           '--menu-max-width': menuMaxWidth,

@@ -68,6 +68,7 @@ const BaseExample = () => {
             ]
           }}>
           <Page
+            toolbar
             title="Home"
             buttonProps={{
               showLength: 1,
