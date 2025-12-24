@@ -2,6 +2,8 @@
   width: 100%;
   padding: 0;
   overflow: hidden;
+  height: unset;
+  min-height: var(--window-height);
   --page-height: 100vh;
   --page-content-height: var(--page-height - 2px);
   &.has-toolbar {
@@ -49,6 +51,8 @@
   .page-children {
     padding: 0;
     overflow: visible !important;
+    height: unset;
+    min-height: var(--container-height);
   }
 }
 
