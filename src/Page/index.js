@@ -3,12 +3,14 @@ import { useEffect } from 'react';
 import Icon from '@kne/react-icon';
 import ButtonGroup from '@kne/button-group';
 import classnames from 'classnames';
+import { useNavigate } from 'react-router-dom';
 import { useContext } from '../context';
 import style from './style.module.scss';
 import { Image } from '@kne/react-file';
 
 const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true, noPadding }) => {
   const { setToolbarShow, setMenuOpen, deviceIsMobile, userAvatar } = useContext();
+  const navigate = useNavigate();
   useEffect(() => {
     setToolbarShow && setToolbarShow(!!toolbar);
   }, [toolbar]);
@@ -25,7 +27,15 @@ const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true
     >
       <Flex justify="space-between" align="center" gap={20} className={classnames('page-header', style['page-header'])}>
         <Flex className={classnames('page-title-outer', style['page-title-outer'])} align="center" gap={4}>
-          {back && <Button type="text" icon={<Icon className={style['back-icon']} type="a-Typearrow_forward_ios" fontClassName="system" />} />}
+          {back && (
+            <Button
+              type="text"
+              icon={<Icon className={style['back-icon']} type="a-Typearrow_forward_ios" fontClassName="system" />}
+              onClick={() => {
+                navigate(-1);
+              }}
+            />
+          )}
           {!back && deviceIsMobile && (
             <Button
               type="link"
