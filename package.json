@@ -1,6 +1,6 @@
 {
   "name": "@kne/system-layout",
-  "version": "0.1.0-alpha.13",
+  "version": "0.2.0-alpha.0",
   "description": "用于一个系统初始化布局",
   "syntax": {
     "esmodules": true
@@ -74,10 +74,10 @@
   },
   "peerDependencies": {
     "antd": ">=5",
+    "lodash": "*",
     "react": "*",
     "react-dom": "*",
-    "react-router-dom": "*",
-    "lodash": "*"
+    "react-router-dom": "*"
   },
   "devDependencies": {
     "@kne/icon-build": "^0.1.7",
@@ -99,7 +99,6 @@
     "@kne/react-file": "^0.1.29",
     "@kne/react-icon": "^0.1.4",
     "@kne/react-intl": "^0.1.9",
-    "@kne/react-liquid-glass": "^0.1.1",
     "classnames": "^2.5.1",
     "simplebar-react": "^3.3.2"
   }
