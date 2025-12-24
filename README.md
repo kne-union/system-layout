@@ -49,6 +49,10 @@ import '@kne/system-layout/dist/index.css';
   width: 430px;
   margin: 0 auto;
   position: relative;
+
+  .toolbar-list {
+    position: absolute !important;
+  }
 }
 ```
 
@@ -219,6 +223,7 @@ const BaseExample = () => {
             ]
           }}>
           <Page
+            toolbar
             title="Home"
             buttonProps={{
               showLength: 1,

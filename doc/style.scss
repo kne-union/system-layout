@@ -2,4 +2,8 @@
   width: 430px;
   margin: 0 auto;
   position: relative;
+
+  .toolbar-list {
+    position: absolute !important;
+  }
 }

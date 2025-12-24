@@ -10,7 +10,7 @@ import { Image } from '@kne/react-file';
 const Page = ({ title, extra = null, back, buttonProps, children, toolbar }) => {
   const { setToolbarShow, setMenuOpen, deviceIsMobile, userAvatar } = useContext();
   useEffect(() => {
-    setToolbarShow && setToolbarShow(toolbar);
+    setToolbarShow && setToolbarShow(!!toolbar);
   }, [toolbar]);
   return (
     <Flex

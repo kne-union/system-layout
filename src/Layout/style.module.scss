@@ -1,8 +1,12 @@
 @mixin is-mobile {
   width: 100%;
-  height: unset;
   padding: 0;
   overflow: hidden;
+  --page-height: 100vh;
+  --page-content-height: var(--page-height - 2px);
+  &.has-toolbar {
+    --page-content-height: calc(var(--page-height) - 60px - 2px);
+  }
   .menu {
     position: absolute;
     left: calc(var(--menu-min-width) * -1);
@@ -44,6 +48,7 @@
 
   .page-children {
     padding: 0;
+    overflow: visible !important;
   }
 }
 
@@ -56,7 +61,7 @@
 .layout {
   --window-width: calc(100vw);
   --window-height: calc(100vh);
-  --page-height: calc(100vh - 48px);
+  --page-height: var(--window-height);
   --page-content-height: calc(var(--page-height) - 48px);
   width: var(--window-width);
   height: var(--window-height);
@@ -182,6 +187,7 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.3s;
+
   &:hover {
     transform: scale(1.2);
   }
@@ -231,7 +237,6 @@
 }
 
 .page {
-  height: var(--page-height);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.72) 100%);
