@@ -351,6 +351,7 @@
   --container-height: var(--page-content-height);
   height: var(--container-height);
   padding: 24px;
+  box-sizing: border-box;
 
   &.is-scroller {
     overflow-y: auto;
