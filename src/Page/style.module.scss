@@ -15,7 +15,7 @@
   }
   .page-inner {
     padding: 12px;
-    --content-height: calc(var(--page-content-height) - 48px);
+    --content-height: calc(var(--page-content-height) - 48px - 24px);
   }
 }
 

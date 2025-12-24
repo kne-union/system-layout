@@ -7,7 +7,7 @@ import { useContext } from '../context';
 import style from './style.module.scss';
 import { Image } from '@kne/react-file';
 
-const Page = ({ title, extra = null, back, buttonProps, children, toolbar }) => {
+const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true }) => {
   const { setToolbarShow, setMenuOpen, deviceIsMobile, userAvatar } = useContext();
   useEffect(() => {
     setToolbarShow && setToolbarShow(!!toolbar);
@@ -36,17 +36,15 @@ const Page = ({ title, extra = null, back, buttonProps, children, toolbar }) => 
           <div className={classnames('page-title', style['page-title'])}>{title}</div>
         </Flex>
         <div className={classnames('page-title-extra', style['page-title-extra'])}>
-          {buttonProps ? (
-            deviceIsMobile ? (
-              <Flex gap={4} align="center">
-                <ButtonGroup {...Object.assign({}, buttonProps, deviceIsMobile ? { showLength: 0, moreType: 'link' } : {})} />
-                <Image.Avatar id={userAvatar} src={userAvatar} shape="circle" size={30} alt="avatar" />
-              </Flex>
-            ) : (
-              <ButtonGroup {...buttonProps} />
-            )
-          ) : (
+          {extra ? (
             extra
+          ) : deviceIsMobile ? (
+            <Flex gap={4} align="center">
+              {buttonProps && <ButtonGroup {...Object.assign({}, buttonProps, deviceIsMobile ? { showLength: 0, moreType: 'link' } : {})} />}
+              <Image.Avatar id={userAvatar} src={userAvatar} shape="circle" size={30} alt="avatar" />
+            </Flex>
+          ) : (
+            buttonProps && <ButtonGroup {...buttonProps} />
           )}
         </div>
       </Flex>
