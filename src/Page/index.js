@@ -7,7 +7,7 @@ import { useContext } from '../context';
 import style from './style.module.scss';
 import { Image } from '@kne/react-file';
 
-const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true }) => {
+const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true, noPadding }) => {
   const { setToolbarShow, setMenuOpen, deviceIsMobile, userAvatar } = useContext();
   useEffect(() => {
     setToolbarShow && setToolbarShow(!!toolbar);
@@ -18,7 +18,9 @@ const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true
       gap={24}
       className={classnames('page', style['page'], {
         ['is-mobile']: deviceIsMobile,
-        [style['is-mobile']]: deviceIsMobile
+        [style['is-mobile']]: deviceIsMobile,
+        ['no-padding']: noPadding,
+        [style['no-padding']]: noPadding
       })}
     >
       <Flex justify="space-between" align="center" gap={20} className={classnames('page-header', style['page-header'])}>
