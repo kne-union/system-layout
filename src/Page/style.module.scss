@@ -29,6 +29,10 @@
   &.is-mobile {
     @include is-mobile;
   }
+
+  &.no-padding .page-inner {
+    padding: 0;
+  }
 }
 
 .page-title {
@@ -39,10 +43,6 @@
 .page-inner {
   --content-height: calc(var(--page-content-height) - 48px - 60px);
   min-height: var(--content-height);
-
-  &.no-padding {
-    padding: 0;
-  }
 }
 
 .page-title-extra {
