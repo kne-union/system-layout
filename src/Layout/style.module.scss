@@ -5,7 +5,7 @@
   height: unset;
   min-height: var(--window-height);
   --page-height: 100vh;
-  --page-content-height: calc(var(--page-height) - var(--toolbar-height));
+  --page-content-height: calc(var(--page-height));
   --page-inner-height: calc(var(--page-height) - var(--nav-height) - var(--toolbar-height));
   --nav-height: 0px;
   --toolbar-height: 0px;
@@ -59,7 +59,7 @@
     padding: 0;
     overflow: visible !important;
     height: unset;
-    min-height: var(--container-height);
+    min-height: calc(var(--container-height) - var(--toolbar-height));
   }
 }
 

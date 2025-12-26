@@ -1,6 +1,6 @@
 {
   "name": "@kne/system-layout",
-  "version": "0.2.0-alpha.8",
+  "version": "0.2.0-alpha.9",
   "description": "用于一个系统初始化布局",
   "syntax": {
     "esmodules": true

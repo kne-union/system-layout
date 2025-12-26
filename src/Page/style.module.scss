@@ -17,6 +17,12 @@
     box-sizing: border-box;
     padding: 12px;
     --content-height: calc(var(--page-inner-height) - 24px);
+
+    &:after {
+      content: '';
+      display: block;
+      height: var(--toolbar-height);
+    }
   }
   &.no-padding .page-inner {
     --content-height: var(--page-inner-height);
