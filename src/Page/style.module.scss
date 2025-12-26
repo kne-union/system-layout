@@ -14,8 +14,12 @@
     flex: none;
   }
   .page-inner {
+    box-sizing: border-box;
     padding: 12px;
-    --content-height: calc(var(--page-content-height) - 48px - 24px);
+    --content-height: calc(var(--page-inner-height) - 24px);
+  }
+  &.no-padding .page-inner {
+    --content-height: var(--page-inner-height);
   }
 }
 
@@ -41,8 +45,8 @@
 }
 
 .page-inner {
-  --content-height: calc(var(--page-content-height) - 48px - 60px);
-  min-height: var(--content-height);
+  --content-height: var(--page-inner-height);
+  min-height: var(--page-inner-height);
 }
 
 .page-title-extra {

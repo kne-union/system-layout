@@ -5,9 +5,15 @@
   height: unset;
   min-height: var(--window-height);
   --page-height: 100vh;
-  --page-content-height: var(--page-height - 2px);
+  --page-content-height: calc(var(--page-height) - var(--toolbar-height));
+  --page-inner-height: calc(var(--page-height) - var(--nav-height) - var(--toolbar-height));
+  --nav-height: 0px;
+  --toolbar-height: 0px;
   &.has-toolbar {
-    --page-content-height: calc(var(--page-height) - 60px - 2px);
+    --toolbar-height: 60px;
+  }
+  &.has-navbar {
+    --nav-height: 48px;
   }
   .menu {
     position: absolute;
@@ -43,6 +49,7 @@
   }
   .page {
     border-radius: 0;
+    border: 0;
   }
   .toolbar {
     display: block;
@@ -63,9 +70,9 @@
 }
 
 .layout {
-  --window-width: calc(100vw);
-  --window-height: calc(100vh);
-  --page-height: var(--window-height);
+  --window-width: 100vw;
+  --window-height: 100vh;
+  --page-height: calc(var(--window-height) - 48px);
   --page-content-height: calc(var(--page-height) - 48px);
   width: var(--window-width);
   height: var(--window-height);
@@ -352,10 +359,10 @@
 }
 
 .page-children {
-  --container-height: var(--page-content-height);
-  height: var(--container-height);
+  --container-height: calc(var(--page-content-height) - 48px);
   padding: 24px;
   box-sizing: border-box;
+  height: var(--page-height);
 
   &.is-scroller {
     overflow-y: auto;
