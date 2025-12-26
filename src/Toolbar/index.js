@@ -43,6 +43,7 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
                 flex={1}
                 justify="center"
                 align="center"
+                gap={8}
                 className={classnames('toolbar-item', style['toolbar-item'], {
                   ['is-active']: active
                 })}

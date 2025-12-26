@@ -24,6 +24,9 @@
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   &:hover {
     backdrop-filter: brightness(1.1);
     transform: scale(1.02);

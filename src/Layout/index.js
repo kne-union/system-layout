@@ -37,6 +37,7 @@ const Layout = ({
   const localMenuOpen = localStorage.getItem(LayoutMenuOpenKey);
   const [menuOpen, setMenuOpen] = useState(typeof localMenuOpen === 'boolean' ? localMenuOpen : true);
   const [toolbarShow, setToolbarShow] = useState(true);
+  const [navbarShow, setNavbarShow] = useState(true);
   const [aiType, setAiType] = useState('closed');
   const deviceIsMobile = typeof isMobileProps === 'boolean' ? isMobileProps : isMobile();
   const openScrollbar = typeof openScrollbarProps === 'boolean' ? openScrollbarProps : !deviceIsMobile && !window.__COMPONENTS_CORE_SIMPLE_BAR_DISABLED;
@@ -44,6 +45,7 @@ const Layout = ({
   const contextValue = useMemo(() => {
     return {
       setToolbarShow,
+      setNavbarShow,
       setMenuOpen,
       deviceIsMobile,
       logo: Object.assign(
@@ -70,7 +72,9 @@ const Layout = ({
           'is-mobile': deviceIsMobile,
           [style['is-mobile']]: deviceIsMobile,
           'has-toolbar': deviceIsMobile && toolbarShow,
-          [style['has-toolbar']]: deviceIsMobile && toolbarShow
+          [style['has-toolbar']]: deviceIsMobile && toolbarShow,
+          'has-navbar': deviceIsMobile && navbarShow,
+          [style['has-navbar']]: deviceIsMobile && navbarShow
         })}
         style={{
           '--menu-max-width': menuMaxWidth,
