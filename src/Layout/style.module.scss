@@ -5,10 +5,8 @@
   height: unset;
   min-height: var(--window-height);
   --page-height: 100vh;
-  --page-content-height: calc(var(--page-height));
+  --page-content-height: var(--page-height);
   --page-inner-height: calc(var(--page-height) - var(--nav-height) - var(--toolbar-height));
-  --nav-height: 0px;
-  --toolbar-height: 0px;
   &.has-toolbar {
     --toolbar-height: 60px;
   }
@@ -72,8 +70,11 @@
 .layout {
   --window-width: 100vw;
   --window-height: 100vh;
+  --nav-height: 0px;
+  --toolbar-height: 0px;
   --page-height: calc(var(--window-height) - 48px);
   --page-content-height: calc(var(--page-height) - 48px);
+  --page-inner-height: calc(var(--page-height) - 48px - 60px);
   width: var(--window-width);
   height: var(--window-height);
   background: var(--background);
