@@ -58,7 +58,7 @@
 
 .page-inner {
   --content-height: var(--page-inner-height);
-  min-height: var(--page-inner-height);
+  min-height: calc(var(--page-inner-height) + var(--toolbar-height));
   display: flex;
   flex-direction: column;
 }
