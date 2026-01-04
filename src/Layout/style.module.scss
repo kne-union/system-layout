@@ -1,79 +1,81 @@
 @mixin common-style {
-  .ant-tag {
-    background: var(--primary-color-1);
-    border-radius: 11px;
-    color: var(--font-color-grey);
-  }
+  :global {
+    .ant-tag {
+      background: var(--primary-color-1);
+      border-radius: 11px;
+      color: var(--font-color-grey);
+    }
 
-  .ant-segmented {
-    border: 1px solid #d1d5db;
-    border-radius: 17px;
-    background: transparent;
-  }
+    .ant-segmented {
+      border: 1px solid #d1d5db;
+      border-radius: 17px;
+      background: transparent !important;
 
-  .ant-segmented-item,
-  .ant-segmented-thumb {
-    border-radius: 14px;
-  }
+      .ant-segmented-item,
+      .ant-segmented-thumb {
+        border-radius: 14px;
+      }
 
-  .ant-segmented-item.ant-segmented-item-selected,
-  .ant-segmented-thumb {
-    background: var(--primary-color);
-    color: #fff;
-  }
+      .ant-segmented-item.ant-segmented-item-selected,
+      .ant-segmented-thumb {
+        background: var(--primary-color) !important;
+        color: #fff !important;
+      }
 
-  .ant-segmented .ant-segmented-item:after {
-    background: transparent !important;
-  }
+      .ant-segmented-item:after {
+        background: transparent !important;
+      }
+    }
 
-  .filter .filter-title {
-    border-bottom: none;
-  }
+    .filter .filter-title {
+      border-bottom: none;
+    }
 
-  .react-form {
-    .ant-card {
+    .react-form {
+      .ant-card {
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+      }
+    }
+
+    .max-width-info-page {
       max-width: 900px;
       margin: 0 auto;
       width: 100%;
     }
-  }
 
-  .max-width-info-page {
-    max-width: 900px;
-    margin: 0 auto;
-    width: 100%;
-  }
+    .part.bordered {
+      background: #ffffff70 !important;
 
-  .part.bordered {
-    background: #ffffff70 !important;
-
-    .part-title {
-      font-size: 16px;
+      .part-title {
+        font-size: 16px;
+      }
     }
-  }
 
-  .ant-pagination-options-size-changer {
-    background: #ffffff70 !important;
-  }
+    .ant-pagination-options-size-changer {
+      background: #ffffff70 !important;
+    }
 
-  .ant-tree {
-    background: #ffffff70 !important;
-  }
+    .ant-tree {
+      background: #ffffff70 !important;
+    }
 
-  .ant-table,
-  .ant-table-placeholder {
-    background: #ffffff70 !important;
-  }
+    .ant-table,
+    .ant-table-placeholder {
+      background: #ffffff70 !important;
+    }
 
-  .ant-table-cell,
-  .ant-table-wrapper .ant-table-tbody > tr > td.ant-table-cell {
-    padding: 4px 8px;
-  }
+    .ant-table-cell,
+    .ant-table-wrapper .ant-table-tbody > tr > td.ant-table-cell {
+      padding: 4px 8px;
+    }
 
-  .ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell {
-    padding: 6px 16px;
-    font-weight: 400 !important;
-    color: var(--font-color-grey);
+    .ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell {
+      padding: 6px 16px;
+      font-weight: 400 !important;
+      color: var(--font-color-grey);
+    }
   }
 }
 
