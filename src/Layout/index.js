@@ -12,10 +12,10 @@ import { ReactComponent as ExpandIcon } from './expand.svg';
 import style from './style.module.scss';
 import ErrorBoundary from '../ErrorComponent';
 import SimpleBar from 'simplebar-react';
-import 'simplebar-react/dist/simplebar.min.css';
-import isMobile from '../isMobile';
 import { Provider } from '../context';
 import { useLocation } from 'react-router-dom';
+import useIsMobile from '../useIsMobile';
+import 'simplebar-react/dist/simplebar.min.css';
 
 const LayoutMenuOpenKey = 'LAYOUT_MENU_OPEN';
 
@@ -35,7 +35,8 @@ const Layout = ({
   children
 }) => {
   const localMenuOpen = localStorage.getItem(LayoutMenuOpenKey);
-  const deviceIsMobile = typeof isMobileProps === 'boolean' ? isMobileProps : isMobile();
+  const isMobile = useIsMobile();
+  const deviceIsMobile = typeof isMobileProps === 'boolean' ? isMobileProps : isMobile;
   const [menuOpen, setMenuOpen] = useState(typeof localMenuOpen === 'boolean' ? localMenuOpen : !deviceIsMobile);
   const [toolbarShow, setToolbarShow] = useState(true);
   const [navbarShow, setNavbarShow] = useState(true);
@@ -61,6 +62,7 @@ const Layout = ({
   }, [deviceIsMobile, logo, userAvatar]);
   const topRef = useRef(null);
   const location = useLocation();
+
   useEffect(() => {
     topRef.current && topRef.current.scrollIntoView();
   }, [location]);
