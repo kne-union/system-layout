@@ -1,4 +1,4 @@
-import { Flex, Button } from 'antd';
+import { Flex, Button, Skeleton } from 'antd';
 import { useEffect } from 'react';
 import Icon from '@kne/react-icon';
 import ButtonGroup from '@kne/button-group';
@@ -7,6 +7,16 @@ import { useNavigate } from 'react-router-dom';
 import { useContext } from '../context';
 import style from './style.module.scss';
 import { Image } from '@kne/react-file';
+
+const PageLoading = () => {
+  return (
+    <Flex flex={1} justify="center">
+      <div className={style['page-loading']}>
+        <Skeleton active />
+      </div>
+    </Flex>
+  );
+};
 
 const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true, navbar = true, noPadding }) => {
   const { setToolbarShow, setNavbarShow, setMenuOpen, deviceIsMobile, userAvatar } = useContext();
@@ -53,28 +63,44 @@ const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true
       </div>
     </Flex>
   ) : null;
-  const pageInnerClassName = classnames('page-inner', style['page-inner']);
+  const pageInnerClassNameOrigin = classnames('page-inner', style['page-inner']);
+  const pageInnerClassName = classnames(pageInnerClassNameOrigin, {
+    ['no-padding']: noPadding,
+    [style['no-padding']]: noPadding
+  });
+
+  const render = ({ children, className }) => {
+    return (
+      <>
+        {navbarEl}
+        <div className={classnames(pageInnerClassNameOrigin, className)}>{children}</div>
+      </>
+    );
+  };
+
   return (
     <Flex
       vertical
       gap={24}
       className={classnames('page', style['page'], {
         ['is-mobile']: deviceIsMobile,
-        [style['is-mobile']]: deviceIsMobile,
-        ['no-padding']: noPadding,
-        [style['no-padding']]: noPadding
+        [style['is-mobile']]: deviceIsMobile
       })}
     >
-      {typeof children === 'function' ? (
-        children({ navbar: navbarEl, className: pageInnerClassName })
-      ) : (
-        <>
-          {navbarEl}
-          <div className={pageInnerClassName}>{children}</div>
-        </>
-      )}
+      {typeof children === 'function'
+        ? children({
+            navbar: navbarEl,
+            className: pageInnerClassName,
+            render,
+            pageLoading: render({
+              children: <PageLoading />
+            })
+          })
+        : render({ children })}
     </Flex>
   );
 };
+
+Page.PageLoading = PageLoading;
 
 export default Page;
