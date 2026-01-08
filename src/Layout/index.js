@@ -37,7 +37,7 @@ const Layout = ({
   const localMenuOpen = localStorage.getItem(LayoutMenuOpenKey);
   const isMobile = useIsMobile();
   const deviceIsMobile = typeof isMobileProps === 'boolean' ? isMobileProps : isMobile;
-  const [menuOpen, setMenuOpen] = useState(typeof localMenuOpen === 'boolean' ? localMenuOpen : !deviceIsMobile);
+  const [menuOpen, setMenuOpen] = useState(typeof localMenuOpen === 'boolean' && !deviceIsMobile ? localMenuOpen : !deviceIsMobile);
   const [toolbarShow, setToolbarShow] = useState(true);
   const [navbarShow, setNavbarShow] = useState(true);
   const [aiType, setAiType] = useState('closed');

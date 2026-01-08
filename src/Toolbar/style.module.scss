@@ -1,6 +1,7 @@
 .toolbar {
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(10px);
+  padding-bottom: var(--safe-area-inset-bottom);
 }
 
 .toolbar-list {

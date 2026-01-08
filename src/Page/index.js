@@ -72,8 +72,14 @@ const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true
   const render = ({ children, className }) => {
     return (
       <>
-        {navbarEl}
-        <div className={classnames(pageInnerClassNameOrigin, className)}>{children}</div>
+        <div className={style['page-top']} />
+        <Flex vertical flex={1}>
+          {navbarEl}
+          <Flex vertical flex={1} className={classnames(pageInnerClassNameOrigin, className)}>
+            {children}
+          </Flex>
+        </Flex>
+        <div className={style['page-bottom']} />
       </>
     );
   };
@@ -81,7 +87,7 @@ const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true
   return (
     <Flex
       vertical
-      gap={24}
+      flex={1}
       className={classnames('page', style['page'], {
         ['is-mobile']: deviceIsMobile,
         [style['is-mobile']]: deviceIsMobile
