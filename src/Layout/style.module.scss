@@ -1,5 +1,44 @@
 @mixin common-style {
   :global {
+    .system-max-width-900 {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .system-font-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .system-font-title-primary {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .system-font-sub-title {
+      font-weight: bold;
+    }
+
+    .system-font-bold {
+      font-weight: bold;
+    }
+
+    .system-font-description {
+      color: var(--font-color-grey);
+    }
+
+    .scroller-bar {
+      background: transparent !important;
+      border-color: transparent !important;
+
+      .scroller-bar-inner {
+        background: #999 !important;
+        height: 40%;
+      }
+    }
+
     .ant-tag {
       background: var(--primary-color-1);
       border-radius: 11px;
@@ -76,6 +115,19 @@
       font-weight: 400 !important;
       color: var(--font-color-grey);
     }
+
+    .ant-table-wrapper .ant-table-cell-fix {
+      background: transparent;
+
+      &.ant-table-cell-fix-end-shadow-show,
+      &.ant-table-cell-fix-start-shadow-show {
+        background: var(--bg-color-grey);
+      }
+    }
+
+    .ant-tooltip-container {
+      max-width: 400px;
+    }
   }
 }
 
@@ -151,6 +203,9 @@
 .layout {
   --window-width: 100vw;
   --window-height: 100vh;
+  --multiple: var(--safe-area-multiple, 1);
+  --safe-area-inset-top: calc(env(safe-area-inset-top) * var(--multiple));
+  --safe-area-inset-bottom: calc(env(safe-area-inset-bottom) * var(--multiple));
   --nav-height: 0px;
   --toolbar-height: 0px;
   --page-height: calc(var(--window-height) - 48px);
@@ -162,6 +217,7 @@
   box-sizing: border-box;
   padding: 24px 24px 24px 0;
   position: relative;
+  line-height: 1.4;
   @include common-style;
 
   &.is-mobile {

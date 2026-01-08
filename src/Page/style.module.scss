@@ -4,6 +4,7 @@
     height: 48px;
     padding: 0 16px;
     background: #ffffff;
+    margin-bottom: 0;
   }
   .page-title {
     font-size: 16px;
@@ -49,6 +50,10 @@
   text-overflow: ellipsis;
 }
 
+.page-header {
+  margin-bottom: 12px;
+}
+
 .page-title {
   font-size: 20px;
   font-weight: 500;
@@ -74,6 +79,18 @@
   background: #fff;
   padding: 12px;
   border-radius: 12px;
+}
+
+.page-top {
+  display: block;
+  width: 100%;
+  padding-top: var(--safe-area-inset-top);
+}
+
+.page-bottom {
+  display: block;
+  width: 100%;
+  padding-bottom: var(--safe-area-inset-bottom);
 }
 
 .back-icon {
