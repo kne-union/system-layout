@@ -66,6 +66,9 @@ const Layout = ({
   useEffect(() => {
     topRef.current && topRef.current.scrollIntoView();
   }, [location]);
+
+  const userCard = <UserCard menuOpen={menuOpen} {...Object.assign({}, userInfo)} />;
+
   return (
     <Provider value={contextValue}>
       <div ref={topRef} />
@@ -122,7 +125,7 @@ const Layout = ({
             </div>
             <div className={classnames('menu-inner', style['menu-inner'])}>
               <div className={classnames('menu-header', style['menu-header'])}>
-                <ErrorBoundary>{menuHeader ? typeof menuHeader === 'function' ? menuHeader({ menuOpen }) : menuHeader : <UserCard menuOpen={menuOpen} {...Object.assign({}, userInfo)} />}</ErrorBoundary>
+                <ErrorBoundary>{menuHeader ? (typeof menuHeader === 'function' ? menuHeader({ menuOpen, userCard }) : menuHeader) : userCard}</ErrorBoundary>
               </div>
               <ErrorBoundary>
                 <Menu
