@@ -137,7 +137,7 @@
   overflow: hidden;
   height: unset;
   min-height: var(--window-height);
-  --page-height: 100vh;
+  --page-height: 100dvh;
   --page-content-height: var(--page-height);
   --page-inner-height: calc(var(--page-height) - var(--nav-height) - var(--toolbar-height));
   &.has-toolbar {
@@ -202,7 +202,7 @@
 
 .layout {
   --window-width: 100vw;
-  --window-height: 100vh;
+  --window-height: 100dvh;
   --multiple: var(--safe-area-multiple, 1);
   --safe-area-inset-top: calc(env(safe-area-inset-top) * var(--multiple));
   --safe-area-inset-bottom: calc(env(safe-area-inset-bottom) * var(--multiple));

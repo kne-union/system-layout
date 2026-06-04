@@ -3,7 +3,7 @@ import { Flex } from 'antd';
 import classnames from 'classnames';
 import style from './style.module.scss';
 
-const UserCard = ({ name, avatar, email, phone, description, menuOpen }) => {
+const UserCard = ({ name, avatar, email, phone, description, menuOpen, extra }) => {
   if (!menuOpen) {
     return <Image.Avatar id={avatar} src={avatar} shape="circle" size={40} alt="avatar" />;
   }
@@ -13,6 +13,7 @@ const UserCard = ({ name, avatar, email, phone, description, menuOpen }) => {
       <Flex vertical>
         <div className={classnames('username', style['username'])}>{name || '-'}</div>
         <div className={classnames('user-description', style['user-description'])}>{email || phone || description || '-'}</div>
+        {extra}
       </Flex>
     </Flex>
   );
