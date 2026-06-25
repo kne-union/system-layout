@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Icon from '@kne/react-icon';
 import classnames from 'classnames';
 import style from './style.module.scss';
-import { isValidElement } from 'react';
+import { isValidElement, useRef, useLayoutEffect, useState, useEffect } from 'react';
 import isPlainObject from 'lodash/isPlainObject';
 
 const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange, target }) => {
@@ -13,6 +13,95 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
   const navigate = useNavigate();
   const currentPathname = base ? location.pathname.replace(new RegExp(`^${base}`), '') : location.pathname;
   const toolbarMenu = items.filter(item => item.toolbar);
+  const itemRefs = useRef([]);
+  const firstRenderRef = useRef(true);
+  const [indicator, setIndicator] = useState({ left: 0, width: 0, scale: 1, visible: false });
+  const [clicked, setClicked] = useState(false);
+  const [scrolling, setScrolling] = useState(false);
+  const scrollTimerRef = useRef(null);
+
+  const activeIndex = toolbarMenu.findIndex(item => {
+    if (typeof activeKey === 'string') {
+      return activeKey === item.key;
+    }
+    if (typeof activeKey === 'function') {
+      return activeKey(item, { base });
+    }
+    if (typeof item.path === 'string') {
+      return ensureSlash(currentPathname) === ensureSlash(item.path);
+    }
+    return false;
+  });
+  const displayIndex = activeIndex >= 0 ? activeIndex : 0;
+
+  const listRef = useRef(null);
+
+  useLayoutEffect(() => {
+    if (activeIndex < 0) {
+      return;
+    }
+    const item = itemRefs.current[activeIndex];
+    const list = listRef.current;
+    if (!item || !list) {
+      return;
+    }
+
+    const itemRect = item.getBoundingClientRect();
+    const listRect = list.getBoundingClientRect();
+    const newLeft = itemRect.left - listRect.left;
+    const newWidth = itemRect.width;
+
+    if (firstRenderRef.current) {
+      firstRenderRef.current = false;
+      setIndicator({ left: newLeft, width: newWidth, scale: 1, visible: true });
+      return;
+    }
+
+    // Phase 1: scale up
+    setIndicator(prev => ({ ...prev, scale: 1.15 }));
+
+    // Phase 2: move
+    const t1 = setTimeout(() => {
+      setIndicator(prev => ({ ...prev, left: newLeft, width: newWidth }));
+    }, 120);
+
+    // Phase 3: scale down
+    const t2 = setTimeout(() => {
+      setIndicator(prev => ({ ...prev, scale: 1 }));
+    }, 380);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [activeIndex, show, target]);
+
+  const resolvedTarget = target ? (typeof target === 'function' ? target() : target) : null;
+
+  useEffect(() => {
+    if (!resolvedTarget) {
+      return;
+    }
+    const handleScroll = () => {
+      setScrolling(true);
+      if (scrollTimerRef.current) {
+        clearTimeout(scrollTimerRef.current);
+      }
+      scrollTimerRef.current = setTimeout(() => {
+        setScrolling(false);
+      }, 500);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    document.addEventListener('scroll', handleScroll, { passive: true, capture: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('scroll', handleScroll, { capture: true });
+      if (scrollTimerRef.current) {
+        clearTimeout(scrollTimerRef.current);
+      }
+    };
+  }, [resolvedTarget]);
 
   if (!show) {
     return null;
@@ -21,36 +110,53 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
   return (
     <div className={classnames('toolbar', style['toolbar'], className)}>
       {createPortal(
-        <Flex className={classnames('toolbar-list', style['toolbar-list'])}>
+        <Flex
+          ref={listRef}
+          className={classnames('toolbar-list', style['toolbar-list'], {
+            ['is-clicked']: clicked,
+            ['is-scrolling']: scrolling
+          })}
+          style={{
+            '--toolbar-count': toolbarMenu.length || 1
+          }}
+          onAnimationEnd={() => {
+            if (clicked) {
+              setClicked(false);
+            }
+          }}
+        >
+          {indicator.visible && (
+            <div
+              className={classnames('toolbar-indicator', style['toolbar-indicator'])}
+              style={{
+                left: `${indicator.left}px`,
+                width: `${indicator.width}px`,
+                transform: `scale(${indicator.scale})`
+              }}
+            />
+          )}
           {toolbarMenu.map((item, index) => {
-            const active = (() => {
-              if (typeof activeKey === 'string') {
-                return activeKey === item.key;
-              }
-              if (typeof activeKey === 'function') {
-                return activeKey(item, { base });
-              }
-              if (typeof item.path === 'string') {
-                return ensureSlash(currentPathname) === ensureSlash(item.path);
-              }
-              return false;
-            })();
+            const active = index === activeIndex;
             const icon = typeof item.icon === 'function' ? item.icon({ active }) : item.icon;
             return (
               <Flex
                 key={item.key || item.path || index}
+                ref={el => {
+                  itemRefs.current[index] = el;
+                }}
                 vertical
                 flex={1}
                 justify="center"
                 align="center"
-                gap={8}
                 className={classnames('toolbar-item', style['toolbar-item'], {
-                  ['is-active']: active
+                  ['is-active']: active,
+                  [style['is-hidden']]: scrolling && index !== displayIndex
                 })}
                 onClick={e => {
                   if (active) {
                     return;
                   }
+                  setClicked(true);
                   onChange && onChange(item, { base });
                   if (typeof item.onClick === 'function') {
                     item.onClick(item, { menuOpen, base, event: e });
@@ -81,7 +187,7 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
             );
           })}
         </Flex>,
-        target ? (typeof target === 'function' ? target() : target) : document.body
+        resolvedTarget || document.body
       )}
     </div>
   );

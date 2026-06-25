@@ -1,5 +1,5 @@
 import { Flex, Button, Skeleton } from 'antd';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Icon from '@kne/react-icon';
 import ButtonGroup from '@kne/button-group';
 import classnames from 'classnames';
@@ -21,13 +21,37 @@ const PageLoading = () => {
 const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true, navbar = true, noPadding }) => {
   const { setToolbarShow, setNavbarShow, setMenuOpen, deviceIsMobile, userAvatar } = useContext();
   const navigate = useNavigate();
+  const navbarRef = useRef(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   useEffect(() => {
     setToolbarShow && setToolbarShow(!!toolbar);
     setNavbarShow && setNavbarShow(!!navbar);
   }, [toolbar, navbar]);
 
+  useEffect(() => {
+    if (!deviceIsMobile || !navbar) {
+      return;
+    }
+    const handleScroll = () => {
+      const threshold = navbarRef.current ? navbarRef.current.offsetHeight : 48;
+      setIsScrolled(window.scrollY > threshold);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [deviceIsMobile, navbar]);
+
   const navbarEl = navbar ? (
-    <Flex justify="space-between" align="center" gap={20} className={classnames('page-header', style['page-header'])}>
+    <Flex
+      ref={navbarRef}
+      justify="space-between"
+      align="center"
+      gap={20}
+      className={classnames('page-header', style['page-header'], {
+        ['is-scrolled']: isScrolled,
+        [style['is-scrolled']]: isScrolled
+      })}
+    >
       <Flex className={classnames('page-title-outer', style['page-title-outer'])} align="center" gap={4}>
         {back && (
           <Button

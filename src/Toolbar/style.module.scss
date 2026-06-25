@@ -1,24 +1,112 @@
 .toolbar {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(10px);
-  padding-bottom: var(--safe-area-inset-bottom);
+  background: transparent;
 }
 
 .toolbar-list {
-  height: 60px;
+  height: 72px;
   position: fixed;
   z-index: 600;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  border-radius: 8px 8px 0 0;
-  box-shadow: 0 -2px 22.9px 0 rgba(78, 96, 139, 0.13);
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(10px);
+  bottom: calc(16px + var(--safe-area-inset-bottom, 0px));
+  left: 16px;
+  right: 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 4px 16px 0 rgba(78, 96, 139, 0.18),
+    0 2px 6px 0 rgba(78, 96, 139, 0.1),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 6px 8px;
+  box-sizing: border-box;
+  transition:
+    transform 0.3s ease,
+    width 0.3s ease,
+    background 0.3s ease,
+    padding 0.3s ease;
+
+  &:global(.is-scrolling) {
+    width: calc((100vw - 32px) / var(--toolbar-count, 4));
+    right: auto;
+    transform: scale(0.65);
+    transform-origin: left bottom;
+    padding: 8px;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    background: rgba(255, 255, 255, 0.1);
+
+    .toolbar-item {
+      padding: 0 !important;
+      flex: none !important;
+      width: 100%;
+      height: 100%;
+      gap: 0 !important;
+      order: 2;
+    }
+
+    .toolbar-item .toolbar-item-icon {
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toolbar-item:not(.is-hidden) {
+      order: 1;
+    }
+
+    .toolbar-item-label {
+      display: none;
+    }
+
+    .toolbar-indicator {
+      left: 8px !important;
+      right: 8px;
+      width: auto !important;
+    }
+  }
+
+  &:global(.is-clicked) {
+    animation: toolbar-click 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
+@keyframes toolbar-click {
+  0% {
+    transform: scaleX(1) scaleY(1);
+    filter: brightness(1);
+  }
+  25% {
+    transform: scaleX(0.98) scaleY(1.015);
+    filter: brightness(1.15);
+  }
+  55% {
+    transform: scaleX(1.008) scaleY(0.995);
+    filter: brightness(1.05);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
 }
 
 .toolbar-item {
   cursor: pointer;
+  border-radius: 999px;
+  padding: 4px 12px;
+  box-sizing: border-box;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+  transition: opacity 0.2s ease;
+  overflow: hidden;
+
+  .toolbar-item-icon,
+  .toolbar-item-label {
+    color: #333;
+    transition: color 0.5s ease;
+  }
 
   &:global(.is-active) {
     .toolbar-item-icon,
@@ -26,14 +114,43 @@
       color: var(--primary-color);
     }
   }
+
+  &.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    flex: 0 !important;
+    width: 0;
+    overflow: hidden;
+    padding: 0;
+  }
+}
+
+.toolbar-indicator {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  border-radius: 999px;
+  background: rgba(120, 120, 120, 0.22);
+  transition:
+    left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s ease;
+  z-index: 0;
+  pointer-events: none;
+  will-change: left, width, transform;
 }
 
 .toolbar-item .toolbar-item-icon {
   width: 24px;
   height: 24px;
   font-size: 24px;
+  line-height: 1;
 }
 
 .toolbar-item-label {
   font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }

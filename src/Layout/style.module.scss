@@ -141,13 +141,14 @@
   --page-content-height: var(--page-height);
   --page-inner-height: calc(var(--page-height) - var(--nav-height) - var(--toolbar-height));
   &.has-toolbar {
-    --toolbar-height: 60px;
+    --toolbar-height: 72px;
   }
   &.has-navbar {
     --nav-height: 48px;
   }
   .menu {
-    position: absolute;
+    position: fixed;
+    top: 0;
     left: calc(var(--menu-min-width) * -1);
     z-index: 900;
     background: var(--background);
@@ -159,7 +160,7 @@
     }
   }
   .layer-menu {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
@@ -181,6 +182,8 @@
   .page {
     border-radius: 0;
     border: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
   .toolbar {
     display: block;
