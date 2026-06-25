@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef, useEffect } from 'react';
+import { useMemo, useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { Flex, Row, Col } from 'antd';
 import classnames from 'classnames';
 import localStorage from '@kne/local-storage';
@@ -61,7 +61,15 @@ const Layout = ({
     };
   }, [deviceIsMobile, logo, userAvatar]);
   const topRef = useRef(null);
+  const pageRef = useRef(null);
+  const [computedToolbarTarget, setComputedToolbarTarget] = useState(toolbarTarget || null);
   const location = useLocation();
+
+  useLayoutEffect(() => {
+    if (!toolbarTarget) {
+      setComputedToolbarTarget(document.body);
+    }
+  }, [toolbarTarget]);
 
   useEffect(() => {
     topRef.current && topRef.current.scrollIntoView();
@@ -149,7 +157,7 @@ const Layout = ({
               )}
             </div>
           </div>
-          <Flex flex={1} className={classnames('page', style['page'])}>
+          <Flex flex={1} ref={pageRef} className={classnames('page', style['page'])}>
             <Row className={classnames('page-content', style['page-content'])}>
               {!deviceIsMobile && aiDialog && aiType === 'inner' && (
                 <Col span={8} className={classnames('page-dialog-outer', style['page-dialog-outer'])}>
@@ -225,7 +233,7 @@ const Layout = ({
             </div>
           )}
         </Flex>
-        <Toolbar {...menu} className={classnames(style['toolbar'])} show={deviceIsMobile && toolbarShow} target={toolbarTarget} />
+        <Toolbar {...menu} className={classnames(style['toolbar'])} show={deviceIsMobile && toolbarShow} target={computedToolbarTarget} />
       </div>
     </Provider>
   );
