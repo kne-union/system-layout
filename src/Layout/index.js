@@ -61,6 +61,80 @@ const LayoutResponsiveScope = ({ boundaryRef, scrollRef, getScrollElement, child
 
 const LayoutMenuOpenKey = 'LAYOUT_MENU_OPEN';
 
+const DRAG_THRESHOLD = 4;
+
+const MobileAiEntry = ({ variant, onOpen }) => {
+  const btnRef = useRef(null);
+  const dragRef = useRef(null);
+  const [pos, setPos] = useState(null);
+
+  const handlePointerDown = event => {
+    const node = btnRef.current;
+    if (!node) {
+      return;
+    }
+    // 与 toolbar 一致：boundary 模式下相对定位容器为 offsetParent，viewport 模式下相对视口
+    const container = node.offsetParent;
+    const rect = node.getBoundingClientRect();
+    const refLeft = container ? container.getBoundingClientRect().left : 0;
+    const refTop = container ? container.getBoundingClientRect().top : 0;
+    dragRef.current = {
+      startX: event.clientX,
+      startY: event.clientY,
+      originLeft: rect.left - refLeft,
+      originTop: rect.top - refTop,
+      refWidth: container ? container.clientWidth : window.innerWidth,
+      refHeight: container ? container.clientHeight : window.innerHeight,
+      size: node.offsetWidth,
+      moved: false
+    };
+    node.setPointerCapture?.(event.pointerId);
+  };
+
+  const handlePointerMove = event => {
+    const drag = dragRef.current;
+    if (!drag) {
+      return;
+    }
+    const dx = event.clientX - drag.startX;
+    const dy = event.clientY - drag.startY;
+    if (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD) {
+      drag.moved = true;
+    }
+    const maxLeft = Math.max(8, drag.refWidth - drag.size - 8);
+    const maxTop = Math.max(8, drag.refHeight - drag.size - 8);
+    setPos({
+      left: Math.min(Math.max(8, drag.originLeft + dx), maxLeft),
+      top: Math.min(Math.max(8, drag.originTop + dy), maxTop)
+    });
+  };
+
+  const handlePointerUp = event => {
+    const drag = dragRef.current;
+    dragRef.current = null;
+    btnRef.current?.releasePointerCapture?.(event.pointerId);
+    if (drag && !drag.moved) {
+      onOpen();
+    }
+  };
+
+  return (
+    <div
+      ref={btnRef}
+      className={classnames('ai-entry-mobile', style['ai-entry-mobile'], {
+        [style['is-viewport']]: variant === 'viewport',
+        [style['is-boundary']]: variant !== 'viewport'
+      })}
+      style={pos ? { left: `${pos.left}px`, top: `${pos.top}px`, right: 'auto', bottom: 'auto' } : undefined}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+    >
+      <Icon type="system-prompt" colorful />
+    </div>
+  );
+};
+
 const Layout = ({
   className,
   menu,
@@ -206,7 +280,7 @@ const Layout = ({
             }}
           />
         </ErrorBoundary>
-        {aiDialog && (
+        {aiDialog && !deviceIsMobile && (
           <div
             className={classnames('ai-entry', style['ai-entry'])}
             onClick={() => {
@@ -221,6 +295,73 @@ const Layout = ({
   );
 
   const portalMenu = useMenuPortal && menuPortalTarget;
+
+  const aiDialogWindow =
+    aiDialog && aiType === 'small' ? (
+      <div
+        className={classnames('ai-dialog-window', style['ai-dialog-window'], {
+          'is-mobile-full': deviceIsMobile,
+          [style['is-mobile-full']]: deviceIsMobile,
+          [style['is-viewport']]: deviceIsMobile && !portalMenu
+        })}
+      >
+        <Flex className={classnames('ai-dialog-window-title', style['ai-dialog-window-title'])}>
+          <div>{aiDialog.title}</div>
+          <Flex gap={10}>
+            {!deviceIsMobile && (
+              <Icon
+                className="btn"
+                type="icon-a-Typeopen_in_full"
+                fontClassName="system"
+                onClick={() => {
+                  setAiType('inner');
+                }}
+              />
+            )}
+            <Icon
+              className="btn"
+              type="icon-a-Typeclose"
+              fontClassName="system"
+              onClick={() => {
+                setAiType('closed');
+              }}
+            />
+          </Flex>
+        </Flex>
+        <ErrorBoundary>
+          <div className={classnames('ai-dialog-window-content', style['ai-dialog-window-content'])}>{aiDialog.content}</div>
+        </ErrorBoundary>
+      </div>
+    ) : null;
+
+  const aiEntryMobile = deviceIsMobile && aiDialog && aiType === 'closed' ? <MobileAiEntry variant={portalMenu ? 'boundary' : 'viewport'} onOpen={() => setAiType('small')} /> : null;
+
+  // portal 到 boundary（popup 挂载点）时，layout 上的 CSS 变量不会随 portal 继承，需要显式透传
+  const aiPortalVars = {
+    '--background': background,
+    '--toolbar-height': deviceIsMobile && toolbarShow ? '72px' : '0px',
+    '--safe-area-inset-top': 'env(safe-area-inset-top)',
+    '--safe-area-inset-bottom': 'env(safe-area-inset-bottom)'
+  };
+
+  const aiOverlayContent =
+    aiDialogWindow || aiEntryMobile ? (
+      <>
+        {aiDialogWindow}
+        {aiEntryMobile}
+      </>
+    ) : null;
+
+  const aiOverlay = !aiOverlayContent
+    ? null
+    : portalMenu
+      ? createPortal(
+          <div className={classnames('ai-boundary-overlay', style['ai-boundary-overlay'])} style={aiPortalVars}>
+            {aiOverlayContent}
+          </div>,
+          menuPortalTarget
+        )
+      : aiOverlayContent;
 
   return (
     <LayoutResponsiveScope boundaryRef={layoutBoundaryRef} scrollRef={pageScrollRef} getScrollElement={getPageScrollElement}>
@@ -302,35 +443,8 @@ const Layout = ({
                 </Col>
               </Row>
             </Flex>
-            {aiDialog && aiType === 'small' && (
-              <div className={classnames('ai-dialog-window', style['ai-dialog-window'])}>
-                <Flex className={classnames('ai-dialog-window-title', style['ai-dialog-window-title'])}>
-                  <div>{aiDialog.title}</div>
-                  <Flex gap={10}>
-                    <Icon
-                      className="btn"
-                      type="icon-a-Typeopen_in_full"
-                      fontClassName="system"
-                      onClick={() => {
-                        setAiType('inner');
-                      }}
-                    />
-                    <Icon
-                      className="btn"
-                      type="icon-a-Typeclose"
-                      fontClassName="system"
-                      onClick={() => {
-                        setAiType('closed');
-                      }}
-                    />
-                  </Flex>
-                </Flex>
-                <ErrorBoundary>
-                  <div className={classnames('ai-dialog-window-content', style['ai-dialog-window-content'])}>{aiDialog.content}</div>
-                </ErrorBoundary>
-              </div>
-            )}
           </Flex>
+          {aiOverlay}
           <Toolbar {...menu} className={classnames(style['toolbar'])} show={deviceIsMobile && toolbarShow} target={toolbarTarget} />
         </div>
       </Provider>

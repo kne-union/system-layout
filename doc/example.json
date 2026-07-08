@@ -40,6 +40,25 @@
       ]
     },
     {
+      "title": "AI 对话框",
+      "description": "桌面端 AI 招聘助手示例：通过左侧菜单底部入口唤起，支持小窗口（small）与内嵌面板（inner）两种形态。对话框内实现了完整的聊天交互——消息列表、快捷提问、模拟应答，贴近简历筛选、面试安排、JD 生成、Offer 评估等真实招聘业务场景",
+      "code": "./ai-dialog.js",
+      "scope": [
+        {
+          "name": "_SystemLayout",
+          "packageName": "@kne/current-lib_system-layout",
+          "importStatement": "import * as _SystemLayout from \"@kne/system-layout\""
+        },
+        {
+          "packageName": "@kne/current-lib_system-layout/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
       "title": "滚动加载",
       "description": "结合 @kne/scroll-loader 在 Page 内实现整页下拉无限加载：候选人列表随页面滚动到底部自动加载下一页，支持关键字搜索与阶段筛选，并根据 useIsMobile 响应式切换布局——移动端整行显示，PC 端使用 antd Masonry 瀑布流多列展示（卡片高度不统一）",
       "code": "./scroll.js",
