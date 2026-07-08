@@ -14,7 +14,7 @@
 | `logo` | `object` | 默认 Logo | Logo 配置，props 传递给 `@kne/react-file` 的 Image 组件 |
 | `menuHeader` | `ReactNode` \| `function` | 默认 UserCard | 菜单头部内容，函数形式接收 `{ menuOpen, userCard }` 参数 |
 | `userInfo` | `object` | - | 用户信息，详见 userInfo 配置 |
-| `aiDialog` | `object` | `null` | AI 对话框配置，包含 `title` 和 `content` 字段（仅桌面端） |
+| `aiDialog` | `object` | `null` | AI 对话框配置，包含 `title` 和 `content` 字段 |
 | `openScrollbar` | `boolean` | - | 是否开启自定义滚动条（SimpleBar），默认桌面端开启、移动端关闭 |
 | `isMobile` | `boolean` | - | 是否强制移动端模式，不设置时自动检测 |
 | `toolbarTarget` | `HTMLElement` | `document.body` | 移动端工具栏 Portal 的目标容器 |
@@ -38,7 +38,9 @@
 | `title` | `string` | 对话框标题 |
 | `content` | `ReactNode` | 对话框内容 |
 
-> AI 对话框支持三种状态：`closed`（关闭）、`small`（小窗口）、`inner`（内嵌面板）。仅桌面端可通过菜单底部入口按钮打开。
+> AI 对话框在桌面端支持三种状态：`closed`（关闭）、`small`（小窗口）、`inner`（内嵌面板），通过菜单底部入口按钮打开；`small` 与 `inner` 之间可通过窗口右上角图标切换。
+>
+> 移动端入口为悬浮在右下角（工具栏上方）的可拖动按钮，点击后以全屏形式展示对话框，仅提供关闭按钮，不支持内嵌面板模式。
 
 ---
 
