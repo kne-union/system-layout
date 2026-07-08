@@ -2,8 +2,8 @@
   "isFull": true,
   "list": [
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
+      "title": "基础布局",
+      "description": "移动端基础布局示例，展示 SystemLayout 在 isMobile 模式下的菜单、工具栏、用户信息和页面内容",
       "code": "./base.js",
       "scope": [
         {
@@ -13,13 +13,17 @@
         },
         {
           "packageName": "@kne/current-lib_system-layout/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
         }
       ]
     },
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
-      "code": "./mobile.js",
+      "title": "Page 组件",
+      "description": "Page 组件的各种功能：返回按钮、自定义内容、函数式子组件、加载状态、navbar/toolbar 控制等",
+      "code": "./page.js",
       "scope": [
         {
           "name": "_SystemLayout",
@@ -28,12 +32,43 @@
         },
         {
           "packageName": "@kne/current-lib_system-layout/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
         }
       ]
     },
     {
-      "title": "这里填写示例标题",
-      "description": "这里填写示例说明",
+      "title": "滚动加载",
+      "description": "结合 @kne/scroll-loader 在 Page 内实现整页下拉无限加载：候选人列表随页面滚动到底部自动加载下一页，支持关键字搜索与阶段筛选，并根据 useIsMobile 响应式切换布局——移动端整行显示，PC 端使用 antd Masonry 瀑布流多列展示（卡片高度不统一）",
+      "code": "./scroll.js",
+      "scope": [
+        {
+          "name": "_SystemLayout",
+          "packageName": "@kne/current-lib_system-layout",
+          "importStatement": "import * as _SystemLayout from \"@kne/system-layout\""
+        },
+        {
+          "packageName": "@kne/current-lib_system-layout/dist/index.css"
+        },
+        {
+          "name": "_ScrollLoader",
+          "packageName": "@kne/scroll-loader",
+          "importStatement": "import * as _ScrollLoader from \"@kne/scroll-loader\""
+        },
+        {
+          "packageName": "@kne/scroll-loader/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "图标字体",
+      "description": "项目内置的图标字体列表",
       "code": "./font.js",
       "scope": [
         {

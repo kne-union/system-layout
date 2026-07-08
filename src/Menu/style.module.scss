@@ -1,3 +1,22 @@
+.menu-list {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 4px 0;
+
+  :global(.rc-virtual-list-holder-inner) {
+    padding: 0 8px 0 16px;
+  }
+
+  :global(.rc-virtual-list-scrollbar) {
+    width: 4px !important;
+  }
+
+  :global(.rc-virtual-list-scrollbar-thumb) {
+    background: rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
 .menu-group {
   font-size: 12px;
   color: var(--font-color-grey);

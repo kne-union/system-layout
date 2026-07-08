@@ -1,11 +1,8 @@
-
 # system-layout
-
 
 ### 描述
 
 用于一个系统初始化布局
-
 
 ### 安装
 
@@ -13,17 +10,19 @@
 npm i --save @kne/system-layout
 ```
 
-
 ### 概述
 
 用于一个系统初始化布局，提供基础的页面结构和功能模块。
 
 #### 功能模块
 
-- **布局组件**：提供灵活的页面布局，支持菜单展开/折叠。
-- **用户信息展示**：支持用户卡片展示。
-- **菜单管理**：支持动态菜单配置和路由跳转。
-
+- **布局组件（SystemLayout）**：提供灵活的页面布局，支持桌面端和移动端两种模式。桌面端包含可展开/收起的侧边菜单，移动端为侧滑抽屉菜单 + 底部工具栏。
+- **页面组件（Page）**：提供标题栏、返回按钮、操作按钮组、加载状态等功能，支持函数式子组件自定义渲染。移动端标题栏滚动时自动收缩为胶囊样式。
+- **菜单管理（Menu）**：支持分组、图标、自定义激活项、自定义点击回调，菜单项可配置是否在移动端工具栏中显示。
+- **用户信息（UserCard）**：在菜单头部展示用户信息，支持头像、姓名、邮箱、手机号、描述等字段。
+- **AI 对话框**：桌面端支持 AI 对话框小窗口和内嵌面板两种展示模式。
+- **响应式工具**：透传 `@kne/responsive-utils` 的响应式工具，支持断点检测、媒体查询、弹层容器等功能。
+- **主题适配**：提供 `themeToken` 配置，将常用 Ant Design 组件背景色设为透明，适配半透明背景风格。
 
 #### 注意
 
@@ -37,110 +36,123 @@ import '@kne/system-layout/dist/index.css';
 #### TODO
 
 - [x] 完成基础布局
-- [ ] 适配到移动端
+- [x] 适配到移动端
+- [ ] 完善桌面端 AI 对话框功能
+
 
 ### 示例(全屏)
-
 
 #### 示例样式
 
 ```scss
-.mobile-layout {
-  width: 430px;
-  margin: 0 auto;
-  position: relative;
-
-  .toolbar-list {
-    position: absolute !important;
-  }
-}
+/* 示例样式 - 移动端布局示例无需额外样式 */
 ```
 
 #### 示例代码
 
-- 这里填写示例标题
-- 这里填写示例说明
-- _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css)
+- 基础布局
+- 移动端基础布局示例，展示 SystemLayout 在 isMobile 模式下的菜单、工具栏、用户信息和页面内容
+- _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),antd(antd)
 
 ```jsx
 const { default: SystemLayout, Page } = _SystemLayout;
+const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography } = antd;
+const { Text, Title } = Typography;
+
+const STATS = [
+  { title: '待办任务', value: 8, suffix: '项', color: '#1677ff' },
+  { title: '本月入职', value: 24, suffix: '人', color: '#52c41a' },
+  { title: '待面试', value: 15, suffix: '场', color: '#faad14' },
+  { title: '离职申请', value: 3, suffix: '份', color: '#ff4d4f' }
+];
+
+const ONBOARDING_STEPS = [
+  { title: '完善个人资料', done: true },
+  { title: '签署入职文件', done: true },
+  { title: '领取办公设备', done: false },
+  { title: '参加新人培训', done: false }
+];
 
 const BaseExample = () => {
+  const doneCount = ONBOARDING_STEPS.filter(step => step.done).length;
+  const percent = Math.round((doneCount / ONBOARDING_STEPS.length) * 100);
+
   return (
-    <div>
-      <SystemLayout
-        userInfo={{
-          name: 'Lucy L',
-          email: 'lucy@company.com'
-        }}
-        aiDialog={{}}
-        menu={{
-          base: '/SystemLayout',
-          items: [
-            {
-              path: '/',
-              label: 'Onboarding',
-              icon: ({ active }) => (active ? 'home' : 'home_line')
-            },
-            {
-              group: 'HIRING',
-              path: '/hiring',
-              label: 'Hiring Hub',
-              icon: 'icon-assignment_ind'
-            },
-            {
-              group: 'HIRING',
-              path: '/hiring/application',
-              label: 'Application List',
-              icon: 'icon-assignment'
-            },
-            {
-              group: 'PEOPLE',
-              path: '/people',
-              label: 'Management',
-              icon: 'icon-automation'
-            },
-            {
-              group: 'TALENT REVIEW',
-              path: '/talent-review',
-              label: 'Projects',
-              icon: 'icon-manage_accounts'
-            },
-            {
-              group: 'TALENT REVIEW',
-              path: '/talent-review/employee',
-              label: 'Employee',
-              icon: 'icon-groups_2'
-            },
-            {
-              group: 'TALENT REVIEW',
-              path: '/talent-review/ai-models',
-              label: 'AI Models',
-              icon: 'icon-network_intelligence'
-            }
+    <SystemLayout
+      userInfo={{ name: 'Lucy L', email: 'lucy@company.com' }}
+      menu={{
+        base: '/SystemLayout',
+        items: [
+          { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
+          { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
+          { group: 'HIRING', path: '/hiring/application', label: 'Application List', icon: 'icon-assignment' },
+          { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: 'icon-automation' },
+          { group: 'TALENT REVIEW', path: '/talent-review', label: 'Projects', icon: 'icon-manage_accounts' },
+          { group: 'TALENT REVIEW', path: '/talent-review/employee', label: 'Employee', toolbar: true, icon: 'icon-groups_2' },
+          { group: 'TALENT REVIEW', path: '/talent-review/ai-models', label: 'AI Models', icon: 'icon-network_intelligence' }
+        ]
+      }}
+    >
+      <Page
+        title="Onboarding"
+        buttonProps={{
+          showLength: 1,
+          list: [
+            { type: 'primary', children: 'New' },
+            { children: 'Options' }
           ]
-        }}>
-        <Page
-          title="Home"
-          buttonProps={{
-            list: [
-              {
-                type: 'primary',
-                children: 'New'
-              },
-              {
-                children: 'Options'
-              },
-              {
-                loading: true,
-                children: 'Options2'
-              }
-            ]
-          }}>
-          Content
-        </Page>
-      </SystemLayout>
-    </div>
+        }}
+      >
+        <Flex vertical gap={16}>
+          <Card styles={{ body: { padding: 20 } }} style={{ background: 'rgba(255,255,255,0.5)' }}>
+            <Flex justify="space-between" align="center" wrap="wrap" gap={16}>
+              <Flex vertical gap={4}>
+                <Title level={4} style={{ margin: 0 }}>
+                  下午好，Lucy 👋
+                </Title>
+                <Text type="secondary">欢迎回到工作台，今天有 8 项待办事项等待处理。</Text>
+              </Flex>
+              <Tag color="processing" style={{ fontSize: 13, padding: '4px 12px' }}>
+                入职进度 {percent}%
+              </Tag>
+            </Flex>
+          </Card>
+
+          <Row gutter={[12, 12]}>
+            {STATS.map(stat => (
+              <Col xs={12} md={6} key={stat.title}>
+                <Card styles={{ body: { padding: 16 } }} style={{ background: 'rgba(255,255,255,0.5)' }}>
+                  <Statistic
+                    title={stat.title}
+                    value={stat.value}
+                    suffix={stat.suffix}
+                    valueStyle={{ color: stat.color, fontSize: 24 }}
+                  />
+                </Card>
+              </Col>
+            ))}
+          </Row>
+
+          <Card title="入职清单" styles={{ body: { padding: 20 } }} style={{ background: 'rgba(255,255,255,0.5)' }}>
+            <Flex vertical gap={16}>
+              <Progress percent={percent} strokeColor={{ from: '#1677ff', to: '#52c41a' }} />
+              <Flex vertical gap={10}>
+                {ONBOARDING_STEPS.map(step => (
+                  <Flex key={step.title} align="center" gap={10}>
+                    <Tag color={step.done ? 'success' : 'default'} style={{ margin: 0 }}>
+                      {step.done ? '已完成' : '待办'}
+                    </Tag>
+                    <Text delete={step.done} type={step.done ? 'secondary' : undefined}>
+                      {step.title}
+                    </Text>
+                  </Flex>
+                ))}
+              </Flex>
+            </Flex>
+          </Card>
+        </Flex>
+      </Page>
+    </SystemLayout>
   );
 };
 
@@ -148,105 +160,133 @@ render(<BaseExample />);
 
 ```
 
-- 这里填写示例标题
-- 这里填写示例说明
-- _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css)
+- Page 组件
+- Page 组件的各种功能：返回按钮、自定义内容、函数式子组件、加载状态、navbar/toolbar 控制等
+- _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),antd(antd)
 
 ```jsx
 const { default: SystemLayout, Page } = _SystemLayout;
-const { useRef, useState, useEffect } = React;
+const { useState } = React;
+const { Segmented, Button, Flex, Card, Alert, Descriptions, Empty } = antd;
+
+const MODE_OPTIONS = [
+  { label: '基础', value: 'basic' },
+  { label: '返回', value: 'back' },
+  { label: 'Extra', value: 'extra' },
+  { label: '无填充', value: 'noPadding' },
+  { label: '函数式', value: 'function' },
+  { label: '无导航', value: 'noNavbar' },
+  { label: '无工具栏', value: 'noToolbar' }
+];
+
+const MODE_TIPS = {
+  basic: '标准页面：标题栏 + 操作按钮组 + 内容区。',
+  back: '已启用返回按钮（back），点击会调用 navigate(-1)。',
+  extra: '已自定义 extra 内容，替代默认的按钮组。',
+  noPadding: '已移除内容区内边距（noPadding），适合放置全屏地图、表格等。',
+  function: '函数式子组件模式：Page 将渲染控制权交给 children 函数。',
+  noNavbar: '已隐藏顶部导航栏（navbar=false）。',
+  noToolbar: '已隐藏底部工具栏（toolbar=false）。'
+};
+
+const ModeSwitcher = ({ mode, setMode }) => (
+  <Segmented block value={mode} onChange={setMode} options={MODE_OPTIONS} />
+);
+
+const menu = {
+  base: '/SystemLayout',
+  items: [
+    { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
+    { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
+    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: 'icon-automation' }
+  ]
+};
+
+const FunctionParams = () => (
+  <Descriptions column={1} size="small" bordered items={[
+    { key: 'navbar', label: 'navbar', children: '导航栏元素' },
+    { key: 'className', label: 'className', children: '内容区类名（含 noPadding 等）' },
+    { key: 'render', label: 'render', children: '标准渲染函数，用于包裹自定义内容' },
+    { key: 'pageLoading', label: 'pageLoading', children: '加载状态元素（含骨架屏）' }
+  ]} />
+);
+
 const BaseExample = () => {
-  const ref = useRef(null);
-  const [toolbarTarget, setToolbarTarget] = useState(null);
-  useEffect(() => {
-    setToolbarTarget(ref.current);
-  }, []);
+  const [mode, setMode] = useState('basic');
+  const [loading, setLoading] = useState(false);
+
   return (
-    <div className="mobile-layout">
-      {toolbarTarget && (
-        <SystemLayout
-          isMobile
-          toolbarTarget={toolbarTarget}
-          userInfo={{
-            name: 'Lucy L',
-            email: 'lucy@company.com'
-          }}
-          aiDialog={{}}
-          menu={{
-            base: '/SystemLayout',
-            items: [
-              {
-                path: '/',
-                label: 'Onboarding',
-                toolbar: true,
-                icon: ({ active }) => (active ? 'home' : 'home_line')
-              },
-              {
-                group: 'HIRING',
-                path: '/hiring',
-                label: 'Hiring Hub',
-                toolbar: true,
-                icon: 'icon-assignment_ind'
-              },
-              {
-                group: 'HIRING',
-                path: '/hiring/application',
-                label: 'Application List',
-                toolbar: true,
-                icon: 'icon-assignment'
-              },
-              {
-                group: 'PEOPLE',
-                path: '/people',
-                label: 'Management',
-                icon: 'icon-automation'
-              },
-              {
-                group: 'TALENT REVIEW',
-                path: '/talent-review',
-                label: 'Projects',
-                icon: 'icon-manage_accounts'
-              },
-              {
-                group: 'TALENT REVIEW',
-                path: '/talent-review/employee',
-                label: 'Employee',
-                toolbar: true,
-                icon: 'icon-groups_2'
-              },
-              {
-                group: 'TALENT REVIEW',
-                path: '/talent-review/ai-models',
-                label: 'AI Models',
-                icon: 'icon-network_intelligence'
+    <SystemLayout userInfo={{ name: 'Lucy L', email: 'lucy@company.com' }} menu={menu}>
+      <Page
+        title="Page 组件演示"
+        back={mode === 'back'}
+        extra={mode === 'extra' ? <Button size="small" type="primary">自定义操作</Button> : null}
+        noPadding={mode === 'noPadding'}
+        navbar={mode !== 'noNavbar'}
+        toolbar={mode !== 'noToolbar'}
+        buttonProps={{
+          showLength: 1,
+          list: [
+            { type: 'primary', children: 'New' },
+            { children: 'Options' },
+            { children: 'Export' }
+          ]
+        }}
+      >
+        {mode === 'function'
+          ? ({ render, pageLoading }) => {
+              if (loading) {
+                return pageLoading;
               }
-            ]
-          }}>
-          <Page
-            toolbar
-            title="Home"
-            buttonProps={{
-              showLength: 1,
-              list: [
-                {
-                  type: 'primary',
-                  children: 'New'
-                },
-                {
-                  children: 'Options'
-                },
-                {
-                  loading: true,
-                  children: 'Options2'
-                }
-              ]
-            }}>
-            Content
-          </Page>
-        </SystemLayout>
-      )}
-      <div ref={ref} />
-    </div>
+              return render({
+                children: (
+                  <Flex vertical gap={16}>
+                    <ModeSwitcher mode={mode} setMode={setMode} />
+                    <Alert type="info" showIcon message={MODE_TIPS.function} />
+                    <Card size="small" title="children 函数参数">
+                      <FunctionParams />
+                    </Card>
+                    <Button
+                      type="primary"
+                      loading={loading}
+                      onClick={() => {
+                        setLoading(true);
+                        setTimeout(() => setLoading(false), 2000);
+                      }}
+                    >
+                      模拟加载（展示骨架屏）
+                    </Button>
+                  </Flex>
+                )
+              });
+            }
+          : (
+            <Flex vertical gap={16}>
+              <ModeSwitcher mode={mode} setMode={setMode} />
+              {mode === 'noPadding' ? (
+                <Flex
+                  align="center"
+                  justify="center"
+                  style={{ background: 'rgba(0,0,0,0.04)', height: 300, borderRadius: 8 }}
+                >
+                  <Empty description="无内边距内容区（noPadding）" />
+                </Flex>
+              ) : (
+                <>
+                  <Alert type="info" showIcon message={MODE_TIPS[mode]} />
+                  <Card size="small" style={{ background: 'rgba(255,255,255,0.5)' }}>
+                    <Descriptions column={1} size="small" items={[
+                      { key: 'mode', label: '当前模式', children: mode },
+                      { key: 'desc', label: '说明', children: 'Page 提供标题栏、返回按钮、操作按钮组与自定义内容。' },
+                      { key: 'mobile', label: '移动端', children: '标题栏固定在顶部，向下滚动时收缩为胶囊样式。' }
+                    ]} />
+                  </Card>
+                </>
+              )}
+            </Flex>
+          )}
+      </Page>
+    </SystemLayout>
   );
 };
 
@@ -254,8 +294,301 @@ render(<BaseExample />);
 
 ```
 
-- 这里填写示例标题
-- 这里填写示例说明
+- 滚动加载
+- 结合 @kne/scroll-loader 在 Page 内实现整页下拉无限加载：候选人列表随页面滚动到底部自动加载下一页，支持关键字搜索与阶段筛选，并根据 useIsMobile 响应式切换布局——移动端整行显示，PC 端使用 antd Masonry 瀑布流多列展示（卡片高度不统一）
+- _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),_ScrollLoader(@kne/scroll-loader)[import * as _ScrollLoader from "@kne/scroll-loader"],(@kne/scroll-loader/dist/index.css),antd(antd)
+
+```jsx
+const { default: SystemLayout, Page, useIsMobile } = _SystemLayout;
+const { FetchScrollLoader } = _ScrollLoader;
+const { Flex, Avatar, Tag, Typography, Input, Select, Progress, Empty, Divider, Masonry } = antd;
+const { useState } = React;
+const { Text } = Typography;
+
+const STAGES = [
+  { value: 'screening', label: '简历筛选', color: 'default' },
+  { value: 'interview', label: '面试中', color: 'processing' },
+  { value: 'offer', label: '已发 Offer', color: 'success' },
+  { value: 'rejected', label: '未通过', color: 'error' }
+];
+
+const POSITIONS = [
+  { title: '高级前端工程师', dept: '技术部' },
+  { title: '产品经理', dept: '产品部' },
+  { title: 'UI/UX 设计师', dept: '设计部' },
+  { title: '数据分析师', dept: '数据部' },
+  { title: '增长运营专员', dept: '运营部' }
+];
+
+const FIRST_NAMES = ['伟', '芳', '娜', '秀英', '敏', '静', '强', '磊', '洋', '艳', '勇', '军', '杰', '娟', '涛', '明'];
+const SURNAMES = ['王', '李', '张', '刘', '陈', '杨', '赵', '黄', '周', '吴', '徐', '孙', '马', '朱', '胡', '林'];
+
+const AVATAR_COLORS = ['#1677ff', '#52c41a', '#faad14', '#eb2f96', '#722ed1', '#13c2c2'];
+
+const SKILLS = ['React', 'Vue', 'TypeScript', 'Node.js', 'Figma', '数据分析', 'Python', '项目管理', 'SQL', '增长策略', 'A/B 测试', 'UI 设计'];
+
+// 长度不一的自我介绍，用于制造瀑布流所需的高度差异
+const BIOS = [
+  '专注体验设计，擅长从 0 到 1 搭建产品。',
+  '有丰富的团队协作经验，能够快速融入并推动项目落地，善于在复杂需求中拆解优先级、平衡各方诉求并持续交付高质量成果。',
+  '注重数据驱动决策。',
+  '热爱技术钻研，长期关注前沿趋势，乐于分享与沉淀方法论，希望在更大的舞台上创造价值，同时帮助团队成员共同成长。',
+  ''
+];
+
+// 模拟候选人列表接口：支持关键字搜索与阶段筛选，返回分页数据
+const mockCandidateList = ({ data = {} }) => {
+  const { currentPage = 1, perPage = 12, keyword, stage } = data;
+  return new Promise(resolve => {
+    const allCandidates = Array.from({ length: 128 }, (_, i) => {
+      const position = POSITIONS[i % POSITIONS.length];
+      const stageInfo = STAGES[i % STAGES.length];
+      return {
+        id: i + 1,
+        name: &#96;${SURNAMES[i % SURNAMES.length]}${FIRST_NAMES[(i * 3) % FIRST_NAMES.length]}&#96;,
+        position: position.title,
+        department: position.dept,
+        stage: stageInfo.value,
+        matchScore: 60 + ((i * 7) % 40),
+        experience: 1 + (i % 12),
+        location: ['北京', '上海', '深圳', '杭州', '广州', '成都'][i % 6],
+        appliedAt: &#96;2024-${String((i % 12) + 1).padStart(2, '0')}-${String((i % 28) + 1).padStart(2, '0')}&#96;,
+        skills: SKILLS.slice((i * 2) % SKILLS.length, ((i * 2) % SKILLS.length) + 2 + (i % 4)),
+        bio: BIOS[i % BIOS.length]
+      };
+    });
+
+    let filtered = allCandidates;
+    if (keyword) {
+      filtered = filtered.filter(item => item.name.includes(keyword) || item.position.includes(keyword));
+    }
+    if (stage) {
+      filtered = filtered.filter(item => item.stage === stage);
+    }
+
+    const start = (currentPage - 1) * perPage;
+    const pageData = filtered.slice(start, start + perPage);
+
+    setTimeout(() => {
+      resolve({ totalCount: filtered.length, pageData });
+    }, 700);
+  });
+};
+
+const getStageInfo = value => STAGES.find(item => item.value === value) || STAGES[0];
+
+const getScoreColor = score => (score >= 90 ? '#52c41a' : score >= 75 ? '#1677ff' : '#faad14');
+
+// 移动端：整行横向布局（头像 + 信息 + 匹配度）
+const CandidateRow = ({ item }) => {
+  const stageInfo = getStageInfo(item.stage);
+  return (
+    <Flex
+      align="center"
+      gap={16}
+      style={{
+        padding: 16,
+        background: 'rgba(255, 255, 255, 0.6)',
+        border: '1px solid rgba(0, 0, 0, 0.06)',
+        borderRadius: 12
+      }}
+    >
+      <Avatar size={48} style={{ backgroundColor: AVATAR_COLORS[item.id % AVATAR_COLORS.length], flex: 'none' }}>
+        {item.name.slice(0, 1)}
+      </Avatar>
+      <Flex vertical gap={6} flex={1} style={{ minWidth: 0 }}>
+        <Flex align="center" gap={8} wrap="wrap">
+          <Text strong style={{ fontSize: 15 }}>
+            {item.name}
+          </Text>
+          <Tag color={stageInfo.color}>{stageInfo.label}</Tag>
+        </Flex>
+        <Flex align="center" gap={8} wrap="wrap">
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            {item.position}
+          </Text>
+          <Divider type="vertical" style={{ margin: 0 }} />
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            {item.department}
+          </Text>
+          <Divider type="vertical" style={{ margin: 0 }} />
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            {item.location} · {item.experience} 年经验
+          </Text>
+        </Flex>
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          投递于 {item.appliedAt}
+        </Text>
+      </Flex>
+      <Flex vertical align="center" gap={4} style={{ flex: 'none', width: 96 }}>
+        <Progress
+          type="circle"
+          size={52}
+          percent={item.matchScore}
+          strokeColor={getScoreColor(item.matchScore)}
+          format={percent => &#96;${percent}&#96;}
+        />
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          匹配度
+        </Text>
+      </Flex>
+    </Flex>
+  );
+};
+
+// PC 端：卡片纵向布局，用于瀑布流展示（内容长度不一，高度自然不统一）
+const CandidateCard = ({ item }) => {
+  const stageInfo = getStageInfo(item.stage);
+  return (
+    <Flex
+      vertical
+      gap={12}
+      style={{
+        padding: 16,
+        background: 'rgba(255, 255, 255, 0.6)',
+        border: '1px solid rgba(0, 0, 0, 0.06)',
+        borderRadius: 12
+      }}
+    >
+      <Flex align="center" gap={12}>
+        <Avatar size={44} style={{ backgroundColor: AVATAR_COLORS[item.id % AVATAR_COLORS.length], flex: 'none' }}>
+          {item.name.slice(0, 1)}
+        </Avatar>
+        <Flex vertical gap={4} flex={1} style={{ minWidth: 0 }}>
+          <Text strong ellipsis style={{ fontSize: 15 }}>
+            {item.name}
+          </Text>
+          <Tag color={stageInfo.color} style={{ margin: 0, width: 'fit-content' }}>
+            {stageInfo.label}
+          </Tag>
+        </Flex>
+        <Progress
+          type="circle"
+          size={48}
+          percent={item.matchScore}
+          strokeColor={getScoreColor(item.matchScore)}
+          format={percent => &#96;${percent}&#96;}
+        />
+      </Flex>
+      <Flex vertical gap={4}>
+        <Text type="secondary" ellipsis style={{ fontSize: 13 }}>
+          {item.position} · {item.department}
+        </Text>
+        <Text type="secondary" style={{ fontSize: 13 }}>
+          {item.location} · {item.experience} 年经验
+        </Text>
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          投递于 {item.appliedAt}
+        </Text>
+      </Flex>
+      {item.bio ? (
+        <Text style={{ fontSize: 13 }}>{item.bio}</Text>
+      ) : null}
+      <Flex gap={6} wrap="wrap">
+        {item.skills.map(skill => (
+          <Tag key={skill} style={{ margin: 0 }}>
+            {skill}
+          </Tag>
+        ))}
+      </Flex>
+    </Flex>
+  );
+};
+
+const menu = {
+  base: '/SystemLayout',
+  items: [
+    { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
+    { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
+    { group: 'HIRING', path: '/hiring/application', label: 'Application List', toolbar: true, icon: 'icon-assignment' },
+    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: 'icon-automation' }
+  ]
+};
+
+const BaseExample = () => {
+  const isMobile = useIsMobile();
+  const [keyword, setKeyword] = useState('');
+  const [stage, setStage] = useState(undefined);
+
+  return (
+    <SystemLayout userInfo={{ name: 'Lucy L', email: 'lucy@company.com' }} menu={menu}>
+      <Page title="候选人列表">
+        <FetchScrollLoader
+          useSimpleBar={false}
+          api={{ loader: mockCandidateList }}
+          searchProps={{ keyword, stage }}
+          getSearchProps={props => {
+            const result = {};
+            if (props.keyword) result.keyword = props.keyword;
+            if (props.stage) result.stage = props.stage;
+            return result;
+          }}
+          pagination={{ paramsType: 'data', current: 'currentPage', pageSizeName: 'perPage', pageSize: 12 }}
+          completeTips="— 已加载全部候选人 —"
+          render={({ fetchApi, children }) => (
+            <Flex vertical gap={16}>
+              <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
+                <Flex gap={12} align="center" wrap="wrap">
+                  <Input.Search
+                    placeholder="搜索姓名或职位"
+                    allowClear
+                    onSearch={setKeyword}
+                    style={{ width: 220 }}
+                  />
+                  <Select
+                    placeholder="按阶段筛选"
+                    allowClear
+                    value={stage}
+                    onChange={setStage}
+                    style={{ width: 140 }}
+                    options={STAGES.map(({ value, label }) => ({ value, label }))}
+                  />
+                </Flex>
+                <Text type="secondary">共 {fetchApi.data.totalCount} 位候选人</Text>
+              </Flex>
+              <Divider style={{ margin: 0 }} />
+              {children}
+            </Flex>
+          )}
+        >
+          {({ list }) => {
+            if (!list || list.length === 0) {
+              return (
+                <Flex justify="center" style={{ padding: 48 }}>
+                  <Empty description="没有符合条件的候选人" />
+                </Flex>
+              );
+            }
+            if (isMobile) {
+              return (
+                <Flex vertical gap={12}>
+                  {list.map(item => (
+                    <CandidateRow key={item.id} item={item} />
+                  ))}
+                </Flex>
+              );
+            }
+            return (
+              <Masonry
+                columns={{ xs: 1, sm: 2, lg: 3, xxl: 4 }}
+                gutter={12}
+                items={list.map(item => ({ key: item.id, data: item }))}
+                itemRender={({ data }) => <CandidateCard item={data} />}
+              />
+            );
+          }}
+        </FetchScrollLoader>
+      </Page>
+    </SystemLayout>
+  );
+};
+
+render(<BaseExample />);
+
+```
+
+- 图标字体
+- 项目内置的图标字体列表
 - _fontList(./src/icons/fonts),(./src/icons/index),_modulesDev(@kne/modules-dev/dist/create-entry)
 
 ```jsx
@@ -270,29 +603,208 @@ render(<BaseExample />);
 
 ```
 
-
 ### API
 
-| 属性 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `className` | `string` | - | 自定义类名 |
-| `menu` | `object` | - | 菜单配置 |
-| `background` | `string` | `linear-gradient(0deg, #BBCFE7 0%, #BBCFE7 100%), #FFFFFF` | 背景样式 |
-| `menuMaxWidth` | `string` | `254px` | 菜单最大宽度 |
-| `menuMinWidth` | `string` | `84px` | 菜单最小宽度 |
-| `logo` | `object` | - | Logo 配置 |
-| `menuHeader` | `ReactNode` | - | 菜单头部内容 |
-| `userInfo` | `object` | - | 用户信息 |
-| `aiDialog` | `object` | `null` | AI 对话框配置 |
-| `children` | `ReactNode` | - | 子组件 |
+### SystemLayout
 
-#### Menu 组件
+系统初始化布局组件，提供页面整体结构，包含侧边菜单、用户信息、页面内容区和移动端工具栏。支持桌面端和移动端两种模式。
+
+#### 属性
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
 | `className` | `string` | - | 自定义类名 |
-| `menuOpen` | `boolean` | - | 菜单是否展开 |
-| `items` | `array` | - | 菜单项配置 |
-| `activeKey` | `string` 或 `function` | - | 当前激活的菜单项 |
-| `base` | `string` | `''` | 基础路径 |
-| `onChange` | `function` | - | 菜单项点击回调 |
+| `menu` | `object` | - | 菜单配置对象，详见 Menu 配置 |
+| `background` | `string` | `linear-gradient(0deg, #BBCFE7 0%, #BBCFE7 100%), #FFFFFF` | 布局背景样式 |
+| `menuMaxWidth` | `string` | `254px` | 菜单展开时的最大宽度（桌面端） |
+| `menuMinWidth` | `string` | `84px` | 菜单收起时的最小宽度（桌面端） |
+| `logo` | `object` | 默认 Logo | Logo 配置，props 传递给 `@kne/react-file` 的 Image 组件 |
+| `menuHeader` | `ReactNode` \| `function` | 默认 UserCard | 菜单头部内容，函数形式接收 `{ menuOpen, userCard }` 参数 |
+| `userInfo` | `object` | - | 用户信息，详见 userInfo 配置 |
+| `aiDialog` | `object` | `null` | AI 对话框配置，包含 `title` 和 `content` 字段（仅桌面端） |
+| `openScrollbar` | `boolean` | - | 是否开启自定义滚动条（SimpleBar），默认桌面端开启、移动端关闭 |
+| `isMobile` | `boolean` | - | 是否强制移动端模式，不设置时自动检测 |
+| `toolbarTarget` | `HTMLElement` | `document.body` | 移动端工具栏 Portal 的目标容器 |
+| `children` | `ReactNode` | - | 页面内容，通常为 Page 组件 |
+
+#### userInfo 配置
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `name` | `string` | 用户名 |
+| `email` | `string` | 邮箱 |
+| `avatar` | `string` | 头像 URL |
+| `phone` | `string` | 手机号 |
+| `description` | `string` | 描述信息 |
+| `extra` | `ReactNode` | 额外展示内容 |
+
+#### aiDialog 配置
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `title` | `string` | 对话框标题 |
+| `content` | `ReactNode` | 对话框内容 |
+
+> AI 对话框支持三种状态：`closed`（关闭）、`small`（小窗口）、`inner`（内嵌面板）。仅桌面端可通过菜单底部入口按钮打开。
+
+---
+
+### Menu 配置
+
+Menu 组件由 SystemLayout 的 `menu` 属性配置，不需要单独使用。
+
+#### 属性
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `base` | `string` | `''` | 菜单基础路径，用于路由匹配时去除路径前缀 |
+| `items` | `array` | - | 菜单项数组，详见 menu items 配置 |
+| `activeKey` | `string` \| `function` | - | 当前激活项的 key，函数形式为 `(item, { menuOpen, base }) => boolean` |
+| `onChange` | `function` | - | 菜单项点击回调 `(item, { menuOpen, base }) => void` |
+
+#### menu items 配置
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `key` | `string` | `path` 或 `index` | 唯一标识 |
+| `path` | `string` | - | 路由路径，点击后导航至 `base + path` |
+| `label` | `string` | - | 显示文本 |
+| `icon` | `string` \| `function` \| `ReactElement` \| `object` | - | 图标配置，详见 icon 配置 |
+| `group` | `string` | - | 分组名称，相同 group 的项会归为一组 |
+| `groupLabel` | `string` | - | 分组显示文本，默认使用 `group` |
+| `toolbar` | `boolean` | `false` | 是否在移动端底部工具栏中显示 |
+| `onClick` | `function` | - | 自定义点击回调 `(item, { menuOpen, base, event }) => void`，设置后不会自动导航 |
+
+#### icon 配置
+
+icon 支持多种格式：
+
+- **string**：图标类型名，如 `'icon-assignment_ind'`，使用 `@kne/react-icon` 渲染
+- **function**：`({ active, menuOpen }) => string`，根据激活状态和菜单展开状态返回图标名
+- **ReactElement**：自定义图标元素
+- **object**：`{ type: string, ... }`，props 传递给 Icon 组件
+
+---
+
+### Page
+
+页面内容区组件，作为 SystemLayout 的子组件使用，提供标题栏、操作按钮、返回按钮等功能。
+
+#### 属性
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `title` | `ReactNode` | - | 页面标题 |
+| `extra` | `ReactNode` | `null` | 标题栏右侧自定义内容，设置后替代 `buttonProps` |
+| `back` | `boolean` | - | 是否显示返回按钮，点击调用 `navigate(-1)` |
+| `buttonProps` | `object` | - | 操作按钮组配置，传递给 `@kne/button-group` 的 ButtonGroup 组件 |
+| `toolbar` | `boolean` | `true` | 是否显示移动端底部工具栏 |
+| `navbar` | `boolean` | `true` | 是否显示顶部导航栏 |
+| `noPadding` | `boolean` | - | 是否移除内容区内边距 |
+| `children` | `ReactNode` \| `function` | - | 页面内容 |
+
+#### children 为函数时
+
+当 `children` 为函数时，Page 将渲染控制权交给子组件，函数接收以下参数：
+
+| 参数 | 类型 | 说明 |
+|------|------|------|
+| `navbar` | `ReactElement` | 导航栏元素 |
+| `className` | `string` | 内容区类名（包含 noPadding 等修饰类） |
+| `render` | `function` | 标准渲染函数，`({ children, className }) => ReactElement`，用于包裹自定义内容以保持标准页面结构 |
+| `pageLoading` | `ReactElement` | 加载状态元素（含骨架屏），可直接返回以显示加载状态 |
+
+#### buttonProps 配置
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `showLength` | `number` | 直接显示的按钮数量，其余收起到"更多"按钮中 |
+| `list` | `array` | 按钮配置数组，每项为 antd Button 的 props |
+| `moreType` | `string` | "更多"按钮的类型，移动端默认为 `'link'` |
+
+#### Page.PageLoading
+
+加载状态子组件，展示 Skeleton 骨架屏。
+
+---
+
+### useLayoutContext
+
+获取 Layout 上下文的 Hook，在 SystemLayout 内部的子组件中使用。
+
+```js
+import { useLayoutContext } from '@kne/system-layout';
+const { setToolbarShow, setNavbarShow, setMenuOpen, deviceIsMobile, logo, userAvatar } = useLayoutContext();
+```
+
+#### 返回值
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `setToolbarShow` | `(show: boolean) => void` | 控制移动端底部工具栏显示/隐藏 |
+| `setNavbarShow` | `(show: boolean) => void` | 控制移动端顶部导航栏显示/隐藏 |
+| `setMenuOpen` | `(open: boolean \| function) => void` | 控制菜单展开/收起 |
+| `deviceIsMobile` | `boolean` | 当前是否为移动端模式 |
+| `logo` | `object` | Logo 配置对象 |
+| `userAvatar` | `string` | 用户头像 URL |
+
+---
+
+### isMobile
+
+同步检测当前设备是否为移动端，基于 `window.matchMedia` 和移动端断点（768px）判断。
+
+```js
+import { isMobile } from '@kne/system-layout';
+const mobile = isMobile(); // boolean
+```
+
+### useIsMobile
+
+响应式移动端检测 Hook，窗口尺寸变化时自动更新。
+
+```js
+import { useIsMobile } from '@kne/system-layout';
+const mobile = useIsMobile(); // boolean
+```
+
+### MOBILE_BREAKPOINT
+
+移动端断点常量（`768px`），可与 `@kne/responsive-utils` 配合使用。
+
+```js
+import { MOBILE_BREAKPOINT } from '@kne/system-layout';
+```
+
+---
+
+### themeToken
+
+Ant Design 主题 Token 配置对象，将 `Input`、`InputNumber`、`Card`、`Tree`、`Select`、`DatePicker` 组件的背景色设为透明，适配 SystemLayout 的半透明背景风格。
+
+```js
+import { themeToken } from '@kne/system-layout';
+// 在 ConfigProvider 中使用
+<ConfigProvider theme={themeToken}>
+  <SystemLayout>...</SystemLayout>
+</ConfigProvider>
+```
+
+---
+
+### 响应式工具
+
+从 `@kne/responsive-utils` 透传的响应式工具，可通过 SystemLayout 直接引入：
+
+| 导出名 | 说明 |
+|--------|------|
+| `ResponsiveProvider` | 响应式 Provider 组件 |
+| `useBreakpoint` | 断点检测 Hook |
+| `useMediaQuery` | 媒体查询 Hook |
+| `usePopupContainer` | 弹层容器 Hook |
+| `useScrollElement` | 滚动元素 Hook |
+| `useResponsiveContext` | 响应式 Context Hook |
+| `mobileBreakpoint` | 移动端断点常量（同 `MOBILE_BREAKPOINT`） |
+| `RESPONSIVE_CONTAINER_CLASS` | 响应式容器 CSS 类名 |
+| `RESPONSIVE_BOUNDARY_CLASS` | 响应式边界 CSS 类名 |
+| `RESPONSIVE_SCROLL_CLASS` | 响应式滚动 CSS 类名 |
