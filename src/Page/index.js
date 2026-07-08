@@ -4,6 +4,7 @@ import Icon from '@kne/react-icon';
 import ButtonGroup from '@kne/button-group';
 import classnames from 'classnames';
 import { useNavigate } from 'react-router-dom';
+import { useScrollElement } from '@kne/responsive-utils';
 import { useContext } from '../context';
 import style from './style.module.scss';
 import { Image } from '@kne/react-file';
@@ -19,8 +20,9 @@ const PageLoading = () => {
 };
 
 const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true, navbar = true, noPadding }) => {
-  const { setToolbarShow, setNavbarShow, setMenuOpen, deviceIsMobile, userAvatar } = useContext();
+  const { setToolbarShow, setNavbarShow, setMenuOpen, deviceIsMobile, userAvatar, scrollReady } = useContext();
   const navigate = useNavigate();
+  const getScrollElement = useScrollElement();
   const navbarRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
   useEffect(() => {
@@ -32,14 +34,18 @@ const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true
     if (!deviceIsMobile || !navbar) {
       return;
     }
+    const scrollEl = getScrollElement();
+    if (!scrollEl || typeof scrollEl.addEventListener !== 'function') {
+      return;
+    }
     const handleScroll = () => {
       const threshold = navbarRef.current ? navbarRef.current.offsetHeight : 48;
-      setIsScrolled(window.scrollY > threshold);
+      setIsScrolled(scrollEl.scrollTop > threshold);
     };
     handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [deviceIsMobile, navbar]);
+    scrollEl.addEventListener('scroll', handleScroll, { passive: true });
+    return () => scrollEl.removeEventListener('scroll', handleScroll);
+  }, [deviceIsMobile, navbar, getScrollElement, scrollReady]);
 
   const navbarEl = navbar ? (
     <Flex

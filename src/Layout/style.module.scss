@@ -1,3 +1,6 @@
+@use '~@kne/responsive-utils/scss' as resp;
+@use '~@kne/responsive-utils/scss/viewport';
+
 @mixin common-style {
   :global {
     .system-max-width-900 {
@@ -184,6 +187,17 @@
     border: 0;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    flex: 1;
+    min-height: 0;
+  }
+  .page-content {
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+
+    :global(.ant-col) {
+      height: 100%;
+    }
   }
   .toolbar {
     display: block;
@@ -193,7 +207,10 @@
     padding: 0;
     overflow: visible !important;
     height: unset;
-    // min-height: calc(var(--container-height) - var(--toolbar-height));
+
+    &.is-scroller {
+      overflow: visible !important;
+    }
   }
 }
 
@@ -204,7 +221,7 @@
 }
 
 .layout {
-  --window-width: 100vw;
+  --window-width: var(--kne-viewport-width, 100vw);
   --window-height: 100dvh;
   --multiple: var(--safe-area-multiple, 1);
   --safe-area-inset-top: calc(env(safe-area-inset-top) * var(--multiple));
@@ -221,6 +238,8 @@
   padding: 24px 24px 24px 0;
   position: relative;
   line-height: 1.4;
+  display: flex;
+  flex-direction: column;
   @include common-style;
 
   &.is-mobile {
@@ -285,6 +304,9 @@
   flex: none;
   transition: width 0.3s;
   position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
   &.open {
     width: var(--menu-max-width);
@@ -293,10 +315,6 @@
   &:not(.open) {
     width: var(--menu-min-width);
 
-    .menu-inner {
-      padding: 0 16px;
-    }
-
     .logo {
       padding: 8px 16px;
       justify-content: center;
@@ -304,10 +322,61 @@
 
     .menu-header {
       padding: 12px 0;
+      margin: 0;
       border: none;
       background: none;
       justify-content: center;
     }
+  }
+}
+
+.menu-boundary-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--kne-viewport-height, 100dvh);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 700;
+}
+
+.menu.is-portaled {
+  position: absolute;
+  flex: none;
+  top: 0;
+  left: calc(var(--menu-min-width, 84px) * -1);
+  z-index: 900;
+  height: 100%;
+  background: var(--background);
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  transition:
+    left 0.3s,
+    width 0.3s;
+
+  &.open {
+    left: 0;
+    box-shadow: 0 -2px 22.9px 0 rgba(78, 96, 139, 0.13);
+  }
+}
+
+.layer-menu.is-portaled {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 800;
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms;
+
+  &.open {
+    opacity: 1;
+    pointer-events: auto;
   }
 }
 
@@ -364,8 +433,19 @@
 }
 
 .menu-inner {
-  padding: 0 8px 0 16px;
   margin-top: 12px;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+
+  &:has(.ai-entry) {
+    .menu-list {
+      padding-bottom: 56px;
+    }
+  }
 }
 
 .menu-header {
@@ -375,6 +455,7 @@
   backdrop-filter: blur(10px);
   min-height: 40px;
   padding: 12px 16px;
+  margin: 0 8px 0 16px;
   display: flex;
   justify-content: flex-start;
   overflow: hidden;
@@ -403,6 +484,8 @@
 
 .menu-list {
   margin-top: 16px;
+  flex: 1;
+  min-height: 0;
 }
 
 .ai-entry {
@@ -505,6 +588,8 @@
   padding: 24px;
   box-sizing: border-box;
   height: var(--page-height);
+  width: 100%;
+  max-width: 100%;
 
   &.is-scroller {
     overflow-y: auto;
@@ -513,6 +598,15 @@
 
 .page-content {
   width: 100%;
+
+  :global(.kne-responsive-container) {
+    container-type: inline-size;
+    container-name: kne-responsive;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
 }
 
 .ai-dialog-window-title {
