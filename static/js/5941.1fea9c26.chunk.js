@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_system_layout_0_2_0_alpha_20=self.webpackChunk_system_layout_0_2_0_alpha_20||[]).push([[5941],{15941(a,_,e){e.r(_),e.d(_,{createMinimalDocxPackage:()=>t.WX,getPart:()=>t._x,packageToArrayBuffer:()=>t.$$,parseDocx:()=>t.YS,withPart:()=>t.Qz});var t=e(96613);e(2638)}}]);
