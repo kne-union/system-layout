@@ -16,20 +16,22 @@ import SimpleBar from 'simplebar-react';
 import { Provider } from '../context';
 import { useLocation } from 'react-router-dom';
 import useIsMobile from '../useIsMobile';
-import { ResponsiveProvider, useResponsiveContext, defaultResponsiveContextValue, findResponsiveScroll, getDefaultScrollElement, RESPONSIVE_BOUNDARY_CLASS, RESPONSIVE_CONTAINER_CLASS, RESPONSIVE_SCROLL_CLASS } from '@kne/responsive-utils';
+import { ResponsiveProvider, useResponsiveContext, findResponsiveScroll, findScrollParent, getDefaultScrollElement, RESPONSIVE_BOUNDARY_CLASS, RESPONSIVE_CONTAINER_CLASS, RESPONSIVE_SCROLL_CLASS } from '@kne/responsive-utils';
 import 'simplebar-react/dist/simplebar.min.css';
-
-const hasParentResponsiveProvider = parent => {
-  return parent.getBoundaryElement !== defaultResponsiveContextValue.getBoundaryElement || parent.getScrollElement !== defaultResponsiveContextValue.getScrollElement;
-};
 
 const resolvePageScrollElement = (pageScrollRef, openScrollbar, deviceIsMobile) => {
   if (deviceIsMobile && !openScrollbar) {
     const anchor = pageScrollRef.current;
-    if (anchor && anchor.parentElement) {
-      const parentScroll = findResponsiveScroll(anchor.parentElement);
-      if (parentScroll) {
-        return parentScroll;
+    if (anchor) {
+      // example 手机外框：滚动在 SimpleBar wrapper 上；class 可能晚于首帧挂上，
+      // findScrollParent 不依赖 kne-responsive-scroll，避免 is-scrolled 监听绑错。
+      const marked = findResponsiveScroll(anchor.parentElement || anchor);
+      if (marked) {
+        return marked;
+      }
+      const scrollParent = findScrollParent(anchor);
+      if (scrollParent) {
+        return scrollParent;
       }
     }
     return getDefaultScrollElement();
@@ -47,13 +49,28 @@ const resolvePageScrollElement = (pageScrollRef, openScrollbar, deviceIsMobile) 
   return findResponsiveScroll(anchor) || getDefaultScrollElement();
 };
 
+// 始终覆盖本页 scroller（否则嵌套在 Global 下 sticky 会绑到 body）。
+// container 模式（example 手机外框）保留外层 boundary，toolbar/menu 才能 portal 到
+// .example-driver-device-scroll（非滚动内容区），absolute/fixed 相对手机视口生效。
 const LayoutResponsiveScope = ({ boundaryRef, scrollRef, getScrollElement, children }) => {
   const parent = useResponsiveContext();
-  if (hasParentResponsiveProvider(parent)) {
-    return children;
-  }
+  const inheritBoundary = parent.mode === 'container';
   return (
-    <ResponsiveProvider boundaryRef={boundaryRef} scrollRef={scrollRef} getScrollElement={getScrollElement}>
+    <ResponsiveProvider
+      mode={parent.mode}
+      containerWidth={parent.containerWidth}
+      boundaryRef={boundaryRef}
+      scrollRef={scrollRef}
+      getScrollElement={getScrollElement}
+      getBoundaryElement={
+        inheritBoundary
+          ? () => {
+              const fromParent = typeof parent.getBoundaryElement === 'function' ? parent.getBoundaryElement() : null;
+              return fromParent || null;
+            }
+          : undefined
+      }
+    >
       {children}
     </ResponsiveProvider>
   );

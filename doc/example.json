@@ -22,7 +22,7 @@
     },
     {
       "title": "Page 组件",
-      "description": "Page 组件的各种功能：返回按钮、自定义内容、函数式子组件、加载状态、navbar/toolbar 控制等",
+      "description": "Page 组件的各种功能：返回按钮、自定义内容、仅头像 / 头像+操作、函数式子组件、加载状态、navbar/toolbar 控制等；内容区加长，便于在手机预览中滚动查看导航栏胶囊态",
       "code": "./page.js",
       "scope": [
         {
@@ -78,6 +78,72 @@
         },
         {
           "packageName": "@kne/scroll-loader/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "表格列表页",
+      "description": "在 SystemLayout + Page 中接入 @kne/table-page：用 useScrollElement 绑定页面滚动实现 sticky 表头，覆盖 TablePage 自带的 tab / filter / search、分页、排序与批量操作，贴近招聘候选人列表场景",
+      "code": "./table-page.js",
+      "scope": [
+        {
+          "name": "_SystemLayout",
+          "packageName": "@kne/current-lib_system-layout",
+          "importStatement": "import * as _SystemLayout from \"@kne/system-layout\""
+        },
+        {
+          "packageName": "@kne/current-lib_system-layout/dist/index.css"
+        },
+        {
+          "name": "_TablePage",
+          "packageName": "@kne/table-page",
+          "importStatement": "import * as _TablePage from \"@kne/table-page\""
+        },
+        {
+          "packageName": "@kne/table-page/dist/index.css"
+        },
+        {
+          "name": "_ReactFilter",
+          "packageName": "@kne/react-filter",
+          "importStatement": "import * as _ReactFilter from \"@kne/react-filter\""
+        },
+        {
+          "packageName": "@kne/react-filter/dist/index.css"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
+      "title": "Tenant 租户设置",
+      "description": "参考 telent-coach：Authenticate + SystemLayout + Tenant@Setting，演示公司/组织/用户/权限设置页；preset 已注册 components-admin，接口走 mock 数据",
+      "code": "./tenant.js",
+      "scope": [
+        {
+          "name": "_SystemLayout",
+          "packageName": "@kne/current-lib_system-layout",
+          "importStatement": "import * as _SystemLayout from \"@kne/system-layout\""
+        },
+        {
+          "packageName": "@kne/current-lib_system-layout/dist/index.css"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "reactRouterDom",
+          "packageName": "react-router-dom"
+        },
+        {
+          "name": "icons",
+          "packageName": "@ant-design/icons"
         },
         {
           "name": "antd",

@@ -2,7 +2,7 @@ import merge from 'lodash/merge';
 import transform from 'lodash/transform';
 
 const transparentBgContainer = { colorBgContainer: 'transparent' };
-const transparentBgContainerComponents = ['Input', 'InputNumber', 'Card', 'Tree', 'Select', 'DatePicker'];
+const transparentBgContainerComponents = ['Input', 'InputNumber', 'Card', 'Tree', 'Select', 'DatePicker', 'Tabs'];
 
 const themeToken = {
   components: merge(

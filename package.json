@@ -1,6 +1,6 @@
 {
   "name": "@kne/system-layout",
-  "version": "0.2.0-alpha.23",
+  "version": "0.2.0-alpha.24",
   "description": "用于一个系统初始化布局",
   "syntax": {
     "esmodules": true
@@ -83,7 +83,9 @@
     "@kne/icon-build": "^0.1.7",
     "@kne/microbundle": "^0.15.5",
     "@kne/modules-dev": "^2.1.16",
+    "@kne/react-filter": "^1.0.11",
     "@kne/scroll-loader": "^0.1.14",
+    "@kne/table-page": "^0.1.11",
     "antd": "^6.5.0",
     "cross-env": "^7.0.3",
     "husky": "^9.0.11",
