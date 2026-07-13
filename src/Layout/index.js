@@ -19,22 +19,50 @@ import useIsMobile from '../useIsMobile';
 import { ResponsiveProvider, useResponsiveContext, findResponsiveScroll, findScrollParent, getDefaultScrollElement, RESPONSIVE_BOUNDARY_CLASS, RESPONSIVE_CONTAINER_CLASS, RESPONSIVE_SCROLL_CLASS } from '@kne/responsive-utils';
 import 'simplebar-react/dist/simplebar.min.css';
 
+const normalizeMarkedScrollElement = marked => {
+  if (!marked) {
+    return null;
+  }
+  if (typeof marked.getScrollElement === 'function') {
+    const fromApi = marked.getScrollElement();
+    if (fromApi) {
+      return fromApi;
+    }
+  }
+  if (marked.nodeType === 1) {
+    const wrapper = marked.querySelector('.simplebar-content-wrapper');
+    if (wrapper) {
+      return wrapper;
+    }
+  }
+  return marked;
+};
+
+const resolveDocumentScrollElement = () => {
+  if (typeof document === 'undefined') {
+    return null;
+  }
+  // 真实移动端滚 document，不要走 getDefaultScrollElement：
+  // 它会 document.querySelector(.kne-responsive-scroll)，容易绑到宿主页无关节点。
+  return document.scrollingElement || document.documentElement || document.body || null;
+};
+
 const resolvePageScrollElement = (pageScrollRef, openScrollbar, deviceIsMobile) => {
   if (deviceIsMobile && !openScrollbar) {
     const anchor = pageScrollRef.current;
     if (anchor) {
-      // example 手机外框：滚动在 SimpleBar wrapper 上；class 可能晚于首帧挂上，
-      // findScrollParent 不依赖 kne-responsive-scroll，避免 is-scrolled 监听绑错。
-      const marked = findResponsiveScroll(anchor.parentElement || anchor);
-      if (marked) {
-        return marked;
-      }
+      // 优先真实可滚祖先（example 手机外框 SimpleBar content-wrapper）
       const scrollParent = findScrollParent(anchor);
       if (scrollParent) {
         return scrollParent;
       }
+      // class 标记的外层可能不是滚动节点，需归一到 content-wrapper
+      const marked = normalizeMarkedScrollElement(findResponsiveScroll(anchor.parentElement || anchor));
+      if (marked) {
+        return marked;
+      }
     }
-    return getDefaultScrollElement();
+    return resolveDocumentScrollElement();
   }
   const anchor = pageScrollRef.current;
   if (anchor && typeof anchor.getScrollElement === 'function') {
