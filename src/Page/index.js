@@ -41,25 +41,41 @@ const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true
     if (!deviceIsMobile || !navbar) {
       return;
     }
-    let boundEl = null;
+    let boundKey = null;
     let remove = null;
 
     const bind = () => {
       const scrollEl = getScrollElement();
-      if (!scrollEl || typeof scrollEl.addEventListener !== 'function' || scrollEl === boundEl) {
+      if (!scrollEl) {
+        return;
+      }
+      const isDocumentScroll = typeof document !== 'undefined' && (scrollEl === document.scrollingElement || scrollEl === document.documentElement || scrollEl === document.body);
+      // document 滚动在部分环境听 element 不稳定，统一挂 window
+      const listenTarget = isDocumentScroll ? window : scrollEl;
+      if (!listenTarget || typeof listenTarget.addEventListener !== 'function') {
+        return;
+      }
+      const nextKey = isDocumentScroll ? 'window' : scrollEl;
+      if (nextKey === boundKey) {
         return;
       }
       if (typeof remove === 'function') {
         remove();
       }
-      boundEl = scrollEl;
+      boundKey = nextKey;
+      const readScrollTop = () => {
+        if (isDocumentScroll) {
+          return document.scrollingElement?.scrollTop ?? window.scrollY ?? 0;
+        }
+        return scrollEl.scrollTop || 0;
+      };
       const handleScroll = () => {
         const threshold = navbarRef.current ? navbarRef.current.offsetHeight : 48;
-        setIsScrolled(scrollEl.scrollTop > threshold);
+        setIsScrolled(readScrollTop() > threshold);
       };
       handleScroll();
-      scrollEl.addEventListener('scroll', handleScroll, { passive: true });
-      remove = () => scrollEl.removeEventListener('scroll', handleScroll);
+      listenTarget.addEventListener('scroll', handleScroll, { passive: true });
+      remove = () => listenTarget.removeEventListener('scroll', handleScroll);
     };
 
     bind();
