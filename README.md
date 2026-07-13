@@ -161,18 +161,25 @@ render(<BaseExample />);
 ```
 
 - Page 组件
-- Page 组件的各种功能：返回按钮、自定义内容、函数式子组件、加载状态、navbar/toolbar 控制等
+- Page 组件的各种功能：返回按钮、自定义内容、仅头像 / 头像+操作、函数式子组件、加载状态、navbar/toolbar 控制等；内容区加长，便于在手机预览中滚动查看导航栏胶囊态
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),antd(antd)
 
 ```jsx
 const { default: SystemLayout, Page } = _SystemLayout;
 const { useState } = React;
-const { Segmented, Button, Flex, Card, Alert, Descriptions, Empty } = antd;
+const { Segmented, Button, Flex, Card, Alert, Descriptions, Empty, Tag, Typography } = antd;
+const { Text } = Typography;
+
+const DEMO_AVATAR = 'https://api.dicebear.com/7.x/avataaars/svg?seed=Lucy';
 
 const MODE_OPTIONS = [
   { label: '基础', value: 'basic' },
   { label: '返回', value: 'back' },
   { label: 'Extra', value: 'extra' },
+  { label: '仅头像', value: 'avatarOnly' },
+  { label: '头像+操作', value: 'avatarActions' },
+  { label: '无头像', value: 'noAvatar' },
+  { label: '无右侧', value: 'noRight' },
   { label: '无填充', value: 'noPadding' },
   { label: '函数式', value: 'function' },
   { label: '无导航', value: 'noNavbar' },
@@ -182,12 +189,36 @@ const MODE_OPTIONS = [
 const MODE_TIPS = {
   basic: '标准页面：标题栏 + 操作按钮组 + 内容区。',
   back: '已启用返回按钮（back），点击会调用 navigate(-1)。',
-  extra: '已自定义 extra 内容，替代默认的按钮组。',
+  extra: '已自定义 extra 内容；移动端仍会在右侧保留头像。',
+  avatarOnly: '仅展示用户头像：无 buttonProps / extra，移动端右侧只有头像胶囊。',
+  avatarActions: '头像 + 额外操作：buttonProps 收起到「更多」，与头像并排；滚动后可看胶囊态。',
+  noAvatar: '无用户头像：userInfo 不传 avatar，移动端右侧仅保留操作（更多）或为空。',
+  noRight: '无右侧操作与头像：不传 buttonProps / extra / avatar，滚动后仅左侧标题胶囊。',
   noPadding: '已移除内容区内边距（noPadding），适合放置全屏地图、表格等。',
   function: '函数式子组件模式：Page 将渲染控制权交给 children 函数。',
   noNavbar: '已隐藏顶部导航栏（navbar=false）。',
   noToolbar: '已隐藏底部工具栏（toolbar=false）。'
 };
+
+const DEFAULT_BUTTON_PROPS = {
+  showLength: 1,
+  list: [
+    { type: 'primary', children: 'New' },
+    { children: 'Options' },
+    { children: 'Export' }
+  ]
+};
+
+const SCROLL_DEMO_ITEMS = [
+  { title: '滚动观察点 1', tip: '继续向下滚动，观察顶部导航是否变为胶囊态' },
+  { title: '滚动观察点 2', tip: '超过导航高度后，标题栏应收成毛玻璃胶囊' },
+  { title: '滚动观察点 3', tip: '右侧操作区（更多 + 头像）也应出现悬浮胶囊' },
+  { title: '滚动观察点 4', tip: '回顶后导航应恢复常态白底样式' },
+  { title: '滚动观察点 5', tip: '可切换「仅头像 / 头像+操作」，对比右侧胶囊内容' },
+  { title: '滚动观察点 6', tip: '手机预览下请在设备框内滚动，而不是滚动外层文档' },
+  { title: '滚动观察点 7', tip: '胶囊态按钮为 link 样式，常态不强制改写按钮外观' },
+  { title: '滚动观察点 8', tip: '内容足够长即可反复验证固定与收缩效果' }
+];
 
 const ModeSwitcher = ({ mode, setMode }) => (
   <Segmented block value={mode} onChange={setMode} options={MODE_OPTIONS} />
@@ -211,12 +242,61 @@ const FunctionParams = () => (
   ]} />
 );
 
+const ScrollDemoList = () => (
+  <Flex vertical gap={12}>
+    <Alert
+      type="success"
+      showIcon
+      message="滚动演示"
+      description="在手机模式下向下滚动本页，可查看导航栏从常态切换为固定胶囊态的效果。"
+    />
+    {SCROLL_DEMO_ITEMS.map((item, index) => (
+      <Card
+        key={item.title}
+        size="small"
+        style={{ background: 'rgba(255,255,255,0.55)', minHeight: 120 }}
+        title={
+          <Flex align="center" gap={8}>
+            <Tag color="blue">{index + 1}</Tag>
+            <span>{item.title}</span>
+          </Flex>
+        }
+      >
+        <Text type="secondary">{item.tip}</Text>
+        <div style={{ marginTop: 12, height: 48, borderRadius: 8, background: 'rgba(22,119,255,0.06)' }} />
+      </Card>
+    ))}
+  </Flex>
+);
+
+const resolveButtonProps = mode => {
+  if (mode === 'avatarOnly' || mode === 'extra' || mode === 'noRight') {
+    return undefined;
+  }
+  if (mode === 'avatarActions' || mode === 'noAvatar') {
+    return {
+      showLength: 1,
+      list: [
+        { type: 'primary', children: '新建' },
+        { children: '导入' },
+        { children: '导出' }
+      ]
+    };
+  }
+  return DEFAULT_BUTTON_PROPS;
+};
+
 const BaseExample = () => {
   const [mode, setMode] = useState('basic');
   const [loading, setLoading] = useState(false);
+  const buttonProps = resolveButtonProps(mode);
+  const userInfo =
+    mode === 'noAvatar' || mode === 'noRight'
+      ? { name: 'Lucy L', email: 'lucy@company.com' }
+      : { name: 'Lucy L', email: 'lucy@company.com', avatar: DEMO_AVATAR };
 
   return (
-    <SystemLayout userInfo={{ name: 'Lucy L', email: 'lucy@company.com' }} menu={menu}>
+    <SystemLayout userInfo={userInfo} menu={menu}>
       <Page
         title="Page 组件演示"
         back={mode === 'back'}
@@ -224,14 +304,7 @@ const BaseExample = () => {
         noPadding={mode === 'noPadding'}
         navbar={mode !== 'noNavbar'}
         toolbar={mode !== 'noToolbar'}
-        buttonProps={{
-          showLength: 1,
-          list: [
-            { type: 'primary', children: 'New' },
-            { children: 'Options' },
-            { children: 'Export' }
-          ]
-        }}
+        buttonProps={buttonProps}
       >
         {mode === 'function'
           ? ({ render, pageLoading }) => {
@@ -256,6 +329,7 @@ const BaseExample = () => {
                     >
                       模拟加载（展示骨架屏）
                     </Button>
+                    <ScrollDemoList />
                   </Flex>
                 )
               });
@@ -264,12 +338,15 @@ const BaseExample = () => {
             <Flex vertical gap={16}>
               <ModeSwitcher mode={mode} setMode={setMode} />
               {mode === 'noPadding' ? (
-                <Flex
-                  align="center"
-                  justify="center"
-                  style={{ background: 'rgba(0,0,0,0.04)', height: 300, borderRadius: 8 }}
-                >
-                  <Empty description="无内边距内容区（noPadding）" />
+                <Flex vertical gap={12}>
+                  <Flex
+                    align="center"
+                    justify="center"
+                    style={{ background: 'rgba(0,0,0,0.04)', height: 300, borderRadius: 8 }}
+                  >
+                    <Empty description="无内边距内容区（noPadding）" />
+                  </Flex>
+                  <ScrollDemoList />
                 </Flex>
               ) : (
                 <>
@@ -277,10 +354,25 @@ const BaseExample = () => {
                   <Card size="small" style={{ background: 'rgba(255,255,255,0.5)' }}>
                     <Descriptions column={1} size="small" items={[
                       { key: 'mode', label: '当前模式', children: mode },
+                      {
+                        key: 'avatar',
+                        label: '头像',
+                        children:
+                          mode === 'avatarOnly'
+                            ? '仅头像，无额外操作'
+                            : mode === 'avatarActions'
+                              ? '头像 + 更多操作'
+                              : mode === 'noAvatar'
+                                ? '无头像，仅更多操作'
+                                : mode === 'noRight'
+                                  ? '无右侧操作与头像'
+                                  : '跟随当前模式'
+                      },
                       { key: 'desc', label: '说明', children: 'Page 提供标题栏、返回按钮、操作按钮组与自定义内容。' },
                       { key: 'mobile', label: '移动端', children: '标题栏固定在顶部，向下滚动时收缩为胶囊样式。' }
                     ]} />
                   </Card>
+                  <ScrollDemoList />
                 </>
               )}
             </Flex>
@@ -772,6 +864,489 @@ const BaseExample = () => {
       </Page>
     </SystemLayout>
   );
+};
+
+render(<BaseExample />);
+
+```
+
+- 表格列表页
+- 在 SystemLayout + Page 中接入 @kne/table-page：用 useScrollElement 绑定页面滚动实现 sticky 表头，覆盖 TablePage 自带的 tab / filter / search、分页、排序与批量操作，贴近招聘候选人列表场景
+- _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),_TablePage(@kne/table-page)[import * as _TablePage from "@kne/table-page"],(@kne/table-page/dist/index.css),_ReactFilter(@kne/react-filter)[import * as _ReactFilter from "@kne/react-filter"],(@kne/react-filter/dist/index.css),antd(antd)
+
+```jsx
+const { default: SystemLayout, Page, useScrollElement, useIsMobile } = _SystemLayout;
+const { default: TablePage, Table } = _TablePage;
+const { fields } = _ReactFilter;
+const { SuperSelectFilterItem } = fields;
+const { Flex, Tag, message, Button } = antd;
+const { useMemo } = React;
+
+const TOTAL = 96;
+const PAGE_HEADER_HEIGHT = 48;
+
+const STAGES = [
+  { value: 'screening', label: '简历筛选', color: 'default' },
+  { value: 'interview', label: '面试中', color: 'processing' },
+  { value: 'offer', label: '已发 Offer', color: 'success' },
+  { value: 'rejected', label: '未通过', color: 'error' }
+];
+
+const DEPARTMENTS = ['技术部', '产品部', '设计部', '数据部', '运营部'];
+
+const POSITIONS = [
+  { title: '高级前端工程师', dept: '技术部' },
+  { title: '产品经理', dept: '产品部' },
+  { title: 'UI/UX 设计师', dept: '设计部' },
+  { title: '数据分析师', dept: '数据部' },
+  { title: '增长运营专员', dept: '运营部' }
+];
+
+const FIRST_NAMES = ['伟', '芳', '娜', '秀英', '敏', '静', '强', '磊', '洋', '艳', '勇', '军', '杰', '娟', '涛', '明'];
+const SURNAMES = ['王', '李', '张', '刘', '陈', '杨', '赵', '黄', '周', '吴', '徐', '孙', '马', '朱', '胡', '林'];
+
+const stageMap = Object.fromEntries(
+  STAGES.map(({ value, label, color }) => [value, { type: color === 'default' ? 'default' : color, text: label }])
+);
+
+const stageOptions = STAGES.map(({ value, label }) => ({ value, label }));
+const departmentOptions = DEPARTMENTS.map(item => ({ value: item, label: item }));
+const locationOptions = ['北京', '上海', '深圳', '杭州', '广州', '成都'].map(item => ({ value: item, label: item }));
+
+const buildCandidate = index => {
+  const position = POSITIONS[index % POSITIONS.length];
+  const stage = STAGES[index % STAGES.length];
+  return {
+    id: &#96;CAND${String(index + 1).padStart(4, '0')}&#96;,
+    name: &#96;${SURNAMES[index % SURNAMES.length]}${FIRST_NAMES[(index * 3) % FIRST_NAMES.length]}&#96;,
+    position: position.title,
+    department: position.dept,
+    stage: stage.value,
+    matchScore: 60 + ((index * 7) % 40),
+    experience: 1 + (index % 12),
+    location: ['北京', '上海', '深圳', '杭州', '广州', '成都'][index % 6],
+    appliedAt: &#96;2024-${String((index % 12) + 1).padStart(2, '0')}-${String((index % 28) + 1).padStart(2, '0')}&#96;,
+    phone: &#96;138${String(index).padStart(8, '0')}&#96;,
+    email: &#96;candidate${index + 1}@mail.com&#96;
+  };
+};
+
+const normalizeFilterValue = value => {
+  if (value == null) {
+    return value;
+  }
+  return Array.isArray(value) ? value[0] : value;
+};
+
+const applyFilters = (list, data, requestParams) => {
+  const params = Object.assign({}, requestParams?.data, data);
+  let result = list;
+
+  if (params.keyword) {
+    const keyword = String(params.keyword).toLowerCase();
+    result = result.filter(
+      item => item.name.includes(params.keyword) || item.position.toLowerCase().includes(keyword) || item.id.toLowerCase().includes(keyword)
+    );
+  }
+
+  const stage = normalizeFilterValue(params.stage);
+  if (stage) {
+    result = result.filter(item => item.stage === stage);
+  }
+
+  const department = normalizeFilterValue(params.department);
+  if (department) {
+    result = result.filter(item => item.department === department);
+  }
+
+  const location = normalizeFilterValue(params.location);
+  if (location) {
+    result = result.filter(item => item.location === location);
+  }
+
+  return result;
+};
+
+const columns = [
+  {
+    name: 'id',
+    title: '候选人编号',
+    width: 140,
+    min: 120,
+    max: 200,
+    fixed: 'left',
+    renderType: 'main',
+    primary: true,
+    onClick: ({ item }) => {
+      message.info(&#96;查看候选人：${item}&#96;);
+    }
+  },
+  { name: 'name', title: '姓名', width: 100, min: 80, max: 140, renderType: 'main' },
+  { name: 'position', title: '应聘职位', width: 160, min: 120, max: 220 },
+  { name: 'department', title: '用人部门', width: 120, min: 100, max: 180 },
+  {
+    name: 'stage',
+    title: '阶段',
+    width: 110,
+    renderType: 'status',
+    getValueOf: item => stageMap[item.stage] || { type: 'default', text: item.stage }
+  },
+  {
+    name: 'matchScore',
+    title: '匹配度',
+    width: 100,
+    min: 80,
+    max: 140,
+    sort: true,
+    render: value => &#96;${value}%&#96;
+  },
+  { name: 'experience', title: '经验', width: 90, render: value => &#96;${value} 年&#96; },
+  { name: 'location', title: '城市', width: 90 },
+  { name: 'appliedAt', title: '投递日期', width: 120, format: 'date', sort: true },
+  { name: 'phone', title: '手机号', width: 140, render: value => value.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') },
+  { name: 'email', title: '邮箱', width: 200, ellipsis: true, hidden: true },
+  {
+    name: 'options',
+    title: '操作',
+    renderType: 'options',
+    fixed: 'right',
+    width: 160,
+    min: 120,
+    max: 200,
+    getValueOf: item => {
+      const actions = [
+        { children: '查看', onClick: () => message.info(&#96;查看 ${item.name}&#96;) },
+        { children: '安排面试', onClick: () => message.success(&#96;已为 ${item.name} 安排面试&#96;) }
+      ];
+      if (item.stage !== 'rejected' && item.stage !== 'offer') {
+        actions.push({
+          children: '淘汰',
+          onClick: () => message.warning(&#96;已淘汰 ${item.name}&#96;)
+        });
+      }
+      return actions;
+    }
+  }
+];
+
+const menu = {
+  base: '/SystemLayout',
+  items: [
+    { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
+    { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
+    { group: 'HIRING', path: '/hiring/application', label: 'Application List', toolbar: true, icon: 'icon-assignment' },
+    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: 'icon-automation' }
+  ]
+};
+
+const CandidateTable = () => {
+  const getScrollElement = useScrollElement();
+  const isMobile = useIsMobile();
+  const tableRef = React.useRef();
+  const allCandidates = useMemo(() => Array.from({ length: TOTAL }, (_, index) => buildCandidate(index)), []);
+  const { selectedRows, getRowSelection } = Table.useSelectedRow({ rowKey: 'id' });
+  const { sortRender, mobileSortToolbar } = Table.useSort({
+    defaultSort: [{ name: 'appliedAt', sort: 'DESC' }],
+    onSortChange: newSort => {
+      tableRef.current?.reload({
+        data: { currentPage: 1, sort: newSort }
+      });
+    }
+  });
+
+  return (
+    <TablePage
+      ref={tableRef}
+      name="system-layout-candidate-table"
+      sticky
+      scrollTopInset={isMobile ? PAGE_HEADER_HEIGHT : 0}
+      getScrollContainer={getScrollElement}
+      scroll={{ x: 1400 }}
+      size="large"
+      renderMobile
+      sortRender={sortRender}
+      mobileSortToolbar={mobileSortToolbar}
+      rowSelection={getRowSelection(allCandidates)}
+      selectedRows={selectedRows}
+      search={{ name: 'keyword', label: '关键词', placeholder: '搜索姓名/职位/编号', style: { width: 220 } }}
+      tab={{
+        name: 'stage',
+        label: '阶段',
+        list: stageOptions
+      }}
+      tabProps={{
+        tabBarExtraContent: (
+          <Button type="link" size="small" onClick={() => message.info('新建招聘需求')}>
+            新建需求
+          </Button>
+        )
+      }}
+      filter={{
+        list: [
+          [
+            {
+              type: SuperSelectFilterItem,
+              props: { name: 'department', label: '部门', single: true, options: departmentOptions }
+            },
+            {
+              type: SuperSelectFilterItem,
+              props: { name: 'location', label: '城市', single: true, options: locationOptions }
+            }
+          ]
+        ],
+        displayLine: 1
+      }}
+      batchActions={[
+        {
+          key: 'export',
+          label: '批量导出',
+          onClick: ({ selectedRowKeys }) => {
+            message.info(&#96;正在导出 ${selectedRowKeys.length} 位候选人&#96;);
+          }
+        },
+        {
+          key: 'notify',
+          label: '批量通知',
+          onClick: ({ selectedRowKeys }) => {
+            message.success(&#96;已通知 ${selectedRowKeys.length} 位候选人&#96;);
+          }
+        }
+      ]}
+      pagination={{
+        open: true,
+        pageSize: 10,
+        cachePageSize: false,
+        showSizeChanger: true,
+        showQuickJumper: true,
+        pageSizeOptions: ['10', '20', '50']
+      }}
+      dataFormat={data => ({
+        list: data.pageData,
+        total: data.totalCount,
+        data
+      })}
+      loader={({ data, requestParams }) => {
+        const currentPage = Number(data?.currentPage ?? requestParams?.data?.currentPage) || 1;
+        const perPage = Number(data?.perPage ?? requestParams?.data?.perPage) || 10;
+        const sortParams = data?.sort ?? requestParams?.data?.sort ?? [{ name: 'appliedAt', sort: 'DESC' }];
+        const filtered = applyFilters(allCandidates, data, requestParams);
+        const sorted = sortParams.length ? Table.sortDataSource(filtered, sortParams, columns) : filtered;
+        const start = (currentPage - 1) * perPage;
+
+        return new Promise(resolve => {
+          setTimeout(() => {
+            resolve({
+              pageData: sorted.slice(start, start + perPage),
+              totalCount: filtered.length
+            });
+          }, 400);
+        });
+      }}
+      columns={columns}
+    />
+  );
+};
+
+const BaseExample = () => {
+  return (
+    <SystemLayout userInfo={{ name: 'Lucy L', email: 'lucy@company.com' }} menu={menu}>
+      <Page
+        title="候选人列表"
+        buttonProps={{
+          showLength: 1,
+          list: [
+            { type: 'primary', children: '新建候选人' },
+            { children: '导入简历' }
+          ]
+        }}
+      >
+        <Flex vertical gap={12}>
+          <Flex gap={8} wrap="wrap" align="center">
+            <Tag color="blue">Layout 滚动</Tag>
+            <span style={{ color: '#666', fontSize: 13 }}>
+              通过 <code>useScrollElement</code> 绑定 Layout 滚动容器；使用 TablePage 自带的 <code>tab</code> / <code>filter</code> /{' '}
+              <code>search</code> 与分页
+            </span>
+          </Flex>
+          <CandidateTable />
+        </Flex>
+      </Page>
+    </SystemLayout>
+  );
+};
+
+render(<BaseExample />);
+
+```
+
+- Tenant 租户设置
+- 参考 telent-coach：Authenticate + SystemLayout + Tenant@Setting，演示公司/组织/用户/权限设置页；preset 已注册 components-admin，接口走 mock 数据
+- _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),remoteLoader(@kne/remote-loader),reactRouterDom(react-router-dom),icons(@ant-design/icons),antd(antd)
+
+```jsx
+const { default: SystemLayout, Page } = _SystemLayout;
+const { createWithRemoteLoader } = remoteLoader;
+const { Routes, Route, Navigate, useLocation } = reactRouterDom;
+const { UserSwitchOutlined, LogoutOutlined, PartitionOutlined, UserOutlined, SafetyCertificateOutlined, HomeOutlined } = icons;
+const { message } = antd;
+
+/**
+ * 参考 telent-coach/src/components/Tenant：
+ * Authenticate 拉取租户用户信息 → SystemLayout 承载菜单 → Setting.* 用 Page 渲染设置页
+ * 接口走 example/src/preset.js 中注册的 mock apis.tenant.*
+ *
+ * menu.base 取当前示例路由前缀（/:id/*），避免跳到 /SystemLayout 后丢失示例页
+ */
+const TenantDemoInner = createWithRemoteLoader({
+  modules: [
+    'components-admin:Tenant@Authenticate',
+    'components-admin:Tenant@Setting',
+    'components-core:Permissions',
+    'components-core:Global@SetGlobal'
+  ]
+})(({ remoteModules, base }) => {
+  const [Authenticate, Setting, Permissions, SetGlobal] = remoteModules;
+
+  return (
+    <Authenticate>
+      {({ global }) => {
+        const { tenantUserInfo, tenant } = global;
+        return (
+          <SetGlobal globalKey="tenant" value={tenant}>
+            <SetGlobal globalKey="userInfo" value={{ tenantUserInfo, tenant }}>
+              <Permissions request={['tenant']} type="error">
+                <SystemLayout
+                  logo={{ id: tenant?.logo, src: tenant?.logo }}
+                  userInfo={tenantUserInfo}
+                  background="linear-gradient(180deg, #E8DCDF, #E1D1E3, #DED7EF, #D5E0F1)"
+                  menu={{
+                    base,
+                    items: [
+                      {
+                        path: '/',
+                        label: '工作台',
+                        toolbar: true,
+                        icon: <HomeOutlined />
+                      },
+                      {
+                        group: 'tenantSetting',
+                        groupLabel: '系统设置',
+                        label: '公司信息',
+                        path: '/setting/company',
+                        icon: { type: 'gongsi' }
+                      },
+                      {
+                        group: 'tenantSetting',
+                        groupLabel: '系统设置',
+                        label: '组织架构',
+                        path: '/setting/org',
+                        icon: <PartitionOutlined />
+                      },
+                      {
+                        group: 'tenantSetting',
+                        groupLabel: '系统设置',
+                        label: '用户管理',
+                        path: '/setting/user',
+                        toolbar: true,
+                        icon: <UserOutlined />
+                      },
+                      {
+                        group: 'tenantSetting',
+                        groupLabel: '系统设置',
+                        label: '权限管理',
+                        path: '/setting/permission',
+                        icon: <SafetyCertificateOutlined />
+                      },
+                      {
+                        group: 'account',
+                        groupLabel: '账号',
+                        label: '切换租户',
+                        icon: <UserSwitchOutlined />,
+                        onClick: () => message.info('示例环境：切换租户（mock）')
+                      },
+                      {
+                        group: 'account',
+                        groupLabel: '账号',
+                        label: '退出登录',
+                        icon: <LogoutOutlined />,
+                        onClick: () => message.info('示例环境：退出登录（mock）')
+                      }
+                    ]
+                  }}
+                >
+                  <Routes>
+                    <Route
+                      path={base}
+                      element={
+                        <Page title="工作台">
+                          <div style={{ padding: 16, color: '#666', lineHeight: 1.8 }}>
+                            <p>
+                              当前租户：<strong>{tenant?.name}</strong>
+                            </p>
+                            <p>
+                              当前用户：<strong>{tenantUserInfo?.name}</strong>（{tenantUserInfo?.email}）
+                            </p>
+                            <p>
+                              左侧菜单进入「系统设置」可体验 components-admin:Tenant@Setting 的公司 / 组织 / 用户 / 权限页面，接口均走
+                              mock 数据。
+                            </p>
+                          </div>
+                        </Page>
+                      }
+                    />
+                    <Route
+                      path={&#96;${base}/setting/company&#96;}
+                      element={<Setting.Company>{({ title, children }) => <Page title={title}>{children}</Page>}</Setting.Company>}
+                    />
+                    <Route
+                      path={&#96;${base}/setting/org&#96;}
+                      element={
+                        <Setting.Org baseUrl={&#96;${base}/setting&#96;}>
+                          {({ title, children }) => <Page title={title}>{children}</Page>}
+                        </Setting.Org>
+                      }
+                    />
+                    <Route
+                      path={&#96;${base}/setting/user&#96;}
+                      element={
+                        <Setting.User>
+                          {({ title, titleExtra, children }) => (
+                            <Page title={title} extra={titleExtra}>
+                              {children}
+                            </Page>
+                          )}
+                        </Setting.User>
+                      }
+                    />
+                    <Route
+                      path={&#96;${base}/setting/permission&#96;}
+                      element={
+                        <Setting.Permission>
+                          {({ title, titleExtra, children }) => (
+                            <Page title={title} extra={titleExtra}>
+                              {children}
+                            </Page>
+                          )}
+                        </Setting.Permission>
+                      }
+                    />
+                    <Route path="*" element={<Navigate to={base} replace />} />
+                  </Routes>
+                </SystemLayout>
+              </Permissions>
+            </SetGlobal>
+          </SetGlobal>
+        );
+      }}
+    </Authenticate>
+  );
+});
+
+const BaseExample = () => {
+  const { pathname } = useLocation();
+  // /:exampleId/... → 取第一段作为示例 base，保证菜单导航仍落在当前示例 :id/* 下
+  const base = '/' + (pathname.replace(/^\//, '').split('/')[0] || 'Tenant 租户设置');
+  return <TenantDemoInner base={base} />;
 };
 
 render(<BaseExample />);
