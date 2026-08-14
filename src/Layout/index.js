@@ -295,21 +295,17 @@ const Layout = ({
     >
       <div className={classnames('logo', style['logo'])}>
         <Image className={style['logo-img']} {...contextValue.logo} />
-      </div>
-      <div
-        className={classnames('expand-btn-wrapper', style['expand-btn-wrapper'])}
-        onClick={() => {
-          setMenuOpen(menuOpen => {
-            localStorage.setItem(LayoutMenuOpenKey, !menuOpen);
-            return !menuOpen;
-          });
-        }}
-      >
-        <ExpandIcon
-          className={classnames('expand-btn', style['expand-btn'], {
-            'is-closed': !menuOpen
-          })}
-        />
+        <div
+          className={classnames('expand-btn-wrapper', style['expand-btn-wrapper'])}
+          onClick={() => {
+            setMenuOpen(menuOpen => {
+              localStorage.setItem(LayoutMenuOpenKey, !menuOpen);
+              return !menuOpen;
+            });
+          }}
+        >
+          <ExpandIcon className={classnames('expand-btn', style['expand-btn'])} />
+        </div>
       </div>
       <div className={classnames('menu-inner', style['menu-inner'])}>
         <div className={classnames('menu-header', style['menu-header'])}>
