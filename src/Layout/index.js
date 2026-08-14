@@ -295,21 +295,17 @@ const Layout = ({
     >
       <div className={classnames('logo', style['logo'])}>
         <Image className={style['logo-img']} {...contextValue.logo} />
-      </div>
-      <div
-        className={classnames('expand-btn-wrapper', style['expand-btn-wrapper'])}
-        onClick={() => {
-          setMenuOpen(menuOpen => {
-            localStorage.setItem(LayoutMenuOpenKey, !menuOpen);
-            return !menuOpen;
-          });
-        }}
-      >
-        <ExpandIcon
-          className={classnames('expand-btn', style['expand-btn'], {
-            'is-closed': !menuOpen
-          })}
-        />
+        <div
+          className={classnames('expand-btn-wrapper', style['expand-btn-wrapper'])}
+          onClick={() => {
+            setMenuOpen(menuOpen => {
+              localStorage.setItem(LayoutMenuOpenKey, !menuOpen);
+              return !menuOpen;
+            });
+          }}
+        >
+          <ExpandIcon className={classnames('expand-btn', style['expand-btn'])} />
+        </div>
       </div>
       <div className={classnames('menu-inner', style['menu-inner'])}>
         <div className={classnames('menu-header', style['menu-header'])}>
@@ -384,7 +380,7 @@ const Layout = ({
   // portal 到 boundary（popup 挂载点）时，layout 上的 CSS 变量不会随 portal 继承，需要显式透传
   const aiPortalVars = {
     '--background': background,
-    '--toolbar-height': deviceIsMobile && toolbarShow ? '72px' : '0px',
+    '--toolbar-height': deviceIsMobile && toolbarShow ? '60px' : '0px',
     '--safe-area-inset-top': 'env(safe-area-inset-top)',
     '--safe-area-inset-bottom': 'env(safe-area-inset-bottom)'
   };

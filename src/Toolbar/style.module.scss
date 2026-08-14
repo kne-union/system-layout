@@ -18,17 +18,14 @@
 }
 
 .toolbar-list {
-  height: 72px;
+  height: 60px;
   z-index: 600;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow:
-    0 4px 16px 0 rgba(78, 96, 139, 0.18),
-    0 2px 6px 0 rgba(78, 96, 139, 0.1),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid #fff;
+  box-shadow: 0 0 14px 0 rgba(78, 96, 139, 0.16);
+  background: rgba(249, 249, 249, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 6px 8px;
   box-sizing: border-box;
   transition:
@@ -82,16 +79,6 @@
     .toolbar-item:not(.is-hidden) {
       order: 1;
     }
-
-    .toolbar-item-label {
-      display: none;
-    }
-
-    .toolbar-indicator {
-      left: 8px !important;
-      right: 8px;
-      width: auto !important;
-    }
   }
 
   &:global(.is-clicked) {
@@ -129,15 +116,13 @@
   transition: opacity 0.2s ease;
   overflow: hidden;
 
-  .toolbar-item-icon,
-  .toolbar-item-label {
+  .toolbar-item-icon {
     color: #333;
     transition: color 0.5s ease;
   }
 
   &:global(.is-active) {
-    .toolbar-item-icon,
-    .toolbar-item-label {
+    .toolbar-item-icon {
       color: var(--primary-color);
     }
   }
@@ -152,32 +137,9 @@
   }
 }
 
-.toolbar-indicator {
-  position: absolute;
-  top: 6px;
-  bottom: 6px;
-  border-radius: 999px;
-  background: rgba(120, 120, 120, 0.22);
-  transition:
-    left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.2s ease;
-  z-index: 0;
-  pointer-events: none;
-  will-change: left, width, transform;
-}
-
 .toolbar-item .toolbar-item-icon {
   width: 24px;
   height: 24px;
   font-size: 24px;
   line-height: 1;
-}
-
-.toolbar-item-label {
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
 }
