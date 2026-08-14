@@ -155,7 +155,7 @@
   --page-content-height: var(--page-height);
   --page-inner-height: calc(var(--page-height) - var(--nav-height) - var(--toolbar-height));
   &.has-toolbar {
-    --toolbar-height: 72px;
+    --toolbar-height: 60px;
   }
   &.has-navbar {
     --nav-height: 48px;
