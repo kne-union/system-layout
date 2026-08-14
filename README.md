@@ -55,7 +55,7 @@ import '@kne/system-layout/dist/index.css';
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),antd(antd)
 
 ```jsx
-const { default: SystemLayout, Page } = _SystemLayout;
+const { default: SystemLayout, Page, BarChartIcon } = _SystemLayout;
 const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography } = antd;
 const { Text, Title } = Typography;
 
@@ -86,7 +86,7 @@ const BaseExample = () => {
           { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
           { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
           { group: 'HIRING', path: '/hiring/application', label: 'Application List', icon: 'icon-assignment' },
-          { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: 'icon-automation' },
+          { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: <BarChartIcon /> },
           { group: 'TALENT REVIEW', path: '/talent-review', label: 'Projects', icon: 'icon-manage_accounts' },
           { group: 'TALENT REVIEW', path: '/talent-review/employee', label: 'Employee', toolbar: true, icon: 'icon-groups_2' },
           { group: 'TALENT REVIEW', path: '/talent-review/ai-models', label: 'AI Models', icon: 'icon-network_intelligence' }
@@ -165,7 +165,7 @@ render(<BaseExample />);
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),antd(antd)
 
 ```jsx
-const { default: SystemLayout, Page } = _SystemLayout;
+const { default: SystemLayout, Page, BarChartIcon } = _SystemLayout;
 const { useState } = React;
 const { Segmented, Button, Flex, Card, Alert, Descriptions, Empty, Tag, Typography } = antd;
 const { Text } = Typography;
@@ -229,7 +229,7 @@ const menu = {
   items: [
     { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
     { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
-    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: 'icon-automation' }
+    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: <BarChartIcon /> }
   ]
 };
 
@@ -391,7 +391,7 @@ render(<BaseExample />);
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),antd(antd)
 
 ```jsx
-const { default: SystemLayout, Page } = _SystemLayout;
+const { default: SystemLayout, Page, BarChartIcon } = _SystemLayout;
 const { useState, useRef, useEffect } = React;
 const { Flex, Card, Input, Button, Avatar, Tag, Typography, Alert, Spin } = antd;
 const { Text, Paragraph } = Typography;
@@ -523,7 +523,7 @@ const menu = {
     { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
     { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
     { group: 'HIRING', path: '/hiring/application', label: 'Application List', icon: 'icon-assignment' },
-    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: 'icon-automation' }
+    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: <BarChartIcon /> }
   ]
 };
 
@@ -582,7 +582,7 @@ render(<BaseExample />);
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),_ScrollLoader(@kne/scroll-loader)[import * as _ScrollLoader from "@kne/scroll-loader"],(@kne/scroll-loader/dist/index.css),antd(antd)
 
 ```jsx
-const { default: SystemLayout, Page, useIsMobile } = _SystemLayout;
+const { default: SystemLayout, Page, useIsMobile, BarChartIcon } = _SystemLayout;
 const { FetchScrollLoader } = _ScrollLoader;
 const { Flex, Avatar, Tag, Typography, Input, Select, Progress, Empty, Divider, Masonry } = antd;
 const { useState } = React;
@@ -784,7 +784,7 @@ const menu = {
     { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
     { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
     { group: 'HIRING', path: '/hiring/application', label: 'Application List', toolbar: true, icon: 'icon-assignment' },
-    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: 'icon-automation' }
+    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: <BarChartIcon /> }
   ]
 };
 
@@ -875,7 +875,7 @@ render(<BaseExample />);
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),_TablePage(@kne/table-page)[import * as _TablePage from "@kne/table-page"],(@kne/table-page/dist/index.css),_ReactFilter(@kne/react-filter)[import * as _ReactFilter from "@kne/react-filter"],(@kne/react-filter/dist/index.css),antd(antd)
 
 ```jsx
-const { default: SystemLayout, Page, useScrollElement, useIsMobile } = _SystemLayout;
+const { default: SystemLayout, Page, useScrollElement, useIsMobile, BarChartIcon } = _SystemLayout;
 const { default: TablePage, Table } = _TablePage;
 const { fields } = _ReactFilter;
 const { SuperSelectFilterItem } = fields;
@@ -1035,7 +1035,7 @@ const menu = {
     { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
     { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
     { group: 'HIRING', path: '/hiring/application', label: 'Application List', toolbar: true, icon: 'icon-assignment' },
-    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: 'icon-automation' }
+    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: <BarChartIcon /> }
   ]
 };
 

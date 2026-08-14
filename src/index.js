@@ -5,6 +5,7 @@ export { default as isMobile, MOBILE_BREAKPOINT } from './isMobile';
 export { default as useIsMobile } from './useIsMobile';
 export { useContext as useLayoutContext } from './context';
 export { default as themeToken } from './themeToken';
+export { default as BarChartIcon } from './Toolbar/BarChartIcon';
 
 export {
   MOBILE_BREAKPOINT as mobileBreakpoint,

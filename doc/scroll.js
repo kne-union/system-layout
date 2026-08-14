@@ -1,4 +1,4 @@
-const { default: SystemLayout, Page, useIsMobile } = _SystemLayout;
+const { default: SystemLayout, Page, useIsMobile, BarChartIcon } = _SystemLayout;
 const { FetchScrollLoader } = _ScrollLoader;
 const { Flex, Avatar, Tag, Typography, Input, Select, Progress, Empty, Divider, Masonry } = antd;
 const { useState } = React;
@@ -200,7 +200,7 @@ const menu = {
     { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
     { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
     { group: 'HIRING', path: '/hiring/application', label: 'Application List', toolbar: true, icon: 'icon-assignment' },
-    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: 'icon-automation' }
+    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: <BarChartIcon /> }
   ]
 };
 
