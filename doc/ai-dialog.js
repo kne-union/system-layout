@@ -1,4 +1,4 @@
-const { default: SystemLayout, Page } = _SystemLayout;
+const { default: SystemLayout, Page, BarChartIcon } = _SystemLayout;
 const { useState, useRef, useEffect } = React;
 const { Flex, Card, Input, Button, Avatar, Tag, Typography, Alert, Spin } = antd;
 const { Text, Paragraph } = Typography;
@@ -130,7 +130,7 @@ const menu = {
     { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
     { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
     { group: 'HIRING', path: '/hiring/application', label: 'Application List', icon: 'icon-assignment' },
-    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: 'icon-automation' }
+    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: <BarChartIcon /> }
   ]
 };
 

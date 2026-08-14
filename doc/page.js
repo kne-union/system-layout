@@ -1,4 +1,4 @@
-const { default: SystemLayout, Page } = _SystemLayout;
+const { default: SystemLayout, Page, BarChartIcon } = _SystemLayout;
 const { useState } = React;
 const { Segmented, Button, Flex, Card, Alert, Descriptions, Empty, Tag, Typography } = antd;
 const { Text } = Typography;
@@ -62,7 +62,7 @@ const menu = {
   items: [
     { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
     { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
-    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: 'icon-automation' }
+    { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: <BarChartIcon /> }
   ]
 };
 
