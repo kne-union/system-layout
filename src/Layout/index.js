@@ -193,6 +193,7 @@ const Layout = ({
   openScrollbar: openScrollbarProps,
   isMobile: isMobileProps,
   toolbarTarget,
+  toolbarMinimal = false,
   children
 }) => {
   const localMenuOpen = localStorage.getItem(LayoutMenuOpenKey);
@@ -380,7 +381,7 @@ const Layout = ({
   // portal 到 boundary（popup 挂载点）时，layout 上的 CSS 变量不会随 portal 继承，需要显式透传
   const aiPortalVars = {
     '--background': background,
-    '--toolbar-height': deviceIsMobile && toolbarShow ? '60px' : '0px',
+    '--toolbar-height': deviceIsMobile && toolbarShow ? (toolbarMinimal ? '60px' : '72px') : '0px',
     '--safe-area-inset-top': 'env(safe-area-inset-top)',
     '--safe-area-inset-bottom': 'env(safe-area-inset-bottom)'
   };
@@ -415,13 +416,16 @@ const Layout = ({
             [style['is-mobile']]: deviceIsMobile,
             'has-toolbar': deviceIsMobile && toolbarShow,
             [style['has-toolbar']]: deviceIsMobile && toolbarShow,
+            'is-toolbar-minimal': deviceIsMobile && toolbarShow && toolbarMinimal,
+            [style['is-toolbar-minimal']]: deviceIsMobile && toolbarShow && toolbarMinimal,
             'has-navbar': deviceIsMobile && navbarShow,
             [style['has-navbar']]: deviceIsMobile && navbarShow
           })}
           style={{
             '--menu-max-width': menuMaxWidth,
             '--menu-min-width': menuMinWidth,
-            '--background': background
+            '--background': background,
+            ...(deviceIsMobile && toolbarShow ? { '--toolbar-height': toolbarMinimal ? '60px' : '72px' } : null)
           }}
         >
           {!portalMenu && layerMenuNode}
@@ -486,7 +490,7 @@ const Layout = ({
             </Flex>
           </Flex>
           {aiOverlay}
-          <Toolbar {...menu} className={classnames(style['toolbar'])} show={deviceIsMobile && toolbarShow} target={toolbarTarget} />
+          <Toolbar {...menu} className={classnames(style['toolbar'])} show={deviceIsMobile && toolbarShow} target={toolbarTarget} minimal={toolbarMinimal} />
         </div>
       </Provider>
     </LayoutResponsiveScope>

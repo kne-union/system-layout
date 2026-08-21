@@ -18,6 +18,7 @@
 | `openScrollbar` | `boolean` | - | 是否开启自定义滚动条（SimpleBar），默认桌面端开启、移动端关闭 |
 | `isMobile` | `boolean` | - | 是否强制移动端模式，不设置时自动检测 |
 | `toolbarTarget` | `HTMLElement` | `document.body` | 移动端工具栏 Portal 的目标容器 |
+| `toolbarMinimal` | `boolean` | `false` | 移动端底部工具栏是否使用极简模式。`false` 为普通模式（展示标题与选中背景），`true` 为极简模式（仅图标） |
 | `children` | `ReactNode` | - | 页面内容，通常为 Page 组件 |
 
 #### userInfo 配置

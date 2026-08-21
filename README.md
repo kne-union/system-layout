@@ -56,7 +56,8 @@ import '@kne/system-layout/dist/index.css';
 
 ```jsx
 const { default: SystemLayout, Page, BarChartIcon } = _SystemLayout;
-const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography } = antd;
+const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography, Switch, Space } = antd;
+const { useState } = React;
 const { Text, Title } = Typography;
 
 const STATS = [
@@ -74,11 +75,13 @@ const ONBOARDING_STEPS = [
 ];
 
 const BaseExample = () => {
+  const [toolbarMinimal, setToolbarMinimal] = useState(false);
   const doneCount = ONBOARDING_STEPS.filter(step => step.done).length;
   const percent = Math.round((doneCount / ONBOARDING_STEPS.length) * 100);
 
   return (
     <SystemLayout
+      toolbarMinimal={toolbarMinimal}
       userInfo={{ name: 'Lucy L', email: 'lucy@company.com' }}
       menu={{
         base: '/SystemLayout',
@@ -112,9 +115,13 @@ const BaseExample = () => {
                 </Title>
                 <Text type="secondary">欢迎回到工作台，今天有 8 项待办事项等待处理。</Text>
               </Flex>
-              <Tag color="processing" style={{ fontSize: 13, padding: '4px 12px' }}>
-                入职进度 {percent}%
-              </Tag>
+              <Space>
+                <Text type="secondary">极简工具栏</Text>
+                <Switch checked={toolbarMinimal} onChange={setToolbarMinimal} />
+                <Tag color="processing" style={{ fontSize: 13, padding: '4px 12px' }}>
+                  入职进度 {percent}%
+                </Tag>
+              </Space>
             </Flex>
           </Card>
 
@@ -1391,6 +1398,7 @@ render(<BaseExample />);
 | `openScrollbar` | `boolean` | - | 是否开启自定义滚动条（SimpleBar），默认桌面端开启、移动端关闭 |
 | `isMobile` | `boolean` | - | 是否强制移动端模式，不设置时自动检测 |
 | `toolbarTarget` | `HTMLElement` | `document.body` | 移动端工具栏 Portal 的目标容器 |
+| `toolbarMinimal` | `boolean` | `false` | 移动端底部工具栏是否使用极简模式。`false` 为普通模式（展示标题与选中背景），`true` 为极简模式（仅图标） |
 | `children` | `ReactNode` | - | 页面内容，通常为 Page 组件 |
 
 #### userInfo 配置
