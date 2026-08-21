@@ -42,6 +42,11 @@
       }
     }
 
+    .react-sticky-scroller-bar {
+      background: transparent !important;
+      border-color: transparent !important;
+    }
+
     .ant-tag {
       background: var(--primary-color-1);
       border-radius: 11px;
@@ -155,7 +160,11 @@
   --page-content-height: var(--page-height);
   --page-inner-height: calc(var(--page-height) - var(--nav-height) - var(--toolbar-height));
   &.has-toolbar {
-    --toolbar-height: 60px;
+    --toolbar-height: 72px;
+
+    &.is-toolbar-minimal {
+      --toolbar-height: 60px;
+    }
   }
   &.has-navbar {
     --nav-height: 48px;

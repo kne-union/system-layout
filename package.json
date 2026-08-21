@@ -1,6 +1,6 @@
 {
   "name": "@kne/system-layout",
-  "version": "0.2.0-alpha.27",
+  "version": "0.2.0",
   "description": "用于一个系统初始化布局",
   "syntax": {
     "esmodules": true
@@ -85,7 +85,7 @@
     "@kne/modules-dev": "^2.1.16",
     "@kne/react-filter": "^1.0.11",
     "@kne/scroll-loader": "^0.1.14",
-    "@kne/table-page": "^0.1.11",
+    "@kne/table-page": "^0.1.27",
     "antd": "^6.5.0",
     "cross-env": "^7.0.3",
     "husky": "^9.0.11",
@@ -95,7 +95,7 @@
     "react-dom": "^18.2.0"
   },
   "dependencies": {
-    "@kne/button-group": "^0.1.18",
+    "@kne/button-group": "^0.1.35",
     "@kne/ensure-slash": "^0.1.0",
     "@kne/local-storage": "^0.1.1",
     "@kne/react-error-boundary": "^0.1.1",
