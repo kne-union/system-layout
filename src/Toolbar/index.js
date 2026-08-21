@@ -120,7 +120,13 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
 
   useEffect(() => {
     const scrollEl = getScrollElement();
-    if (!scrollEl || typeof scrollEl.addEventListener !== 'function') {
+    if (!scrollEl) {
+      return;
+    }
+    const isDocumentScroll = typeof document !== 'undefined' && (scrollEl === document.scrollingElement || scrollEl === document.documentElement || scrollEl === document.body);
+    // 与 Page navbar 一致：document/body 滚动在部分环境听 element 不稳定，统一挂 window
+    const listenTarget = isDocumentScroll ? window : scrollEl;
+    if (!listenTarget || typeof listenTarget.addEventListener !== 'function') {
       return;
     }
     const handleScroll = () => {
@@ -143,9 +149,9 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
       }, 500);
     };
 
-    scrollEl.addEventListener('scroll', handleScroll, { passive: true });
+    listenTarget.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
-      scrollEl.removeEventListener('scroll', handleScroll);
+      listenTarget.removeEventListener('scroll', handleScroll);
       if (scrollTimerRef.current) {
         clearTimeout(scrollTimerRef.current);
       }
