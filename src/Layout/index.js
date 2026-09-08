@@ -498,3 +498,6 @@ const Layout = ({
 };
 
 export default Layout;
+
+/** 包在此 class 容器内可取消 layout 默认的胶囊按钮圆角 */
+export const NO_CAPSULE_BTN_CLASS = 'kne-system-layout-no-capsule-btn';

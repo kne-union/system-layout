@@ -272,6 +272,8 @@
 
   :global {
     .ant-btn {
+      border-radius: 999px;
+
       &:not(.ant-btn-primary):not(.ant-btn-dangerous):not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(:disabled) {
         background: var(--primary-color-2);
         color: var(--primary-color);
@@ -299,6 +301,14 @@
         box-shadow: none;
         color: var(--font-color-disabled);
         background: rgba(17, 24, 39, 0.2);
+
+        // link/text 禁用态保持透明，避免表格操作列等露出灰底
+        &.ant-btn-link,
+        &.ant-btn-text,
+        &.ant-btn-variant-link,
+        &.ant-btn-variant-text {
+          background: transparent;
+        }
       }
 
       &.ant-btn-primary:not(:disabled) {
@@ -308,8 +318,21 @@
       }
     }
 
+    // 包一层即可恢复 antd 默认圆角，取消 layout 内胶囊按钮
+    .kne-system-layout-no-capsule-btn {
+      .ant-btn {
+        border-radius: var(--ant-border-radius, 6px);
+
+        &.ant-btn-circle {
+          border-radius: 50%;
+        }
+      }
+    }
+
     // ButtonGroup「更多」下拉挂在 layout boundary 内，会吃到上面的玻璃按钮样式；菜单项应无背景
     .ant-dropdown .ant-btn {
+      border-radius: 8px;
+
       &:not(.ant-btn-primary):not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(:disabled) {
         background: transparent;
       }
@@ -370,9 +393,15 @@
       padding: 8px 16px;
       justify-content: center;
 
-      &:hover .expand-btn-wrapper {
-        opacity: 1;
-        pointer-events: auto;
+      &:hover {
+        .logo-img {
+          opacity: 0;
+        }
+
+        .expand-btn-wrapper {
+          opacity: 1;
+          pointer-events: auto;
+        }
       }
     }
 
@@ -467,6 +496,7 @@
 .logo-img {
   display: flex;
   align-items: center;
+  transition: opacity 0.2s;
 }
 
 .expand-btn-wrapper {
@@ -541,6 +571,9 @@
     0 20px 40px 0 rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(10px);
   min-width: 0;
+  min-height: 0;
+  // 裁切子项，避免 page-children 固定高度越过 1px 边框
+  overflow: hidden;
 }
 
 .menu-list {
@@ -772,7 +805,9 @@
   --container-height: calc(var(--page-content-height) - 48px);
   padding: 24px;
   box-sizing: border-box;
-  height: var(--page-height);
+  // 跟随 .page 内容区高度，勿用 --page-height（未扣除 page 的 1px 边框会溢出）
+  height: 100%;
+  min-height: 0;
   width: 100%;
   max-width: 100%;
 
@@ -783,6 +818,13 @@
 
 .page-content {
   width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  :global(.ant-col) {
+    height: 100%;
+    min-height: 0;
+  }
 
   :global(.kne-responsive-container) {
     container-type: inline-size;

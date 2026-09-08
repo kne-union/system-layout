@@ -51,12 +51,12 @@ import '@kne/system-layout/dist/index.css';
 #### 示例代码
 
 - 基础布局
-- 移动端基础布局示例，展示 SystemLayout 在 isMobile 模式下的菜单、工具栏、用户信息和页面内容
+- 移动端基础布局示例，展示 SystemLayout 在 isMobile 模式下的菜单、工具栏、用户信息和页面内容；并演示 Layout 默认胶囊按钮与 NO_CAPSULE_BTN_CLASS 取消胶囊圆角的用法
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),antd(antd)
 
 ```jsx
-const { default: SystemLayout, Page, BarChartIcon } = _SystemLayout;
-const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography, Switch, Space } = antd;
+const { default: SystemLayout, Page, BarChartIcon, NO_CAPSULE_BTN_CLASS } = _SystemLayout;
+const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography, Switch, Space, Button } = antd;
 const { useState } = React;
 const { Text, Title } = Typography;
 
@@ -122,6 +122,31 @@ const BaseExample = () => {
                   入职进度 {percent}%
                 </Tag>
               </Space>
+            </Flex>
+          </Card>
+
+          <Card title="按钮圆角" styles={{ body: { padding: 20 } }} style={{ background: 'rgba(255,255,255,0.5)' }}>
+            <Flex vertical gap={12}>
+              <Flex vertical gap={8}>
+                <Text type="secondary">Layout 内默认胶囊按钮</Text>
+                <Space wrap>
+                  <Button type="primary">Primary</Button>
+                  <Button>Default</Button>
+                  <Button danger>Danger</Button>
+                </Space>
+              </Flex>
+              <Flex vertical gap={8}>
+                <Text type="secondary">
+                  使用 <code>NO_CAPSULE_BTN_CLASS</code> 取消胶囊圆角
+                </Text>
+                <div className={NO_CAPSULE_BTN_CLASS}>
+                  <Space wrap>
+                    <Button type="primary">Primary</Button>
+                    <Button>Default</Button>
+                    <Button danger>Danger</Button>
+                  </Space>
+                </div>
+              </Flex>
             </Flex>
           </Card>
 
@@ -878,7 +903,7 @@ render(<BaseExample />);
 ```
 
 - 表格列表页
-- 在 SystemLayout + Page 中接入 @kne/table-page：用 useScrollElement 绑定页面滚动实现 sticky 表头，覆盖 TablePage 自带的 tab / filter / search、分页、排序与批量操作，贴近招聘候选人列表场景
+- 在 SystemLayout + Page 中接入 @kne/table-page：用 useScrollElement 绑定页面滚动实现 sticky 表头，覆盖 TablePage 自带的 tab / filter / search、分页、排序与批量操作；首页仅第一行操作 disabled，便于对比验收 layout 下 link 禁用无灰底
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),_TablePage(@kne/table-page)[import * as _TablePage from "@kne/table-page"],(@kne/table-page/dist/index.css),_ReactFilter(@kne/react-filter)[import * as _ReactFilter from "@kne/react-filter"],(@kne/react-filter/dist/index.css),antd(antd)
 
 ```jsx
@@ -932,9 +957,11 @@ const buildCandidate = index => {
     matchScore: 60 + ((index * 7) % 40),
     experience: 1 + (index % 12),
     location: ['北京', '上海', '深圳', '杭州', '广州', '成都'][index % 6],
-    appliedAt: &#96;2024-${String((index % 12) + 1).padStart(2, '0')}-${String((index % 28) + 1).padStart(2, '0')}&#96;,
+    // 仅第一行用于禁用态验收，排到列表最前便于对照
+    appliedAt: index === 0 ? '2024-12-31' : &#96;2024-${String((index % 12) + 1).padStart(2, '0')}-${String((index % 28) + 1).padStart(2, '0')}&#96;,
     phone: &#96;138${String(index).padStart(8, '0')}&#96;,
-    email: &#96;candidate${index + 1}@mail.com&#96;
+    email: &#96;candidate${index + 1}@mail.com&#96;,
+    opsDisabled: index === 0
   };
 };
 
@@ -1017,21 +1044,29 @@ const columns = [
     title: '操作',
     renderType: 'options',
     fixed: 'right',
-    width: 160,
-    min: 120,
-    max: 200,
+    width: 200,
+    min: 160,
+    max: 260,
     getValueOf: item => {
-      const actions = [
-        { children: '查看', onClick: () => message.info(&#96;查看 ${item.name}&#96;) },
-        { children: '安排面试', onClick: () => message.success(&#96;已为 ${item.name} 安排面试&#96;) }
-      ];
-      if (item.stage !== 'rejected' && item.stage !== 'offer') {
-        actions.push({
+      // 仅禁用一行，便于对比验收 link 禁用无灰底
+      const locked = !!item.opsDisabled;
+      return [
+        {
+          children: '查看',
+          disabled: locked,
+          onClick: () => message.info(&#96;查看 ${item.name}&#96;)
+        },
+        {
+          children: '安排面试',
+          disabled: locked,
+          onClick: () => message.success(&#96;已为 ${item.name} 安排面试&#96;)
+        },
+        {
           children: '淘汰',
+          disabled: locked,
           onClick: () => message.warning(&#96;已淘汰 ${item.name}&#96;)
-        });
-      }
-      return actions;
+        }
+      ];
     }
   }
 ];
@@ -1170,9 +1205,10 @@ const BaseExample = () => {
         <Flex vertical gap={12}>
           <Flex gap={8} wrap="wrap" align="center">
             <Tag color="blue">Layout 滚动</Tag>
+            <Tag color="orange">禁用操作</Tag>
             <span style={{ color: '#666', fontSize: 13 }}>
               通过 <code>useScrollElement</code> 绑定 Layout 滚动容器；使用 TablePage 自带的 <code>tab</code> / <code>filter</code> /{' '}
-              <code>search</code> 与分页
+              <code>search</code> 与分页。首页第一行操作禁用（其余正常），用于对比验收 link 禁用无灰底
             </span>
           </Flex>
           <CandidateTable />
@@ -1584,3 +1620,4 @@ import { themeToken } from '@kne/system-layout';
 | `RESPONSIVE_CONTAINER_CLASS` | 响应式容器 CSS 类名 |
 | `RESPONSIVE_BOUNDARY_CLASS` | 响应式边界 CSS 类名 |
 | `RESPONSIVE_SCROLL_CLASS` | 响应式滚动 CSS 类名 |
+| `NO_CAPSULE_BTN_CLASS` | 包一层可取消 Layout 内按钮默认胶囊圆角 |

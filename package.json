@@ -1,6 +1,6 @@
 {
   "name": "@kne/system-layout",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "用于一个系统初始化布局",
   "syntax": {
     "esmodules": true
@@ -102,7 +102,7 @@
     "@kne/react-file": "^0.1.29",
     "@kne/react-icon": "^0.1.4",
     "@kne/react-intl": "^0.1.9",
-    "@kne/responsive-utils": "^0.1.8",
+    "@kne/responsive-utils": "^0.1.16",
     "classnames": "^2.5.1",
     "rc-virtual-list": "^3.19.2",
     "simplebar-react": "^3.3.2"
