@@ -1,5 +1,5 @@
-const { default: SystemLayout, Page, BarChartIcon } = _SystemLayout;
-const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography, Switch, Space } = antd;
+const { default: SystemLayout, Page, BarChartIcon, NO_CAPSULE_BTN_CLASS } = _SystemLayout;
+const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography, Switch, Space, Button } = antd;
 const { useState } = React;
 const { Text, Title } = Typography;
 
@@ -65,6 +65,31 @@ const BaseExample = () => {
                   入职进度 {percent}%
                 </Tag>
               </Space>
+            </Flex>
+          </Card>
+
+          <Card title="按钮圆角" styles={{ body: { padding: 20 } }} style={{ background: 'rgba(255,255,255,0.5)' }}>
+            <Flex vertical gap={12}>
+              <Flex vertical gap={8}>
+                <Text type="secondary">Layout 内默认胶囊按钮</Text>
+                <Space wrap>
+                  <Button type="primary">Primary</Button>
+                  <Button>Default</Button>
+                  <Button danger>Danger</Button>
+                </Space>
+              </Flex>
+              <Flex vertical gap={8}>
+                <Text type="secondary">
+                  使用 <code>NO_CAPSULE_BTN_CLASS</code> 取消胶囊圆角
+                </Text>
+                <div className={NO_CAPSULE_BTN_CLASS}>
+                  <Space wrap>
+                    <Button type="primary">Primary</Button>
+                    <Button>Default</Button>
+                    <Button danger>Danger</Button>
+                  </Space>
+                </div>
+              </Flex>
             </Flex>
           </Card>
 

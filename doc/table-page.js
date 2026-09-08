@@ -48,9 +48,11 @@ const buildCandidate = index => {
     matchScore: 60 + ((index * 7) % 40),
     experience: 1 + (index % 12),
     location: ['北京', '上海', '深圳', '杭州', '广州', '成都'][index % 6],
-    appliedAt: `2024-${String((index % 12) + 1).padStart(2, '0')}-${String((index % 28) + 1).padStart(2, '0')}`,
+    // 仅第一行用于禁用态验收，排到列表最前便于对照
+    appliedAt: index === 0 ? '2024-12-31' : `2024-${String((index % 12) + 1).padStart(2, '0')}-${String((index % 28) + 1).padStart(2, '0')}`,
     phone: `138${String(index).padStart(8, '0')}`,
-    email: `candidate${index + 1}@mail.com`
+    email: `candidate${index + 1}@mail.com`,
+    opsDisabled: index === 0
   };
 };
 
@@ -133,21 +135,29 @@ const columns = [
     title: '操作',
     renderType: 'options',
     fixed: 'right',
-    width: 160,
-    min: 120,
-    max: 200,
+    width: 200,
+    min: 160,
+    max: 260,
     getValueOf: item => {
-      const actions = [
-        { children: '查看', onClick: () => message.info(`查看 ${item.name}`) },
-        { children: '安排面试', onClick: () => message.success(`已为 ${item.name} 安排面试`) }
-      ];
-      if (item.stage !== 'rejected' && item.stage !== 'offer') {
-        actions.push({
+      // 仅禁用一行，便于对比验收 link 禁用无灰底
+      const locked = !!item.opsDisabled;
+      return [
+        {
+          children: '查看',
+          disabled: locked,
+          onClick: () => message.info(`查看 ${item.name}`)
+        },
+        {
+          children: '安排面试',
+          disabled: locked,
+          onClick: () => message.success(`已为 ${item.name} 安排面试`)
+        },
+        {
           children: '淘汰',
+          disabled: locked,
           onClick: () => message.warning(`已淘汰 ${item.name}`)
-        });
-      }
-      return actions;
+        }
+      ];
     }
   }
 ];
@@ -286,9 +296,10 @@ const BaseExample = () => {
         <Flex vertical gap={12}>
           <Flex gap={8} wrap="wrap" align="center">
             <Tag color="blue">Layout 滚动</Tag>
+            <Tag color="orange">禁用操作</Tag>
             <span style={{ color: '#666', fontSize: 13 }}>
               通过 <code>useScrollElement</code> 绑定 Layout 滚动容器；使用 TablePage 自带的 <code>tab</code> / <code>filter</code> /{' '}
-              <code>search</code> 与分页
+              <code>search</code> 与分页。首页第一行操作禁用（其余正常），用于对比验收 link 禁用无灰底
             </span>
           </Flex>
           <CandidateTable />

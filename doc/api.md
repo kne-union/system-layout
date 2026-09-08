@@ -204,3 +204,4 @@ import { themeToken } from '@kne/system-layout';
 | `RESPONSIVE_CONTAINER_CLASS` | 响应式容器 CSS 类名 |
 | `RESPONSIVE_BOUNDARY_CLASS` | 响应式边界 CSS 类名 |
 | `RESPONSIVE_SCROLL_CLASS` | 响应式滚动 CSS 类名 |
+| `NO_CAPSULE_BTN_CLASS` | 包一层可取消 Layout 内按钮默认胶囊圆角 |

@@ -1,5 +1,5 @@
 export { default } from './Layout';
-export { default as Layout } from './Layout';
+export { default as Layout, NO_CAPSULE_BTN_CLASS } from './Layout';
 export { default as Page } from './Page';
 export { default as isMobile, MOBILE_BREAKPOINT } from './isMobile';
 export { default as useIsMobile } from './useIsMobile';

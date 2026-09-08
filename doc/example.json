@@ -3,7 +3,7 @@
   "list": [
     {
       "title": "基础布局",
-      "description": "移动端基础布局示例，展示 SystemLayout 在 isMobile 模式下的菜单、工具栏、用户信息和页面内容",
+      "description": "移动端基础布局示例，展示 SystemLayout 在 isMobile 模式下的菜单、工具栏、用户信息和页面内容；并演示 Layout 默认胶囊按钮与 NO_CAPSULE_BTN_CLASS 取消胶囊圆角的用法",
       "code": "./base.js",
       "scope": [
         {
@@ -87,7 +87,7 @@
     },
     {
       "title": "表格列表页",
-      "description": "在 SystemLayout + Page 中接入 @kne/table-page：用 useScrollElement 绑定页面滚动实现 sticky 表头，覆盖 TablePage 自带的 tab / filter / search、分页、排序与批量操作，贴近招聘候选人列表场景",
+      "description": "在 SystemLayout + Page 中接入 @kne/table-page：用 useScrollElement 绑定页面滚动实现 sticky 表头，覆盖 TablePage 自带的 tab / filter / search、分页、排序与批量操作；首页仅第一行操作 disabled，便于对比验收 layout 下 link 禁用无灰底",
       "code": "./table-page.js",
       "scope": [
         {
