@@ -3,7 +3,7 @@
   "list": [
     {
       "title": "基础布局",
-      "description": "移动端基础布局示例，展示 SystemLayout 在 isMobile 模式下的菜单、工具栏、用户信息和页面内容；并演示 Layout 默认胶囊按钮与 NO_CAPSULE_BTN_CLASS 取消胶囊圆角的用法",
+      "description": "移动端基础布局示例，展示 SystemLayout 在 isMobile 模式下的菜单、工具栏、用户信息和页面内容；并演示 Layout 默认胶囊按钮、NO_CAPSULE_BTN_CLASS 取消胶囊圆角，以及菜单/工具栏徽标（数量、圆点、溢出数字）",
       "code": "./base.js",
       "scope": [
         {
@@ -22,7 +22,7 @@
     },
     {
       "title": "Page 组件",
-      "description": "Page 组件的各种功能：返回按钮、自定义内容、仅头像 / 头像+操作、函数式子组件、加载状态、navbar/toolbar 控制等；内容区加长，便于在手机预览中滚动查看导航栏胶囊态",
+      "description": "Page 组件的各种功能：返回按钮、自定义内容、仅头像 / 头像+操作、函数式子组件、加载状态、navbar/toolbar 控制、底部操作栏等；内容区加长，便于在手机预览中滚动查看导航栏胶囊态与底栏贴底",
       "code": "./page.js",
       "scope": [
         {

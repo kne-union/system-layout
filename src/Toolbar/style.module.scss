@@ -48,7 +48,7 @@
 
   &.is-viewport {
     position: fixed;
-    bottom: calc(16px + var(--safe-area-inset-bottom, 0px));
+    bottom: calc(var(--toolbar-bottom-gap, 16px) + var(--safe-area-inset-bottom, 0px));
     left: 16px;
     right: 16px;
     pointer-events: auto;
@@ -56,7 +56,7 @@
 
   &.is-boundary {
     position: absolute;
-    bottom: calc(16px + var(--safe-area-inset-bottom, 0px));
+    bottom: calc(var(--toolbar-bottom-gap, 16px) + var(--safe-area-inset-bottom, 0px));
     left: 16px;
     right: 16px;
     pointer-events: auto;
@@ -136,7 +136,7 @@
   position: relative;
   z-index: 1;
   transition: opacity 0.2s ease;
-  overflow: hidden;
+  overflow: visible;
 
   .toolbar-item-icon,
   .toolbar-item-label {
@@ -189,6 +189,15 @@
     width: 24px;
     height: 24px;
     display: block;
+  }
+}
+
+.toolbar-item-badge {
+  line-height: 1;
+
+  :global(.ant-badge-count),
+  :global(.ant-badge-dot) {
+    box-shadow: none;
   }
 }
 

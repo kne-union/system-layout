@@ -7,6 +7,7 @@ import ensureSlash from '@kne/ensure-slash';
 import isPlainObject from 'lodash/isPlainObject';
 import VirtualList from 'rc-virtual-list';
 import style from './style.module.scss';
+import ItemBadge from '../ItemBadge';
 
 const MENU_ITEM_HEIGHT = 52;
 const MENU_GROUP_HEIGHT = 48;
@@ -128,22 +129,34 @@ const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) =>
           align="center"
           gap={8}
         >
-          {(icon => {
-            if (typeof icon === 'string') {
-              return <Icon className={classnames('menu-item-icon', style['menu-item-icon'])} type={icon} fontClassName="system" />;
+          {(iconNode => {
+            if (!menuOpen) {
+              return (
+                <ItemBadge badge={item.badge} className={classnames('menu-item-badge', style['menu-item-badge'])}>
+                  {iconNode}
+                </ItemBadge>
+              );
             }
+            return iconNode;
+          })(
+            (() => {
+              if (typeof icon === 'string') {
+                return <Icon className={classnames('menu-item-icon', style['menu-item-icon'])} type={icon} fontClassName="system" />;
+              }
 
-            if (isValidElement(icon)) {
-              return <span className={classnames('menu-item-icon', style['menu-item-icon'])}>{icon}</span>;
-            }
+              if (isValidElement(icon)) {
+                return <span className={classnames('menu-item-icon', style['menu-item-icon'])}>{icon}</span>;
+              }
 
-            if (isPlainObject(icon) && typeof icon.type === 'string') {
-              return <Icon {...icon} className={classnames('menu-item-icon', style['menu-item-icon'])} />;
-            }
+              if (isPlainObject(icon) && typeof icon.type === 'string') {
+                return <Icon {...icon} className={classnames('menu-item-icon', style['menu-item-icon'])} />;
+              }
 
-            return null;
-          })(icon)}
-          {menuOpen && item.label}
+              return null;
+            })()
+          )}
+          {menuOpen ? <span className={classnames('menu-item-label', style['menu-item-label'])}>{item.label}</span> : null}
+          {menuOpen ? <ItemBadge badge={item.badge} className={classnames('menu-item-badge', style['menu-item-badge'])} /> : null}
         </Flex>
       </div>
     );

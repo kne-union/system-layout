@@ -16,7 +16,8 @@ const MODE_OPTIONS = [
   { label: '无填充', value: 'noPadding' },
   { label: '函数式', value: 'function' },
   { label: '无导航', value: 'noNavbar' },
-  { label: '无工具栏', value: 'noToolbar' }
+  { label: '无工具栏', value: 'noToolbar' },
+  { label: '底栏', value: 'footer' }
 ];
 
 const MODE_TIPS = {
@@ -30,7 +31,8 @@ const MODE_TIPS = {
   noPadding: '已移除内容区内边距（noPadding），适合放置全屏地图、表格等。',
   function: '函数式子组件模式：Page 将渲染控制权交给 children 函数。',
   noNavbar: '已隐藏顶部导航栏（navbar=false）。',
-  noToolbar: '已隐藏底部工具栏（toolbar=false）。'
+  noToolbar: '已隐藏底部工具栏（toolbar=false）。',
+  footer: 'Page.Footer 贴在内容列底部。移动端可切换 Toolbar：有 Toolbar 时底栏在其上方，无 Toolbar 时贴住页面底边。'
 };
 
 const DEFAULT_BUTTON_PROPS = {
@@ -122,6 +124,7 @@ const resolveButtonProps = mode => {
 const BaseExample = () => {
   const [mode, setMode] = useState('basic');
   const [loading, setLoading] = useState(false);
+  const [footerToolbar, setFooterToolbar] = useState(true);
   const buttonProps = resolveButtonProps(mode);
   const userInfo =
     mode === 'noAvatar' || mode === 'noRight'
@@ -136,7 +139,7 @@ const BaseExample = () => {
         extra={mode === 'extra' ? <Button size="small" type="primary">自定义操作</Button> : null}
         noPadding={mode === 'noPadding'}
         navbar={mode !== 'noNavbar'}
-        toolbar={mode !== 'noToolbar'}
+        toolbar={mode === 'noToolbar' ? false : mode === 'footer' ? footerToolbar : true}
         buttonProps={buttonProps}
       >
         {mode === 'function'
@@ -168,8 +171,20 @@ const BaseExample = () => {
               });
             }
           : (
+            <>
             <Flex vertical gap={16}>
               <ModeSwitcher mode={mode} setMode={setMode} />
+              {mode === 'footer' ? (
+                <Segmented
+                  block
+                  value={footerToolbar ? 'withToolbar' : 'withoutToolbar'}
+                  onChange={value => setFooterToolbar(value === 'withToolbar')}
+                  options={[
+                    { label: '有 Toolbar', value: 'withToolbar' },
+                    { label: '无 Toolbar', value: 'withoutToolbar' }
+                  ]}
+                />
+              ) : null}
               {mode === 'noPadding' ? (
                 <Flex vertical gap={12}>
                   <Flex
@@ -209,6 +224,13 @@ const BaseExample = () => {
                 </>
               )}
             </Flex>
+            {mode === 'footer' ? (
+              <Page.Footer>
+                <Button>取消</Button>
+                <Button type="primary">提交</Button>
+              </Page.Footer>
+            ) : null}
+            </>
           )}
       </Page>
     </SystemLayout>

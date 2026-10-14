@@ -159,6 +159,7 @@
   --page-height: 100dvh;
   --page-content-height: var(--page-height);
   --page-inner-height: calc(var(--page-height) - var(--nav-height) - var(--toolbar-height));
+  --toolbar-bottom-gap: 16px;
   &.has-toolbar {
     --toolbar-height: 72px;
 
@@ -225,6 +226,7 @@
 
   .page-children {
     padding: 0;
+    padding-bottom: var(--page-footer-height, 0px);
     overflow: visible !important;
     height: unset;
 
@@ -260,7 +262,6 @@
   line-height: 1.4;
   display: flex;
   flex-direction: column;
-  @include common-style;
 
   &.is-mobile {
     @include is-mobile;
@@ -269,7 +270,9 @@
   .toolbar {
     display: none;
   }
+}
 
+@mixin layout-buttons {
   :global {
     .ant-btn {
       border-radius: 999px;
@@ -372,6 +375,11 @@
       }
     }
   }
+}
+
+:global(.kne-system-layout-scope) {
+  @include common-style;
+  @include layout-buttons;
 }
 
 .menu {
@@ -562,6 +570,7 @@
 }
 
 .page {
+  position: relative;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.72) 100%);
@@ -804,6 +813,7 @@
 .page-children {
   --container-height: calc(var(--page-content-height) - 48px);
   padding: 24px;
+  padding-bottom: max(24px, var(--page-footer-height, 0px));
   box-sizing: border-box;
   // 跟随 .page 内容区高度，勿用 --page-height（未扣除 page 的 1px 边框会溢出）
   height: 100%;
@@ -827,6 +837,7 @@
   }
 
   :global(.kne-responsive-container) {
+    position: relative;
     container-type: inline-size;
     container-name: kne-responsive;
     width: 100%;

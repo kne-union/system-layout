@@ -51,7 +51,7 @@ import '@kne/system-layout/dist/index.css';
 #### 示例代码
 
 - 基础布局
-- 移动端基础布局示例，展示 SystemLayout 在 isMobile 模式下的菜单、工具栏、用户信息和页面内容；并演示 Layout 默认胶囊按钮与 NO_CAPSULE_BTN_CLASS 取消胶囊圆角的用法
+- 移动端基础布局示例，展示 SystemLayout 在 isMobile 模式下的菜单、工具栏、用户信息和页面内容；并演示 Layout 默认胶囊按钮、NO_CAPSULE_BTN_CLASS 取消胶囊圆角，以及菜单/工具栏徽标（数量、圆点、溢出数字）
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),antd(antd)
 
 ```jsx
@@ -86,10 +86,10 @@ const BaseExample = () => {
       menu={{
         base: '/SystemLayout',
         items: [
-          { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
-          { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
+          { path: '/', label: 'Onboarding', toolbar: true, badge: 8, icon: ({ active }) => (active ? 'home' : 'home_line') },
+          { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, badge: true, icon: 'icon-assignment_ind' },
           { group: 'HIRING', path: '/hiring/application', label: 'Application List', icon: 'icon-assignment' },
-          { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: <BarChartIcon /> },
+          { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, badge: { count: 120, overflowCount: 99 }, icon: <BarChartIcon /> },
           { group: 'TALENT REVIEW', path: '/talent-review', label: 'Projects', icon: 'icon-manage_accounts' },
           { group: 'TALENT REVIEW', path: '/talent-review/employee', label: 'Employee', toolbar: true, icon: 'icon-groups_2' },
           { group: 'TALENT REVIEW', path: '/talent-review/ai-models', label: 'AI Models', icon: 'icon-network_intelligence' }
@@ -193,7 +193,7 @@ render(<BaseExample />);
 ```
 
 - Page 组件
-- Page 组件的各种功能：返回按钮、自定义内容、仅头像 / 头像+操作、函数式子组件、加载状态、navbar/toolbar 控制等；内容区加长，便于在手机预览中滚动查看导航栏胶囊态
+- Page 组件的各种功能：返回按钮、自定义内容、仅头像 / 头像+操作、函数式子组件、加载状态、navbar/toolbar 控制、底部操作栏等；内容区加长，便于在手机预览中滚动查看导航栏胶囊态与底栏贴底
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),antd(antd)
 
 ```jsx
@@ -215,7 +215,8 @@ const MODE_OPTIONS = [
   { label: '无填充', value: 'noPadding' },
   { label: '函数式', value: 'function' },
   { label: '无导航', value: 'noNavbar' },
-  { label: '无工具栏', value: 'noToolbar' }
+  { label: '无工具栏', value: 'noToolbar' },
+  { label: '底栏', value: 'footer' }
 ];
 
 const MODE_TIPS = {
@@ -229,7 +230,8 @@ const MODE_TIPS = {
   noPadding: '已移除内容区内边距（noPadding），适合放置全屏地图、表格等。',
   function: '函数式子组件模式：Page 将渲染控制权交给 children 函数。',
   noNavbar: '已隐藏顶部导航栏（navbar=false）。',
-  noToolbar: '已隐藏底部工具栏（toolbar=false）。'
+  noToolbar: '已隐藏底部工具栏（toolbar=false）。',
+  footer: 'Page.Footer 贴在内容列底部。移动端可切换 Toolbar：有 Toolbar 时底栏在其上方，无 Toolbar 时贴住页面底边。'
 };
 
 const DEFAULT_BUTTON_PROPS = {
@@ -321,6 +323,7 @@ const resolveButtonProps = mode => {
 const BaseExample = () => {
   const [mode, setMode] = useState('basic');
   const [loading, setLoading] = useState(false);
+  const [footerToolbar, setFooterToolbar] = useState(true);
   const buttonProps = resolveButtonProps(mode);
   const userInfo =
     mode === 'noAvatar' || mode === 'noRight'
@@ -335,7 +338,7 @@ const BaseExample = () => {
         extra={mode === 'extra' ? <Button size="small" type="primary">自定义操作</Button> : null}
         noPadding={mode === 'noPadding'}
         navbar={mode !== 'noNavbar'}
-        toolbar={mode !== 'noToolbar'}
+        toolbar={mode === 'noToolbar' ? false : mode === 'footer' ? footerToolbar : true}
         buttonProps={buttonProps}
       >
         {mode === 'function'
@@ -367,8 +370,20 @@ const BaseExample = () => {
               });
             }
           : (
+            <>
             <Flex vertical gap={16}>
               <ModeSwitcher mode={mode} setMode={setMode} />
+              {mode === 'footer' ? (
+                <Segmented
+                  block
+                  value={footerToolbar ? 'withToolbar' : 'withoutToolbar'}
+                  onChange={value => setFooterToolbar(value === 'withToolbar')}
+                  options={[
+                    { label: '有 Toolbar', value: 'withToolbar' },
+                    { label: '无 Toolbar', value: 'withoutToolbar' }
+                  ]}
+                />
+              ) : null}
               {mode === 'noPadding' ? (
                 <Flex vertical gap={12}>
                   <Flex
@@ -408,6 +423,13 @@ const BaseExample = () => {
                 </>
               )}
             </Flex>
+            {mode === 'footer' ? (
+              <Page.Footer>
+                <Button>取消</Button>
+                <Button type="primary">提交</Button>
+              </Page.Footer>
+            ) : null}
+            </>
           )}
       </Page>
     </SystemLayout>
@@ -1485,6 +1507,7 @@ Menu 组件由 SystemLayout 的 `menu` 属性配置，不需要单独使用。
 | `group` | `string` | - | 分组名称，相同 group 的项会归为一组 |
 | `groupLabel` | `string` | - | 分组显示文本，默认使用 `group` |
 | `toolbar` | `boolean` | `false` | 是否在移动端底部工具栏中显示 |
+| `badge` | `number` \| `boolean` \| `object` | - | 徽标。数字为数量，`true` 为圆点，对象透传给 antd `Badge`（如 `{ count, dot, overflowCount, showZero }`）。展开菜单时显示在文字右侧，收起菜单和 Toolbar 显示在图标角上 |
 | `onClick` | `function` | - | 自定义点击回调 `(item, { menuOpen, base, event }) => void`，设置后不会自动导航 |
 
 #### icon 配置
@@ -1538,6 +1561,27 @@ icon 支持多种格式：
 
 加载状态子组件，展示 Skeleton 骨架屏。
 
+#### Page.Footer
+
+贴在 Page 内容列底部的操作栏。宽度等于内容列，不吃 `.page-children` / `.page-inner` 的内边距。用它包住按钮或其他操作内容；同一页只放一个。
+
+```jsx
+<Page title="工单">
+  <div>表单内容</div>
+  <Page.Footer>
+    <Button>取消</Button>
+    <Button type="primary">提交</Button>
+  </Page.Footer>
+</Page>
+```
+
+| 属性 | 类型 | 说明 |
+|------|------|------|
+| `children` | `ReactNode` | 底栏内容，右对齐 |
+| `className` | `string` | 追加到根节点，可覆盖默认样式 |
+
+底栏会 portal 到内容列底部，并写入 `--page-footer-height`，让滚动内容停在底栏上方。移动端底栏固定在可视区域底部：当前页显示 Toolbar 时，底栏抬到 Toolbar 上方（含底部间距和安全区）；`toolbar={false}` 时贴住页面底边，并在底栏内留出安全区。手机预览框内会挂到预览边界，而不是浏览器视口。
+
 ---
 
 ### useLayoutContext
@@ -1557,6 +1601,8 @@ const { setToolbarShow, setNavbarShow, setMenuOpen, deviceIsMobile, logo, userAv
 | `setNavbarShow` | `(show: boolean) => void` | 控制移动端顶部导航栏显示/隐藏 |
 | `setMenuOpen` | `(open: boolean \| function) => void` | 控制菜单展开/收起 |
 | `deviceIsMobile` | `boolean` | 当前是否为移动端模式 |
+| `toolbarShow` | `boolean` | 移动端底部工具栏当前是否显示 |
+| `toolbarMinimal` | `boolean` | 移动端工具栏是否为收起后的窄高度 |
 | `logo` | `object` | Logo 配置对象 |
 | `userAvatar` | `string` | 用户头像 URL |
 
@@ -1621,3 +1667,4 @@ import { themeToken } from '@kne/system-layout';
 | `RESPONSIVE_BOUNDARY_CLASS` | 响应式边界 CSS 类名 |
 | `RESPONSIVE_SCROLL_CLASS` | 响应式滚动 CSS 类名 |
 | `NO_CAPSULE_BTN_CLASS` | 包一层可取消 Layout 内按钮默认胶囊圆角 |
+| `LAYOUT_SCOPE_CLASS` | 通用样式作用域。内容 portal 到 `.layout` 外时，挂载点带上此类后按钮胶囊、工具类与主题变量仍然生效 |

@@ -1,14 +1,119 @@
 import { Flex, Button, Skeleton } from 'antd';
 import { createPortal } from 'react-dom';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Icon from '@kne/react-icon';
 import ButtonGroup from '@kne/button-group';
 import classnames from 'classnames';
 import { useNavigate } from 'react-router-dom';
-import { useScrollElement, usePopupContainer, useResponsiveContext } from '@kne/responsive-utils';
+import { useScrollElement, usePopupContainer, useResponsiveContext, RESPONSIVE_CONTAINER_CLASS } from '@kne/responsive-utils';
 import { useContext } from '../context';
 import style from './style.module.scss';
 import { Image } from '@kne/react-file';
+
+const findFooterMount = anchor => {
+  if (!anchor) {
+    return null;
+  }
+  const container = anchor.closest(`.${RESPONSIVE_CONTAINER_CLASS}`);
+  if (container) {
+    return container;
+  }
+  const pageRoot = anchor.closest('.page');
+  if (pageRoot && pageRoot.parentElement) {
+    return pageRoot.parentElement.closest('.page');
+  }
+  return null;
+};
+
+const PageFooter = ({ children, className }) => {
+  const anchorRef = useRef(null);
+  const footerRef = useRef(null);
+  const [host, setHost] = useState(null);
+  const { deviceIsMobile, toolbarShow, toolbarMinimal } = useContext();
+  const { mode } = useResponsiveContext();
+  const getBoundaryElement = usePopupContainer();
+  const hasToolbar = !!toolbarShow;
+  const useBoundaryMount = deviceIsMobile && mode === 'container';
+  const boundaryTarget = useBoundaryMount ? getBoundaryElement() : null;
+  const boundaryReady = useBoundaryMount && !!boundaryTarget;
+  const useViewportFixed = deviceIsMobile && !boundaryReady;
+
+  useLayoutEffect(() => {
+    setHost(findFooterMount(anchorRef.current));
+  }, []);
+
+  useLayoutEffect(() => {
+    const el = footerRef.current;
+    if (!host || !el) {
+      return;
+    }
+    const apply = () => {
+      if (deviceIsMobile) {
+        const hostRect = host.getBoundingClientRect();
+        if (boundaryReady && boundaryTarget) {
+          const boundRect = boundaryTarget.getBoundingClientRect();
+          el.style.left = `${hostRect.left - boundRect.left}px`;
+        } else {
+          el.style.left = `${hostRect.left}px`;
+        }
+        el.style.width = `${hostRect.width}px`;
+        el.style.right = 'auto';
+      }
+      host.style.setProperty('--page-footer-height', `${el.getBoundingClientRect().height}px`);
+    };
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(el);
+    observer.observe(host);
+    window.addEventListener('resize', apply);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', apply);
+      host.style.removeProperty('--page-footer-height');
+    };
+  }, [host, hasToolbar, deviceIsMobile, toolbarMinimal, boundaryReady, boundaryTarget]);
+
+  const footer = (
+    <div
+      ref={footerRef}
+      className={classnames('page-footer', style['page-footer'], className, {
+        'is-mobile': deviceIsMobile,
+        [style['is-mobile']]: deviceIsMobile,
+        'has-toolbar': hasToolbar,
+        [style['has-toolbar']]: hasToolbar,
+        'is-viewport': useViewportFixed,
+        [style['is-viewport']]: useViewportFixed,
+        'is-boundary': boundaryReady,
+        [style['is-boundary']]: boundaryReady
+      })}
+    >
+      {children}
+    </div>
+  );
+
+  const portalTarget = boundaryReady ? boundaryTarget : host;
+  const node = boundaryReady ? (
+    <div
+      className={classnames('page-footer-boundary-overlay', style['page-footer-boundary-overlay'])}
+      style={{
+        '--toolbar-height': hasToolbar ? (toolbarMinimal ? '60px' : '72px') : '0px',
+        '--toolbar-bottom-gap': '16px',
+        '--safe-area-inset-bottom': 'env(safe-area-inset-bottom)'
+      }}
+    >
+      {footer}
+    </div>
+  ) : (
+    footer
+  );
+
+  return (
+    <>
+      <span ref={anchorRef} className={style['page-footer-anchor']} />
+      {portalTarget ? createPortal(node, portalTarget) : null}
+    </>
+  );
+};
 
 const PageLoading = () => {
   return (
@@ -226,5 +331,6 @@ const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true
 };
 
 Page.PageLoading = PageLoading;
+Page.Footer = PageFooter;
 
 export default Page;

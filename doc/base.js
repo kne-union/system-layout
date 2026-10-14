@@ -29,10 +29,10 @@ const BaseExample = () => {
       menu={{
         base: '/SystemLayout',
         items: [
-          { path: '/', label: 'Onboarding', toolbar: true, icon: ({ active }) => (active ? 'home' : 'home_line') },
-          { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, icon: 'icon-assignment_ind' },
+          { path: '/', label: 'Onboarding', toolbar: true, badge: 8, icon: ({ active }) => (active ? 'home' : 'home_line') },
+          { group: 'HIRING', path: '/hiring', label: 'Hiring Hub', toolbar: true, badge: true, icon: 'icon-assignment_ind' },
           { group: 'HIRING', path: '/hiring/application', label: 'Application List', icon: 'icon-assignment' },
-          { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, icon: <BarChartIcon /> },
+          { group: 'PEOPLE', path: '/people', label: 'Management', toolbar: true, badge: { count: 120, overflowCount: 99 }, icon: <BarChartIcon /> },
           { group: 'TALENT REVIEW', path: '/talent-review', label: 'Projects', icon: 'icon-manage_accounts' },
           { group: 'TALENT REVIEW', path: '/talent-review/employee', label: 'Employee', toolbar: true, icon: 'icon-groups_2' },
           { group: 'TALENT REVIEW', path: '/talent-review/ai-models', label: 'AI Models', icon: 'icon-network_intelligence' }
