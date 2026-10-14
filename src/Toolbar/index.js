@@ -9,6 +9,8 @@ import { isValidElement, useRef, useLayoutEffect, useState, useEffect } from 're
 import isPlainObject from 'lodash/isPlainObject';
 import { useScrollElement, usePopupContainer, useResponsiveContext, useIsMobile } from '@kne/responsive-utils';
 import { useContext } from '../context';
+import { LAYOUT_SCOPE_CLASS } from '../layoutScope';
+import ItemBadge from '../ItemBadge';
 
 const resolveTarget = target => {
   if (!target) {
@@ -225,21 +227,23 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
               }
             }}
           >
-            {(icon => {
-              if (typeof icon === 'string') {
-                return <Icon className={classnames('toolbar-item-icon', style['toolbar-item-icon'])} type={icon} fontClassName="system" />;
-              }
+            <ItemBadge badge={item.badge} className={classnames('toolbar-item-badge', style['toolbar-item-badge'])}>
+              {(icon => {
+                if (typeof icon === 'string') {
+                  return <Icon className={classnames('toolbar-item-icon', style['toolbar-item-icon'])} type={icon} fontClassName="system" />;
+                }
 
-              if (isValidElement(icon)) {
-                return <span className={classnames('toolbar-item-icon', style['toolbar-item-icon'])}>{icon}</span>;
-              }
+                if (isValidElement(icon)) {
+                  return <span className={classnames('toolbar-item-icon', style['toolbar-item-icon'])}>{icon}</span>;
+                }
 
-              if (isPlainObject(icon) && typeof icon.type === 'string') {
-                return <Icon {...icon} className={classnames('toolbar-item-icon', style['toolbar-item-icon'])} />;
-              }
+                if (isPlainObject(icon) && typeof icon.type === 'string') {
+                  return <Icon {...icon} className={classnames('toolbar-item-icon', style['toolbar-item-icon'])} />;
+                }
 
-              return null;
-            })(icon)}
+                return null;
+              })(icon)}
+            </ItemBadge>
             {!minimal && <div className={classnames('toolbar-item-label', style['toolbar-item-label'])}>{item.label}</div>}
           </Flex>
         );
@@ -256,7 +260,7 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
   }
 
   if (explicitTarget) {
-    return <div className={classnames('toolbar', style['toolbar'], className)}>{createPortal(toolbarList, explicitTarget)}</div>;
+    return <div className={classnames('toolbar', style['toolbar'], className)}>{createPortal(<div className={LAYOUT_SCOPE_CLASS}>{toolbarList}</div>, explicitTarget)}</div>;
   }
 
   return null;

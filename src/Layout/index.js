@@ -14,6 +14,7 @@ import style from './style.module.scss';
 import ErrorBoundary from '../ErrorComponent';
 import SimpleBar from 'simplebar-react';
 import { Provider } from '../context';
+import { LAYOUT_SCOPE_CLASS, syncLayoutScope, clearLayoutScope } from '../layoutScope';
 import { useLocation } from 'react-router-dom';
 import useIsMobile from '../useIsMobile';
 import { ResponsiveProvider, useResponsiveContext, findResponsiveScroll, findScrollParent, getDefaultScrollElement, RESPONSIVE_BOUNDARY_CLASS, RESPONSIVE_CONTAINER_CLASS, RESPONSIVE_SCROLL_CLASS } from '@kne/responsive-utils';
@@ -216,6 +217,8 @@ const Layout = ({
       setMenuOpen,
       deviceIsMobile,
       scrollReady,
+      toolbarShow: deviceIsMobile && toolbarShow,
+      toolbarMinimal: deviceIsMobile && toolbarShow && toolbarMinimal,
       logo: Object.assign(
         {},
         logo
@@ -226,11 +229,23 @@ const Layout = ({
       ),
       userAvatar
     };
-  }, [deviceIsMobile, logo, userAvatar, scrollReady]);
+  }, [deviceIsMobile, logo, userAvatar, scrollReady, toolbarShow, toolbarMinimal]);
   const topRef = useRef(null);
   const pageRef = useRef(null);
   const layoutBoundaryRef = useRef(null);
   const pageScrollRef = useRef(null);
+
+  useEffect(() => {
+    if (responsiveContext.mode !== 'container' || typeof responsiveContext.getBoundaryElement !== 'function') {
+      return undefined;
+    }
+    const boundary = responsiveContext.getBoundaryElement();
+    if (!boundary || boundary === layoutBoundaryRef.current) {
+      return undefined;
+    }
+    syncLayoutScope(boundary, layoutBoundaryRef.current);
+    return () => clearLayoutScope(boundary);
+  }, [responsiveContext.mode, responsiveContext.getBoundaryElement, deviceIsMobile, toolbarShow, toolbarMinimal, background, scrollReady]);
   const location = useLocation();
   const getPageScrollElement = useCallback(() => {
     return resolvePageScrollElement(pageScrollRef, openScrollbar, deviceIsMobile);
@@ -411,7 +426,7 @@ const Layout = ({
         <div ref={topRef} />
         <div
           ref={layoutBoundaryRef}
-          className={classnames(className, 'layout', style['layout'], RESPONSIVE_BOUNDARY_CLASS, {
+          className={classnames(className, 'layout', style['layout'], LAYOUT_SCOPE_CLASS, RESPONSIVE_BOUNDARY_CLASS, {
             'is-mobile': deviceIsMobile,
             [style['is-mobile']]: deviceIsMobile,
             'has-toolbar': deviceIsMobile && toolbarShow,
@@ -501,3 +516,4 @@ export default Layout;
 
 /** 包在此 class 容器内可取消 layout 默认的胶囊按钮圆角 */
 export const NO_CAPSULE_BTN_CLASS = 'kne-system-layout-no-capsule-btn';
+export { LAYOUT_SCOPE_CLASS } from '../layoutScope';
