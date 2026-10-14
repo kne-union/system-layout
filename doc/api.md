@@ -11,7 +11,7 @@
 | `background` | `string` | `linear-gradient(0deg, #BBCFE7 0%, #BBCFE7 100%), #FFFFFF` | 布局背景样式 |
 | `menuMaxWidth` | `string` | `254px` | 菜单展开时的最大宽度（桌面端） |
 | `menuMinWidth` | `string` | `84px` | 菜单收起时的最小宽度（桌面端） |
-| `logo` | `object` | 默认 Logo | Logo 配置，props 传递给 `@kne/react-file` 的 Image 组件 |
+| `logo` | `object` \| `null` \| `false` | 默认 Logo | Logo 配置，props 传递给 `@kne/react-file` 的 Image 组件。不传时显示默认 Logo；传 `null`、`false` 或不含 `src` / `id` 的对象时不显示 Logo，只保留展开收起按钮。图片加载中和加载失败的占位图都限制在 24px 高 |
 | `menuHeader` | `ReactNode` \| `function` | 默认 UserCard | 菜单头部内容，函数形式接收 `{ menuOpen, userCard }` 参数 |
 | `userInfo` | `object` | - | 用户信息，详见 userInfo 配置 |
 | `aiDialog` | `object` | `null` | AI 对话框配置，包含 `title` 和 `content` 字段 |
@@ -165,7 +165,7 @@ const { setToolbarShow, setNavbarShow, setMenuOpen, deviceIsMobile, logo, userAv
 | `deviceIsMobile` | `boolean` | 当前是否为移动端模式 |
 | `toolbarShow` | `boolean` | 移动端底部工具栏当前是否显示 |
 | `toolbarMinimal` | `boolean` | 移动端工具栏是否为收起后的窄高度 |
-| `logo` | `object` | Logo 配置对象 |
+| `logo` | `object` \| `null` | Logo 配置对象，不显示 Logo 时为 `null` |
 | `userAvatar` | `string` | 用户头像 URL |
 
 ---

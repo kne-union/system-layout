@@ -1,5 +1,5 @@
 const { default: SystemLayout, Page, BarChartIcon, NO_CAPSULE_BTN_CLASS } = _SystemLayout;
-const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography, Switch, Space, Button } = antd;
+const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography, Switch, Space, Button, Segmented } = antd;
 const { useState } = React;
 const { Text, Title } = Typography;
 
@@ -17,13 +17,21 @@ const ONBOARDING_STEPS = [
   { title: '参加新人培训', done: false }
 ];
 
+const LOGO_OPTIONS = {
+  default: undefined,
+  empty: null,
+  broken: { src: 'https://example.invalid/logo.png' }
+};
+
 const BaseExample = () => {
   const [toolbarMinimal, setToolbarMinimal] = useState(false);
+  const [logoMode, setLogoMode] = useState('default');
   const doneCount = ONBOARDING_STEPS.filter(step => step.done).length;
   const percent = Math.round((doneCount / ONBOARDING_STEPS.length) * 100);
 
   return (
     <SystemLayout
+      logo={LOGO_OPTIONS[logoMode]}
       toolbarMinimal={toolbarMinimal}
       userInfo={{ name: 'Lucy L', email: 'lucy@company.com' }}
       menu={{
@@ -58,7 +66,18 @@ const BaseExample = () => {
                 </Title>
                 <Text type="secondary">欢迎回到工作台，今天有 8 项待办事项等待处理。</Text>
               </Flex>
-              <Space>
+              <Space wrap>
+                <Text type="secondary">Logo</Text>
+                <Segmented
+                  size="small"
+                  value={logoMode}
+                  onChange={setLogoMode}
+                  options={[
+                    { label: '默认', value: 'default' },
+                    { label: '不显示', value: 'empty' },
+                    { label: '加载失败', value: 'broken' }
+                  ]}
+                />
                 <Text type="secondary">极简工具栏</Text>
                 <Switch checked={toolbarMinimal} onChange={setToolbarMinimal} />
                 <Tag color="processing" style={{ fontSize: 13, padding: '4px 12px' }}>

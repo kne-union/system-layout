@@ -411,6 +411,11 @@
           pointer-events: auto;
         }
       }
+
+      &.is-empty .expand-btn-wrapper {
+        opacity: 1;
+        pointer-events: auto;
+      }
     }
 
     .expand-btn-wrapper {
@@ -490,6 +495,8 @@
 
 .logo {
   position: relative;
+  box-sizing: border-box;
+  min-height: 40px;
   padding: 8px 24px;
   display: flex;
   justify-content: flex-start;
@@ -504,7 +511,22 @@
 .logo-img {
   display: flex;
   align-items: center;
+  height: 24px;
+  max-width: 100%;
+  overflow: hidden;
   transition: opacity 0.2s;
+
+  // 加载失败的占位 svg 自带 200x200
+  svg {
+    width: 24px;
+    height: 24px;
+    flex: none;
+  }
+
+  :global(.ant-skeleton-avatar) {
+    width: 24px !important;
+    height: 24px !important;
+  }
 }
 
 .expand-btn-wrapper {
