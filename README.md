@@ -51,12 +51,12 @@ import '@kne/system-layout/dist/index.css';
 #### 示例代码
 
 - 基础布局
-- 移动端基础布局示例，展示 SystemLayout 在 isMobile 模式下的菜单、工具栏、用户信息和页面内容；并演示 Layout 默认胶囊按钮、NO_CAPSULE_BTN_CLASS 取消胶囊圆角，以及菜单/工具栏徽标（数量、圆点、溢出数字）
+- 移动端基础布局示例，展示 SystemLayout 在 isMobile 模式下的菜单、工具栏、用户信息和页面内容；并演示 Layout 默认胶囊按钮、NO_CAPSULE_BTN_CLASS 取消胶囊圆角，菜单/工具栏徽标（数量、圆点、溢出数字），以及 Logo 默认 / 不显示 / 加载失败三种状态
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),antd(antd)
 
 ```jsx
 const { default: SystemLayout, Page, BarChartIcon, NO_CAPSULE_BTN_CLASS } = _SystemLayout;
-const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography, Switch, Space, Button } = antd;
+const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography, Switch, Space, Button, Segmented } = antd;
 const { useState } = React;
 const { Text, Title } = Typography;
 
@@ -74,13 +74,21 @@ const ONBOARDING_STEPS = [
   { title: '参加新人培训', done: false }
 ];
 
+const LOGO_OPTIONS = {
+  default: undefined,
+  empty: null,
+  broken: { src: 'https://example.invalid/logo.png' }
+};
+
 const BaseExample = () => {
   const [toolbarMinimal, setToolbarMinimal] = useState(false);
+  const [logoMode, setLogoMode] = useState('default');
   const doneCount = ONBOARDING_STEPS.filter(step => step.done).length;
   const percent = Math.round((doneCount / ONBOARDING_STEPS.length) * 100);
 
   return (
     <SystemLayout
+      logo={LOGO_OPTIONS[logoMode]}
       toolbarMinimal={toolbarMinimal}
       userInfo={{ name: 'Lucy L', email: 'lucy@company.com' }}
       menu={{
@@ -115,7 +123,18 @@ const BaseExample = () => {
                 </Title>
                 <Text type="secondary">欢迎回到工作台，今天有 8 项待办事项等待处理。</Text>
               </Flex>
-              <Space>
+              <Space wrap>
+                <Text type="secondary">Logo</Text>
+                <Segmented
+                  size="small"
+                  value={logoMode}
+                  onChange={setLogoMode}
+                  options={[
+                    { label: '默认', value: 'default' },
+                    { label: '不显示', value: 'empty' },
+                    { label: '加载失败', value: 'broken' }
+                  ]}
+                />
                 <Text type="secondary">极简工具栏</Text>
                 <Switch checked={toolbarMinimal} onChange={setToolbarMinimal} />
                 <Tag color="processing" style={{ fontSize: 13, padding: '4px 12px' }}>
@@ -1449,7 +1468,7 @@ render(<BaseExample />);
 | `background` | `string` | `linear-gradient(0deg, #BBCFE7 0%, #BBCFE7 100%), #FFFFFF` | 布局背景样式 |
 | `menuMaxWidth` | `string` | `254px` | 菜单展开时的最大宽度（桌面端） |
 | `menuMinWidth` | `string` | `84px` | 菜单收起时的最小宽度（桌面端） |
-| `logo` | `object` | 默认 Logo | Logo 配置，props 传递给 `@kne/react-file` 的 Image 组件 |
+| `logo` | `object` \| `null` \| `false` | 默认 Logo | Logo 配置，props 传递给 `@kne/react-file` 的 Image 组件。不传时显示默认 Logo；传 `null`、`false` 或不含 `src` / `id` 的对象时不显示 Logo，只保留展开收起按钮。图片加载中和加载失败的占位图都限制在 24px 高 |
 | `menuHeader` | `ReactNode` \| `function` | 默认 UserCard | 菜单头部内容，函数形式接收 `{ menuOpen, userCard }` 参数 |
 | `userInfo` | `object` | - | 用户信息，详见 userInfo 配置 |
 | `aiDialog` | `object` | `null` | AI 对话框配置，包含 `title` 和 `content` 字段 |
@@ -1603,7 +1622,7 @@ const { setToolbarShow, setNavbarShow, setMenuOpen, deviceIsMobile, logo, userAv
 | `deviceIsMobile` | `boolean` | 当前是否为移动端模式 |
 | `toolbarShow` | `boolean` | 移动端底部工具栏当前是否显示 |
 | `toolbarMinimal` | `boolean` | 移动端工具栏是否为收起后的窄高度 |
-| `logo` | `object` | Logo 配置对象 |
+| `logo` | `object` \| `null` | Logo 配置对象，不显示 Logo 时为 `null` |
 | `userAvatar` | `string` | 用户头像 URL |
 
 ---

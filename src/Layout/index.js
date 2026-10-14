@@ -219,14 +219,7 @@ const Layout = ({
       scrollReady,
       toolbarShow: deviceIsMobile && toolbarShow,
       toolbarMinimal: deviceIsMobile && toolbarShow && toolbarMinimal,
-      logo: Object.assign(
-        {},
-        logo
-          ? logo
-          : {
-              src: defaultLogo
-            }
-      ),
+      logo: logo === undefined ? { src: defaultLogo } : logo && (logo.src || logo.id) ? Object.assign({}, logo) : null,
       userAvatar
     };
   }, [deviceIsMobile, logo, userAvatar, scrollReady, toolbarShow, toolbarMinimal]);
@@ -309,8 +302,12 @@ const Layout = ({
       })}
       style={menuPortalVars}
     >
-      <div className={classnames('logo', style['logo'])}>
-        <Image className={style['logo-img']} {...contextValue.logo} />
+      <div className={classnames('logo', style['logo'], { [style['is-empty']]: !contextValue.logo })}>
+        {contextValue.logo ? (
+          <span className={classnames('logo-img', style['logo-img'])}>
+            <Image {...contextValue.logo} />
+          </span>
+        ) : null}
         <div
           className={classnames('expand-btn-wrapper', style['expand-btn-wrapper'])}
           onClick={() => {
