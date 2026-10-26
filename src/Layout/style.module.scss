@@ -103,6 +103,11 @@
     border-radius: 12px;
   }
 
+  // table-page 卡片模式把工具栏 padding-inline 置 0，这里有玻璃底色，内容会贴边
+  &:not(:has(.ant-table)) .table-page-toolbar {
+    padding-inline: 16px;
+  }
+
   .ant-table-container table > thead > tr:first-child > * {
     border-radius: 0 !important;
   }
