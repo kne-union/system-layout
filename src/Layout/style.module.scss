@@ -889,6 +889,11 @@
       min-height: 40px;
     }
 
+    // SuperSelect 根节点默认 flex-start，被撑到 40px 后内容偏上
+    .react-form .react-form__field-component.select-input {
+      align-items: center;
+    }
+
     // 可输入元素字号不低于 16px，否则 iOS 聚焦时会缩放页面（含 TablePage 搜索框等写死 size 的控件）
     input.ant-input,
     textarea.ant-input,
