@@ -1,4 +1,4 @@
-const { default: SystemLayout, Page } = _SystemLayout;
+const { default: SystemLayout, Page, Card, CARD_THEME } = _SystemLayout;
 const { createWithRemoteLoader } = remoteLoader;
 const { Routes, Route, Navigate, useLocation } = reactRouterDom;
 const { UserSwitchOutlined, LogoutOutlined, PartitionOutlined, UserOutlined, SafetyCertificateOutlined, HomeOutlined } = icons;
@@ -93,18 +93,13 @@ const TenantDemoInner = createWithRemoteLoader({
                       path={base}
                       element={
                         <Page title="工作台">
-                          <div style={{ padding: 16, color: '#666', lineHeight: 1.8 }}>
-                            <p>
-                              当前租户：<strong>{tenant?.name}</strong>
-                            </p>
-                            <p>
-                              当前用户：<strong>{tenantUserInfo?.name}</strong>（{tenantUserInfo?.email}）
-                            </p>
-                            <p>
-                              左侧菜单进入「系统设置」可体验 components-admin:Tenant@Setting 的公司 / 组织 / 用户 / 权限页面，接口均走
-                              mock 数据。
-                            </p>
-                          </div>
+                          <Card
+                            theme={CARD_THEME.glass}
+                            subtitle="当前租户"
+                            title={tenant?.name}
+                            extra={`${tenantUserInfo?.name || ''}（${tenantUserInfo?.email || ''}）`}
+                            description="左侧菜单进入「系统设置」可体验 components-admin:Tenant@Setting 的公司 / 组织 / 用户 / 权限页面，接口均走 mock 数据。"
+                          />
                         </Page>
                       }
                     />

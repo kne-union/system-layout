@@ -1,3 +1,7 @@
+@use '../styles/tokens';
+
+@include tokens.jelly-keyframes;
+
 @keyframes capsule-click {
   0% {
     transform: scaleX(1) scaleY(1);
@@ -17,9 +21,13 @@
   }
 }
 
+// 移动端尺寸：左右边距 16px，导航控件 40px（与 antd large 控件同高）
+$mobile-gutter: 16px;
+$nav-size: 40px;
+
 @mixin page-header-mobile {
   height: 48px;
-  padding: 0 12px;
+  padding: 0 $mobile-gutter;
   background: transparent;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -57,11 +65,19 @@
     width: fit-content;
     max-width: calc(100% - 96px);
     min-width: 0;
+
+    // 菜单 / 返回键：固定 36px 方形热区，放进 40px 胶囊（含 1px 描边）不溢出
+    :global(.ant-btn) {
+      flex: none;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+    }
   }
 
   .page-title {
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 17px;
+    font-weight: 600;
     flex: 0 1 auto;
     min-width: 0;
     color: var(--primary-color);
@@ -74,15 +90,65 @@
       color 0.3s ease;
   }
 
+  // 右侧操作区：容器本身无外观；圆钮 / 胶囊在顶部为平铺，滚动后（.is-scrolled）才显示玻璃面，与左侧标题一致
   .page-title-extra {
     flex: 0 0 auto;
     margin-left: auto;
-    max-width: none;
-    overflow: visible;
-    // 禁止容器自身在切胶囊时插值 border / shadow
-    transition: none !important;
-    border: 1px solid transparent;
-    box-shadow: none;
+    max-width: 60%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-circle,
+  .nav-capsule {
+    box-sizing: border-box;
+    height: $nav-size !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    color: var(--sl-text-1) !important;
+
+    &:active {
+      animation: capsule-click 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+  }
+
+  .nav-circle {
+    flex: none;
+    width: $nav-size !important;
+    min-width: $nav-size;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: none;
+
+    &:global(.ant-btn):hover,
+    &:global(.ant-btn):focus-visible {
+      color: var(--sl-text-hover) !important;
+    }
+
+    :global(.ant-avatar) {
+      flex: none;
+    }
+  }
+
+  .nav-avatar {
+    overflow: hidden;
+  }
+
+  .nav-capsule {
+    min-width: 0;
+    max-width: 100%;
+    border-radius: 999px;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
 
     :global(.ant-space),
     :global(.ant-space-item) {
@@ -90,37 +156,38 @@
       align-items: center;
     }
 
-    :global(.ant-avatar) {
-      flex: none;
-    }
-
-    // antd Button 默认 transition:all，滚动切换时会出现 border 动画
     :global(.ant-btn) {
-      transition: none !important;
-      border-color: transparent !important;
+      color: var(--sl-text-1) !important;
+      height: 32px;
+      padding: 0 4px !important;
+      font-size: 15px;
+      border: none !important;
       box-shadow: none !important;
+      background: transparent !important;
+      white-space: nowrap;
+      transition: none !important;
     }
-  }
 
-  .page-title-actions {
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    :global(.ant-btn):hover,
+    :global(.ant-btn):focus {
+      color: var(--sl-text-hover) !important;
+    }
 
-    // 测宽节点关在 actions 内，避免参与外层 gap / 撑开胶囊
-    > div:first-child {
-      width: 0 !important;
-      min-width: 0 !important;
-      max-width: 0 !important;
-      flex: 0 0 0 !important;
-      overflow: hidden;
+    // 不用 display:none，保留布局以便内容后续变化时 JS 仍能量测
+    &.is-empty {
+      padding: 0;
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      opacity: 0;
       pointer-events: none;
     }
   }
 
   &.is-scrolled {
-    height: 36px;
+    height: $nav-size;
     padding: 0;
     background: transparent;
     backdrop-filter: none;
@@ -134,16 +201,13 @@
       width: fit-content;
       max-width: calc(100% - 48px);
       border-radius: 999px;
-      padding: 0 10px 0 6px;
-      height: 36px;
+      padding: 0 12px 0 2px;
+      height: $nav-size;
       min-width: 0;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      box-shadow:
-        0 8px 32px 0 rgba(78, 96, 139, 0.18),
-        0 2px 8px 0 rgba(78, 96, 139, 0.1),
-        inset 0 1px 1px 0 rgba(255, 255, 255, 0.6);
-      background: rgba(255, 255, 255, 0.25);
+      border: 1px solid var(--sl-glass-border-strong);
+      box-shadow: var(--sl-shadow-float);
+      background: var(--sl-glass-bg-faint);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
 
@@ -155,79 +219,27 @@
       :global(.ant-btn),
       :global(.ant-btn) .back-icon,
       .back-icon {
-        color: #333 !important;
+        color: var(--sl-text-1) !important;
       }
 
       :global(.ant-btn):hover,
       :global(.ant-btn):focus {
-        color: #555 !important;
+        color: var(--sl-text-hover) !important;
       }
     }
 
-    .page-title-extra {
-      flex: 0 1 auto;
-      margin-left: auto;
-      max-width: 50%;
-      min-width: 0;
-
-      &.has-float {
-        width: fit-content;
-        max-width: 50%;
-        min-width: 0;
-        border-radius: 999px;
-        padding: 0 8px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow:
-          0 8px 32px 0 rgba(78, 96, 139, 0.18),
-          0 2px 8px 0 rgba(78, 96, 139, 0.1),
-          inset 0 1px 1px 0 rgba(255, 255, 255, 0.6);
-        background: rgba(255, 255, 255, 0.25);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        transition: none !important;
-
-        &:active {
-          animation: capsule-click 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        // 胶囊态：宽度随内容，超出由容器裁切（适配「自定义操作」等文案按钮）
-        :global(.ant-btn) {
-          color: #333 !important;
-          display: inline-flex !important;
-          align-items: center;
-          justify-content: center;
-          width: auto;
-          max-width: 100%;
-          min-width: 0 !important;
-          height: 28px;
-          padding: 0 4px !important;
-          font-size: 13px;
-          line-height: 1;
-          border: none !important;
-          box-shadow: none !important;
-          background: transparent !important;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          transition: none !important;
-        }
-
-        :global(.ant-btn):hover,
-        :global(.ant-btn):focus {
-          color: #555 !important;
-          background: transparent !important;
-        }
-      }
+    .nav-circle,
+    .nav-capsule:not(.is-empty) {
+      border-color: var(--sl-glass-border-strong) !important;
+      box-shadow: var(--sl-shadow-float) !important;
+      background: var(--sl-glass-bg-faint) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     .page-title {
-      font-size: 14px;
-      color: #333;
+      font-size: 15px;
+      color: var(--sl-text-1);
       line-height: 1;
     }
   }
@@ -244,13 +256,13 @@
   }
   .page-inner {
     box-sizing: border-box;
-    --content-height: calc(var(--page-inner-height) - 24px);
-    padding: 12px;
+    --content-height: calc(var(--page-inner-height) - #{$mobile-gutter * 2});
+    padding: $mobile-gutter;
 
     &:after {
       content: '';
       display: block;
-      height: max(0px, calc(var(--toolbar-height) + 48px + var(--safe-area-inset-bottom) - var(--page-footer-height, 0px)));
+      height: max(0px, calc(var(--toolbar-height) + 24px + var(--safe-area-inset-bottom) - var(--page-footer-height, 0px)));
     }
 
     &.no-padding {
@@ -382,13 +394,111 @@
     bottom: 0;
   }
 
-  &.is-mobile:not(.has-toolbar) {
+  &.is-mobile:not(.is-merged) {
     padding-bottom: calc(12px + var(--safe-area-inset-bottom, 0px));
   }
 
-  &.is-mobile.has-toolbar {
-    bottom: 0;
-    padding-bottom: calc(12px + var(--toolbar-height, 72px) + var(--toolbar-bottom-gap, 16px) + var(--safe-area-inset-bottom, 0px));
+  // 与 Toolbar 同排：左侧留出 Toolbar 圆钮位置，形态与 Toolbar 一致的玻璃胶囊
+  &.is-merged {
+    $side: tokens.$bar-side;
+    $gap: tokens.$bar-gap;
+    // 底栏态整行用紧凑高度；展开导航态右侧圆钮与 Toolbar 同高
+    $compact: tokens.$bar-compact;
+    $size: var(--toolbar-height, 62px);
+    bottom: max(var(--toolbar-bottom-gap, 8px), calc(var(--safe-area-inset-bottom, 0px) - 12px));
+    left: calc(#{$side} + #{$compact} + #{$gap});
+    right: auto;
+    width: calc(100% - #{$side * 2} - #{$gap} - #{$compact});
+    height: $compact;
+    padding: 0 4px;
+    align-items: center;
+    z-index: 600;
+    overflow: hidden;
+    border-radius: 999px;
+    border: 1px solid var(--sl-glass-border-strong);
+    box-shadow: var(--sl-shadow-float);
+    background: var(--sl-glass-bg-strong);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition:
+      left tokens.$spring-duration tokens.$spring,
+      width tokens.$spring-duration tokens.$spring,
+      height tokens.$spring-duration tokens.$spring,
+      padding tokens.$spring-duration tokens.$spring,
+      transform 0.3s ease,
+      background 0.3s ease;
+
+    @include tokens.jelly('.is-docked');
+
+    // 与 Toolbar 同步滚动收缩：收成右侧圆钮并向右下角缩小，停止滚动后放开
+    &.is-scrolling {
+      transform: scale(0.65);
+      transform-origin: right bottom;
+      background: var(--sl-glass-bg-faint);
+    }
+
+    &.is-docked {
+      left: calc(100% - #{$side} - #{$size});
+      width: $size;
+      height: $size;
+      padding: 0;
+    }
+
+    &.is-scrolling {
+      left: calc(100% - #{$side} - #{$compact});
+      width: $compact;
+      padding: 0;
+    }
+  }
+}
+
+.page-footer-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  transform-origin: right center;
+  transition:
+    opacity 0.2s ease,
+    transform tokens.$spring-duration tokens.$spring;
+
+  .is-docked > &,
+  .is-scrolling > & {
+    opacity: 0;
+    transform: scale(0.85);
+    pointer-events: none;
+  }
+}
+
+.page-footer-dock {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--sl-primary);
+  font-size: 24px;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.4);
+  pointer-events: none;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+
+  .is-docked > &,
+  .is-scrolling > & {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+    transition:
+      opacity 0.2s ease 0.1s,
+      transform tokens.$spring-duration cubic-bezier(0.34, 1.8, 0.64, 1) 0.1s;
   }
 }
 

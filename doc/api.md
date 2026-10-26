@@ -21,6 +21,17 @@
 | `toolbarMinimal` | `boolean` | `false` | 移动端底部工具栏是否使用极简模式。`false` 为普通模式（展示标题与选中背景），`true` 为极简模式（仅图标） |
 | `children` | `ReactNode` | - | 页面内容，通常为 Page 组件 |
 
+#### 移动端规范
+
+移动端按触控与可读性要求统一尺寸：
+
+- 正文字号 15px（antd token `fontSize: 15`），标签、辅助说明等次要文字保持 13–14px
+- antd 控件默认 `componentSize="large"`（高 40px），`components-core:FormInfo` 字段同样放大到 40px
+- 所有输入框（含 TablePage 搜索框等固定尺寸控件）字号不低于 16px，iOS 聚焦输入框时不会缩放页面
+- 页面左右与内容区边距 16px，导航标题 17px 加粗，导航栏圆钮 40px
+- FormInfo / InfoPage 的分组（`.ant-card.part`）渲染为玻璃卡片，移动端内边距 16px
+- 底部 Toolbar 高 62px、左右边距 20px；与 Page.Footer 合并时，底栏态（左侧圆钮 + 底栏）整行 48px，展开导航态右侧圆钮与 Toolbar 同为 62px，圆钮与底栏间距 12px
+
 #### userInfo 配置
 
 | 属性 | 类型 | 说明 |
@@ -117,7 +128,20 @@ icon 支持多种格式：
 |------|------|------|
 | `showLength` | `number` | 直接显示的按钮数量，其余收起到"更多"按钮中 |
 | `list` | `array` | 按钮配置数组，每项为 antd Button 的 props |
-| `moreType` | `string` | "更多"按钮的类型，移动端默认为 `'link'` |
+| `moreType` | `string` | "更多"按钮的类型 |
+
+#### 移动端导航栏右侧
+
+移动端右侧由独立的玻璃圆钮组成，常态与滚动后的胶囊态形态一致：
+
+- `buttonProps`：全部按钮收进"更多"圆钮，点击后向右下展开菜单，`showLength`、`more`、`placement` 由 Page 接管
+- `extra`：放在玻璃胶囊内，渲染结果为空时自动隐藏
+- 用户头像：始终显示头像圆钮（未配置 `userInfo.avatar` 时为默认头像），点击打开左侧菜单
+
+#### 移动端菜单入口
+
+- 一级页面（不传 `back`）：左上角为菜单按钮，右侧头像圆钮同样可打开菜单
+- 二级页面（传 `back`）：左上角只放返回按钮，通过右侧头像圆钮打开菜单；`back` 只用于从上级页面进入的页面
 
 #### Page.PageLoading
 
@@ -141,8 +165,15 @@ icon 支持多种格式：
 |------|------|------|
 | `children` | `ReactNode` | 底栏内容，右对齐 |
 | `className` | `string` | 追加到根节点，可覆盖默认样式 |
+| `icon` | `string` \| `ReactNode` | 移动端与 Toolbar 合并时，底栏收起成圆钮所显示的图标；字符串按 system 图标字体渲染。默认为 `FooterOpenIcon`（左右切换箭头，表示切回底部操作栏），可从本库引入复用 |
 
-底栏会 portal 到内容列底部，并写入 `--page-footer-height`，让滚动内容停在底栏上方。移动端底栏固定在可视区域底部：当前页显示 Toolbar 时，底栏抬到 Toolbar 上方（含底部间距和安全区）；`toolbar={false}` 时贴住页面底边，并在底栏内留出安全区。手机预览框内会挂到预览边界，而不是浏览器视口。
+底栏会 portal 到内容列底部，并写入 `--page-footer-height`，让滚动内容停在底栏上方。
+
+移动端：
+
+- `toolbar={false}` 时底栏贴住页面底边，并在底栏内留出安全区。
+- 当前页显示 Toolbar 时，底栏与 Toolbar 合并为同一行：默认展示底栏，Toolbar 收成左侧圆钮（显示当前导航项图标）；点圆钮展开 Toolbar，底栏收成右侧圆钮，点它切回底栏。展开 Toolbar 后滚动页面也会自动切回底栏。展示底栏时向下滚动，左侧圆钮缩向左下角，底栏收成右侧圆钮并缩向右下角，与普通 Toolbar 的滚动收缩一致，停止滚动后放开。
+- 手机预览框内会挂到预览边界，而不是浏览器视口。
 
 ---
 
@@ -209,6 +240,30 @@ import { themeToken } from '@kne/system-layout';
   <SystemLayout>...</SystemLayout>
 </ConfigProvider>
 ```
+
+---
+
+### Card / CARD_THEME
+
+页面卡片使用 `@kne/react-box` 的 `Card`，本库在其上注册了一组贴合 SystemLayout 风格的主题。业务直接从本库引入 `Card`，通过 `theme` 选择主题，不要再自己写卡片背景、边框、阴影。
+
+```jsx
+import { Card, CARD_THEME } from '@kne/system-layout';
+
+<Card theme={CARD_THEME.glass} title="入职清单" extra="2/4">...</Card>
+<Card theme={CARD_THEME.accent} color="#52c41a">...</Card>
+```
+
+| 主题 | 值 | 适用场景 |
+|------|------|------|
+| `CARD_THEME.glass` | `'system-glass'` | 默认内容卡：通透的 liquid glass，融入页面背景 |
+| `CARD_THEME.solid` | `'system-solid'` | 列表项 / 移动端卡片 / 浮层面板：更致密的 liquid glass，信息密集时保证可读 |
+| `CARD_THEME.tint` | `'system-tint'` | 欢迎区、提示区等需要强调的区块：主色染色的 liquid glass，标题为主色 |
+| `CARD_THEME.accent` | `'system-accent'` | 数据概览 / 统计卡：liquid glass + 顶部主色色带 |
+
+所有主题都按 liquid glass 绘制：半透明渐变底、左上斜向高光、白色高光描边与内侧顶部亮边，并对背景做 `blur(20px) saturate(180%)`，与 Toolbar、胶囊导航栏的玻璃质感一致。
+
+主色默认取 `--sl-primary`，跟随宿主主题；传 `color` 时按传入色重算色板（如统计卡按指标色区分）。其余属性（`title`、`subtitle`、`extra`、`description`、`footer`、`prefix`、`padding`、`radius`、`hover`、`colors` 等）与 `@kne/react-box` 的 `Card` 一致。
 
 ---
 

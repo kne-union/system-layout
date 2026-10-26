@@ -1,4 +1,4 @@
-const { default: SystemLayout, Page, useScrollElement, useIsMobile, BarChartIcon } = _SystemLayout;
+const { default: SystemLayout, Page, useScrollElement, useIsMobile, BarChartIcon, Card, CARD_THEME } = _SystemLayout;
 const { default: TablePage, Table } = _TablePage;
 const { fields } = _ReactFilter;
 const { SuperSelectFilterItem } = fields;
@@ -294,14 +294,21 @@ const BaseExample = () => {
         }}
       >
         <Flex vertical gap={12}>
-          <Flex gap={8} wrap="wrap" align="center">
-            <Tag color="blue">Layout 滚动</Tag>
-            <Tag color="orange">禁用操作</Tag>
-            <span style={{ color: '#666', fontSize: 13 }}>
-              通过 <code>useScrollElement</code> 绑定 Layout 滚动容器；使用 TablePage 自带的 <code>tab</code> / <code>filter</code> /{' '}
-              <code>search</code> 与分页。首页第一行操作禁用（其余正常），用于对比验收 link 禁用无灰底
-            </span>
-          </Flex>
+          <Card
+            theme={CARD_THEME.tint}
+            title={
+              <Flex gap={8} wrap="wrap" align="center">
+                <Tag color="blue" style={{ margin: 0 }}>Layout 滚动</Tag>
+                <Tag color="orange" style={{ margin: 0 }}>禁用操作</Tag>
+              </Flex>
+            }
+            description={
+              <>
+                通过 <code>useScrollElement</code> 绑定 Layout 滚动容器；使用 TablePage 自带的 <code>tab</code> / <code>filter</code> /{' '}
+                <code>search</code> 与分页。首页第一行操作禁用（其余正常），用于对比验收 link 禁用无灰底
+              </>
+            }
+          />
           <CandidateTable />
         </Flex>
       </Page>

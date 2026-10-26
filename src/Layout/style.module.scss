@@ -1,5 +1,215 @@
 @use '~@kne/responsive-utils/scss' as resp;
 @use '~@kne/responsive-utils/scss/viewport';
+@use '../styles/tokens';
+
+@mixin table-page-tabs {
+  .ant-tabs-nav::before {
+    display: none;
+  }
+
+  // 溢出时直接圆角裁切，不用 antd 的边缘阴影
+  .ant-tabs-nav-wrap {
+    flex: 0 1 auto;
+    border-radius: 999px;
+
+    &::before,
+    &::after {
+      display: none;
+    }
+  }
+
+  .ant-tabs-nav-list {
+    padding: 3px;
+    border-radius: 999px;
+    background: var(--sl-field-bg) !important;
+  }
+
+  .ant-tabs-tab {
+    position: relative;
+    z-index: 1;
+    margin: 0 !important;
+    padding: 5px 14px !important;
+    border-radius: 999px;
+    color: var(--sl-text-2);
+    transition: color var(--sl-transition-normal);
+
+    &:hover {
+      color: var(--sl-text-1);
+    }
+  }
+
+  .ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: var(--sl-primary) !important;
+    font-weight: 500;
+    text-shadow: none;
+  }
+
+  // 墨水条改成白色滑块，沿用 antd 的位移动画
+  .ant-tabs-ink-bar {
+    top: 3px;
+    bottom: 3px;
+    height: auto !important;
+    z-index: 0;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: var(--sl-shadow-thumb);
+  }
+
+  .ant-tabs-extra-content {
+    margin-left: auto;
+    padding-left: 12px;
+  }
+}
+
+// table-page 把搜索框底色挂在 .ant-input-search 上，内部输入框与按钮强制透明
+@mixin table-page-search {
+  overflow: hidden;
+  border-radius: 999px !important;
+  background: var(--sl-field-bg) !important;
+  transition:
+    background var(--sl-transition-fast),
+    box-shadow var(--sl-transition-fast);
+
+  &:focus-within {
+    background: #fff !important;
+    box-shadow: 0 0 0 1px var(--sl-primary-2);
+  }
+
+  .ant-input-affix-wrapper {
+    padding-left: 14px;
+  }
+
+  .ant-input-search-btn {
+    border-radius: 0 999px 999px 0 !important;
+    backdrop-filter: none !important;
+    transform: none !important;
+  }
+}
+
+@mixin table-page-desktop {
+  border: none !important;
+  border-radius: 12px;
+
+  .table-page-toolbar-section {
+    border-bottom: none !important;
+    border-radius: 12px 12px 0 0;
+    background: var(--sl-glass-bg-strong) !important;
+  }
+
+  .ant-table-container table > thead > tr:first-child > * {
+    border-radius: 0 !important;
+  }
+
+  .ant-table-thead > tr > th,
+  .ant-table-thead > tr > td {
+    background: var(--sl-primary-1) !important;
+    border-bottom: none !important;
+    color: var(--sl-text-2);
+    font-weight: 500;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .ant-table-tbody > tr > td {
+    border-bottom-color: var(--sl-divider) !important;
+  }
+
+  .ant-table-tbody > tr:last-child > td {
+    border-bottom: none !important;
+  }
+
+  .ant-table {
+    border-radius: 0 0 12px 12px;
+  }
+}
+
+// 移动端 Tab 可横向滚动：灰色轨道放在固定宽的 nav-wrap 上，滚动的 nav-list 透明，溢出侧渐隐
+@mixin table-page-mobile-tabs {
+  .ant-tabs-nav-wrap {
+    background: var(--sl-field-bg) !important;
+  }
+
+  .ant-tabs-nav-list {
+    background: transparent !important;
+  }
+
+  .ant-tabs-nav-wrap-ping-right {
+    mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent);
+  }
+
+  .ant-tabs-nav-wrap-ping-left {
+    mask-image: linear-gradient(90deg, transparent, #000 32px);
+  }
+
+  .ant-tabs-nav-wrap-ping-left.ant-tabs-nav-wrap-ping-right {
+    mask-image: linear-gradient(90deg, transparent, #000 32px, #000 calc(100% - 32px), transparent);
+  }
+
+  .ant-tabs-nav-operations {
+    align-self: center;
+    margin-left: 6px;
+  }
+
+  .ant-tabs-nav-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0 !important;
+    border-radius: 50%;
+    background: var(--sl-field-bg) !important;
+    color: var(--sl-text-2);
+  }
+
+  .ant-tabs-extra-content {
+    padding-left: 8px;
+  }
+}
+
+// 移动端筛选条：白色胶囊与灰色搜索框 / Tab 轨道区分，左侧与上方对齐
+@mixin table-page-mobile-filter {
+  .list-scroll-wrap:not(:has(> button + .list-scroll)) {
+    padding-left: 0;
+  }
+
+  .list-scroll-wrap > button {
+    background: none;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .list-scroll {
+    --bg-color-grey-1: #fff;
+    --font-color-grey: var(--sl-text-2);
+    padding: 2px 0;
+  }
+
+  .list-scroll .line > span > .ant-space > .ant-space-item > div {
+    box-shadow: 0 1px 3px 0 rgba(78, 96, 139, 0.1);
+  }
+}
+
+@mixin table-page-mobile-list {
+  // 全选 / 排序条
+  > div:first-child:not(.info-page-table-mobile-card) {
+    padding: 4px 6px 4px 12px;
+    border-radius: 999px;
+    background: var(--sl-glass-bg) !important;
+    box-shadow: inset 0 0 0 1px var(--sl-glass-border-light);
+  }
+
+  .info-page-table-mobile-card {
+    border: none !important;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: var(--sl-shadow-card);
+  }
+}
 
 @mixin common-style {
   :global {
@@ -29,7 +239,7 @@
     }
 
     .system-font-description {
-      color: var(--font-color-grey);
+      color: var(--sl-text-2);
     }
 
     .scroller-bar {
@@ -37,7 +247,7 @@
       border-color: transparent !important;
 
       .scroller-bar-inner {
-        background: #999 !important;
+        background: var(--sl-scrollbar-thumb) !important;
         height: 40%;
       }
     }
@@ -48,24 +258,24 @@
     }
 
     .ant-tag {
-      background: var(--primary-color-1);
+      background: var(--sl-primary-1);
       border-radius: 11px;
-      color: var(--font-color-grey);
+      color: var(--sl-text-2);
     }
 
     .ant-segmented {
-      border: 1px solid #d1d5db;
-      border-radius: 17px;
+      border: 1px solid var(--sl-border);
+      border-radius: 999px;
       background: transparent !important;
 
       .ant-segmented-item,
       .ant-segmented-thumb {
-        border-radius: 14px;
+        border-radius: 999px;
       }
 
       .ant-segmented-item.ant-segmented-item-selected,
       .ant-segmented-thumb {
-        background: var(--primary-color) !important;
+        background: var(--sl-primary) !important;
         color: #fff !important;
       }
 
@@ -84,6 +294,26 @@
         margin: 0 auto;
         width: 100%;
       }
+
+      // FormInfo 字段自带主题作用域，不吃 Layout 的 componentSize，移动端单独放大到 40px
+      @include resp.mobile-container {
+        .react-form__field-component:not(textarea):not(.ant-radio-group):not(.ant-checkbox-group):not(.ant-switch) {
+          min-height: 40px;
+        }
+      }
+    }
+
+    // 移动端可输入元素字号不低于 16px，否则 iOS 聚焦时会缩放页面（含 TablePage 搜索框等写死 size 的控件）
+    @include resp.mobile-container {
+      input.ant-input,
+      textarea.ant-input,
+      .ant-select-input,
+      .ant-select-content,
+      .ant-picker-input > input,
+      .ant-input-number-input,
+      .ant-mentions > textarea {
+        font-size: 16px !important;
+      }
     }
 
     .max-width-info-page {
@@ -93,15 +323,48 @@
     }
 
     .part.bordered {
-      background: #ffffff70 !important;
+      background: var(--sl-glass-bg-panel) !important;
 
       .part-title {
         font-size: 16px;
       }
     }
 
+    // FormInfo / InfoPage 分组：默认 Card 内边距为 0，字段贴边；统一成与 Card 主题一致的玻璃卡片
+    .ant-card.part:not(.bordered) {
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 42%), linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.72) 100%) !important;
+      box-shadow: var(--sl-shadow-card);
+
+      > .ant-card-head {
+        min-height: 0;
+        padding: 20px 20px 0;
+        border-bottom: none;
+      }
+
+      > .ant-card-body {
+        padding: 16px 20px 4px;
+      }
+
+      .part-title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      @include resp.mobile-container {
+        > .ant-card-head {
+          padding: 16px 16px 0;
+        }
+
+        > .ant-card-body {
+          padding: 12px 16px 0;
+        }
+      }
+    }
+
     .ant-pagination-options-size-changer {
-      background: #ffffff70 !important;
+      background: var(--sl-glass-bg-panel) !important;
     }
 
     .ant-pagination-item:not(.ant-pagination-item-active) {
@@ -109,15 +372,10 @@
     }
 
     .ant-tree {
-      background: #ffffff70 !important;
+      background: var(--sl-glass-bg-panel) !important;
     }
 
-    // TablePage：搜索栏白底，Tab（含包装层）透明以适配布局玻璃背景
-    .table-page-toolbar-section .ant-input-search,
-    .table-page-toolbar .ant-input-search {
-      background: #ffffff !important;
-    }
-
+    // Tab（含包装层）透明以适配布局玻璃背景
     .table-page-toolbar-section,
     .table-page-toolbar,
     div:has(> .ant-tabs),
@@ -134,9 +392,49 @@
       --ant-tabs-card-bg: transparent;
     }
 
+    // TablePage 头部：Tab 改胶囊分段，去掉 Tab 底线；桌面端为 Tab 后紧跟表格容器，移动端 Tab 在工具栏区内
+    div:has(> .ant-tabs):has(+ div > .react-filter) > .ant-tabs,
+    .table-page-toolbar-section > div > .ant-tabs {
+      @include table-page-tabs;
+    }
+
+    // TablePage 搜索框：无边框胶囊
+    .table-page-toolbar-section .ant-input-search {
+      @include table-page-search;
+    }
+
+    // TablePage 桌面端：工具栏 / 表头 / 表体三层分色，去掉外框与分隔线
+    div:has(> .react-filter:not(.is-mobile) > .table-page-toolbar-section) {
+      @include table-page-desktop;
+    }
+
+    // TablePage 移动端：Tab 轨道、筛选条、全选条与卡片列表
+    .react-filter.is-mobile .table-page-toolbar-section > div > .ant-tabs {
+      @include table-page-mobile-tabs;
+    }
+
+    // 搜索 / Tab / 筛选三行统一 8px 左右的间距
+    .react-filter.is-mobile .table-page-toolbar-section {
+      > div:has(> .ant-tabs) {
+        padding-top: 8px;
+      }
+
+      > .table-page-toolbar {
+        padding-top: 4px;
+      }
+    }
+
+    .react-filter.is-mobile {
+      @include table-page-mobile-filter;
+    }
+
+    .info-page-table-mobile-card-list {
+      @include table-page-mobile-list;
+    }
+
     .ant-table,
     .ant-table-placeholder {
-      background: #ffffff70 !important;
+      background: var(--sl-glass-bg-panel) !important;
     }
 
     .ant-table-wrapper .ant-table-cell-fix {
@@ -145,6 +443,24 @@
       &.ant-table-cell-fix-end-shadow-show,
       &.ant-table-cell-fix-start-shadow-show {
         background: var(--bg-color-grey);
+      }
+    }
+
+    // 键盘可达性：仅键盘聚焦（Tab）时显示焦点环，鼠标点击不触发
+    :focus-visible {
+      outline: 2px solid var(--sl-primary);
+      outline-offset: 2px;
+      border-radius: 8px;
+    }
+
+    // 尊重系统「减弱动效」偏好，无障碍降级
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
       }
     }
   }
@@ -159,12 +475,12 @@
   --page-height: 100dvh;
   --page-content-height: var(--page-height);
   --page-inner-height: calc(var(--page-height) - var(--nav-height) - var(--toolbar-height));
-  --toolbar-bottom-gap: 16px;
+  --toolbar-bottom-gap: 8px;
   &.has-toolbar {
-    --toolbar-height: 72px;
+    --toolbar-height: 62px;
 
     &.is-toolbar-minimal {
-      --toolbar-height: 60px;
+      --toolbar-height: 48px;
     }
   }
   &.has-navbar {
@@ -180,7 +496,7 @@
 
     &.open {
       left: 0;
-      box-shadow: 0 -2px 22.9px 0 rgba(78, 96, 139, 0.13);
+      box-shadow: var(--sl-shadow-drawer);
     }
   }
   .layer-menu {
@@ -208,6 +524,8 @@
     border: 0;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    // 移动端不留菜单间距
+    margin-left: 0;
     flex: 1;
     min-height: 0;
   }
@@ -252,12 +570,14 @@
   --toolbar-height: 0px;
   --page-height: calc(var(--window-height) - 48px);
   --page-content-height: calc(var(--page-height) - 48px);
-  --page-inner-height: calc(var(--page-height) - 48px - 60px);
+  --page-inner-height: calc(var(--page-height) - 48px - 62px);
   width: var(--window-width);
   height: var(--window-height);
   background: var(--background);
   box-sizing: border-box;
-  padding: 24px 24px 24px 0;
+  // 外层留白可通过 padding 参数（--layout-padding，默认 12px）控制；
+  // 超过默认值的部分对称分配：最左侧与菜单↔页面间距各一份，菜单在多余留白中保持视觉平衡
+  padding: var(--layout-padding, 12px) var(--layout-padding, 12px) var(--layout-padding, 12px) max(0px, calc(var(--layout-padding, 12px) - 12px));
   position: relative;
   line-height: 1.4;
   display: flex;
@@ -278,15 +598,13 @@
       border-radius: 999px;
 
       &:not(.ant-btn-primary):not(.ant-btn-dangerous):not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(:disabled) {
-        background: var(--primary-color-2);
-        color: var(--primary-color);
+        background: var(--sl-primary-2);
+        color: var(--sl-primary);
       }
 
       &:not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(:disabled) {
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        box-shadow:
-          0 5px 10px 0 rgba(0, 0, 0, 0.05),
-          0 15px 30px 0 rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--sl-glass-border) !important;
+        box-shadow: var(--sl-shadow-md);
         backdrop-filter: blur(10px);
 
         &:hover:not(:disabled):not(.ant-btn-loading) {
@@ -302,8 +620,8 @@
 
       &:disabled {
         box-shadow: none;
-        color: var(--font-color-disabled);
-        background: rgba(17, 24, 39, 0.2);
+        color: var(--sl-text-disabled);
+        background: var(--sl-btn-disabled-bg);
 
         // link/text 禁用态保持透明，避免表格操作列等露出灰底
         &.ant-btn-link,
@@ -315,9 +633,7 @@
       }
 
       &.ant-btn-primary:not(:disabled) {
-        box-shadow:
-          0 5px 10px 0 rgba(0, 0, 0, 0.05),
-          0 15px 30px 0 rgba(0, 0, 0, 0.08);
+        box-shadow: var(--sl-shadow-md);
       }
     }
 
@@ -341,7 +657,7 @@
       }
 
       &:not(.ant-btn-primary):not(.ant-btn-dangerous):not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(:disabled) {
-        color: var(--primary-color);
+        color: var(--sl-primary);
       }
 
       &:not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(:disabled) {
@@ -350,14 +666,14 @@
         backdrop-filter: none;
 
         &:hover:not(:disabled):not(.ant-btn-loading) {
-          background: var(--primary-color-1) !important;
+          background: var(--sl-primary-1) !important;
           backdrop-filter: none;
           transform: none;
         }
       }
 
       &.ant-btn-dangerous:hover:not(:disabled):not(.ant-btn-loading) {
-        background: #fff1f0 !important;
+        background: var(--sl-danger-1) !important;
       }
 
       &:active:not(.ant-btn-loading) {
@@ -384,7 +700,7 @@
 
 .menu {
   flex: none;
-  transition: width 0.3s;
+  transition: width var(--sl-transition-normal);
   position: relative;
   height: 100%;
   display: flex;
@@ -427,7 +743,7 @@
       height: 40px;
       opacity: 0;
       pointer-events: none;
-      background: rgba(255, 255, 255, 0.3);
+      background: var(--sl-glass-border-light);
       backdrop-filter: blur(5px);
       -webkit-backdrop-filter: blur(5px);
       transition: opacity 0.2s;
@@ -471,7 +787,7 @@
 
   &.open {
     left: 0;
-    box-shadow: 0 -2px 22.9px 0 rgba(78, 96, 139, 0.13);
+    box-shadow: var(--sl-shadow-drawer);
   }
 }
 
@@ -540,10 +856,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 8px;
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
+
+  // 视觉保持 24px，用透明伪元素将命中区扩到 44px（触控目标最低标准）
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 12px;
+  }
 }
 
 .expand-btn {
@@ -571,8 +895,8 @@
 
 .menu-header {
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--sl-glass-border-light);
+  background: var(--sl-glass-bg-subtle);
   backdrop-filter: blur(10px);
   min-height: 40px;
   padding: 12px 16px;
@@ -588,21 +912,21 @@
 
 .user-description {
   font-size: 12px;
-  color: var(--font-color-grey);
+  color: var(--sl-text-2);
 }
 
 .page {
   position: relative;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.72) 100%);
-  box-shadow:
-    0 5px 10px 0 rgba(0, 0, 0, 0.05),
-    0 15px 30px 0 rgba(0, 0, 0, 0.08),
-    0 20px 40px 0 rgba(0, 0, 0, 0.08);
+  border-radius: var(--page-radius, 12px);
+  border: 1px solid var(--sl-glass-border);
+  background: var(--sl-page-bg);
+  box-shadow: var(--sl-shadow-lg);
   backdrop-filter: blur(10px);
   min-width: 0;
   min-height: 0;
+  // 外层留白超过默认值（12px）的部分作为菜单与页面之间的间距（菜单保持视觉居中）；
+  // padding 参数为 0 时由 JS 注入 --page-radius: 0px 去掉圆角
+  margin-left: max(0px, calc(var(--layout-padding, 12px) - 12px));
   // 裁切子项，避免 page-children 固定高度越过 1px 边框
   overflow: hidden;
 }
@@ -624,13 +948,16 @@
   padding: 12px;
   font-size: 24px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--sl-glass-bg);
   backdrop-filter: blur(40px);
   cursor: pointer;
-  transition: all 0.3s;
+  transition:
+    background var(--sl-transition-normal),
+    transform var(--sl-transition-normal),
+    backdrop-filter var(--sl-transition-normal);
 
   &:hover {
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--sl-glass-bg-strong);
     backdrop-filter: blur(40px) saturate(1.5);
     transform: scale(1.1);
   }
@@ -641,7 +968,7 @@
   --container-height: 400px;
   --container-base-width: var(--container-width);
   --container-base-height: var(--container-height);
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--sl-glass-bg);
   backdrop-filter: blur(10px);
   border-radius: 8px;
   width: var(--container-width);
@@ -652,10 +979,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow:
-    0 5px 10px 0 rgba(0, 0, 0, 0.05),
-    0 15px 30px 0 rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s;
+  box-shadow: var(--sl-shadow-md);
+  transition: box-shadow var(--sl-transition-normal);
   @keyframes pulse-dialog-window {
     0%,
     100% {
@@ -668,12 +993,9 @@
 
   &:hover {
     animation: pulse-dialog-window 0.4s ease-out;
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--sl-glass-bg-strong);
     backdrop-filter: blur(10px) saturate(1.5);
-    box-shadow:
-      0 5px 10px 0 rgba(0, 0, 0, 0.05),
-      0 15px 30px 0 rgba(0, 0, 0, 0.08),
-      0 20px 40px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: var(--sl-shadow-lg);
   }
 
   &.is-mobile-full {
@@ -740,7 +1062,7 @@
   padding: 12px;
   font-size: 24px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--sl-glass-bg-strong);
   backdrop-filter: blur(40px);
   box-shadow:
     0 4px 10px 0 rgba(0, 0, 0, 0.1),
@@ -769,7 +1091,7 @@
 }
 
 .page-dialog {
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--sl-glass-bg);
   border-radius: 8px;
   height: 100%;
   display: flex;
@@ -789,10 +1111,7 @@
   &:hover {
     backdrop-filter: blur(40px) saturate(1.2);
     animation: pulse-page-dialog 0.4s ease-out;
-    box-shadow:
-      0 5px 10px 0 rgba(0, 0, 0, 0.05),
-      0 15px 30px 0 rgba(0, 0, 0, 0.08),
-      0 20px 40px 0 rgba(0, 0, 0, 0.08);
+    box-shadow: var(--sl-shadow-lg);
   }
 }
 
@@ -880,5 +1199,22 @@
     font-size: 24px;
     color: var(--font-color-grey);
     cursor: pointer;
+  }
+}
+
+// 不支持 backdrop-filter 的环境（旧 iOS / 低端安卓 WebView）：用实底色兜底，保证可读性
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .page {
+    background: #f7f9fc;
+  }
+
+  .menu-header {
+    background: rgba(255, 255, 255, 0.85);
+  }
+
+  .ai-entry,
+  .ai-dialog-window,
+  .page-dialog {
+    background: rgba(255, 255, 255, 0.9);
   }
 }

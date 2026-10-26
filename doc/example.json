@@ -121,6 +121,29 @@
       ]
     },
     {
+      "title": "表单页",
+      "description": "在 Page 中使用 components-core:FormInfo 搭建新员工入职表单：FormInfo 分组展示字段，移动端单列、PC 端两列；必填校验与 SubmitButton / CancelButton 放在 Page.Footer 中，移动端与 Toolbar 合并为同一行",
+      "code": "./form.js",
+      "scope": [
+        {
+          "name": "_SystemLayout",
+          "packageName": "@kne/current-lib_system-layout",
+          "importStatement": "import * as _SystemLayout from \"@kne/system-layout\""
+        },
+        {
+          "packageName": "@kne/current-lib_system-layout/dist/index.css"
+        },
+        {
+          "name": "remoteLoader",
+          "packageName": "@kne/remote-loader"
+        },
+        {
+          "name": "antd",
+          "packageName": "antd"
+        }
+      ]
+    },
+    {
       "title": "Tenant 租户设置",
       "description": "参考 telent-coach：Authenticate + SystemLayout + Tenant@Setting，演示公司/组织/用户/权限设置页；preset 已注册 components-admin，接口走 mock 数据",
       "code": "./tenant.js",

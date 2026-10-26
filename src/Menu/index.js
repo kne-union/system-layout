@@ -101,21 +101,32 @@ const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) =>
     const icon = typeof item.icon === 'function' ? item.icon({ menuOpen, active }) : item.icon;
     const hasGroup = item.group && item.group !== items[index - 1]?.group;
 
+    const handleClick = e => {
+      if (active) {
+        return;
+      }
+      onChange && onChange(item, { menuOpen, base });
+      if (typeof item.onClick === 'function') {
+        item.onClick(item, { menuOpen, base, event: e });
+        return;
+      }
+      if (item.path) {
+        navigate(ensureSlash(`${base}${item.path}`));
+      }
+    };
+
     return (
       <div
         key={getItemKey(item, index)}
         title={item.label}
-        onClick={e => {
-          if (active) {
-            return;
-          }
-          onChange && onChange(item, { menuOpen, base });
-          if (typeof item.onClick === 'function') {
-            item.onClick(item, { menuOpen, base, event: e });
-            return;
-          }
-          if (item.path) {
-            navigate(ensureSlash(`${base}${item.path}`));
+        role="link"
+        tabIndex={0}
+        aria-current={active ? 'page' : undefined}
+        onClick={handleClick}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClick(e);
           }
         }}
       >
@@ -163,7 +174,7 @@ const Menu = ({ className, menuOpen, items, activeKey, base = '', onChange }) =>
   };
 
   return (
-    <div ref={listRef} className={classnames('menu', className, style['menu-list'])}>
+    <div ref={listRef} role="navigation" aria-label="主导航" className={classnames('menu', className, style['menu-list'])}>
       {listHeight > 0 ? (
         <VirtualList ref={virtualListRef} data={listData} height={listHeight} itemHeight={estimatedItemHeight} itemKey="key" virtual={listData.length > 0}>
           {({ item, index }) => renderMenuItem(item, index)}

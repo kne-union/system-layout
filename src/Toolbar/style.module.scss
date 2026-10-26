@@ -1,3 +1,7 @@
+@use '../styles/tokens';
+
+@include tokens.jelly-keyframes;
+
 .toolbar {
   background: transparent;
 }
@@ -17,28 +21,30 @@
   z-index: 600;
 }
 
+// 底距贴合系统安全区：有 Home 指示条时压进安全区一部分，无安全区时只留最小间距
+$toolbar-bottom: max(var(--toolbar-bottom-gap, 8px), calc(var(--safe-area-inset-bottom, 0px) - 12px));
+$toolbar-side: tokens.$bar-side;
+$toolbar-dock-gap: tokens.$bar-gap;
+
 .toolbar-list {
-  height: 72px;
+  height: 62px;
   z-index: 600;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow:
-    0 4px 16px 0 rgba(78, 96, 139, 0.18),
-    0 2px 6px 0 rgba(78, 96, 139, 0.1),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid var(--sl-glass-border-strong);
+  box-shadow: var(--sl-shadow-float);
+  background: var(--sl-glass-bg-faint);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  padding: 6px 8px;
+  padding: 5px 6px;
   box-sizing: border-box;
   transition:
     transform 0.3s ease,
-    width 0.3s ease,
+    width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     background 0.3s ease,
     padding 0.3s ease;
 
   &.is-minimal {
-    height: 60px;
+    height: 48px;
     border: 1px solid #fff;
     box-shadow: 0 0 14px 0 rgba(78, 96, 139, 0.16);
     background: rgba(249, 249, 249, 0.05);
@@ -46,24 +52,72 @@
     -webkit-backdrop-filter: blur(10px);
   }
 
+  &.is-viewport,
+  &.is-boundary {
+    bottom: $toolbar-bottom;
+    left: $toolbar-side;
+    right: auto;
+    width: calc(100% - #{$toolbar-side * 2});
+    pointer-events: auto;
+  }
+
   &.is-viewport {
     position: fixed;
-    bottom: calc(var(--toolbar-bottom-gap, 16px) + var(--safe-area-inset-bottom, 0px));
-    left: 16px;
-    right: 16px;
-    pointer-events: auto;
   }
 
   &.is-boundary {
     position: absolute;
-    bottom: calc(var(--toolbar-bottom-gap, 16px) + var(--safe-area-inset-bottom, 0px));
-    left: 16px;
-    right: 16px;
-    pointer-events: auto;
+  }
+
+  // 与 Page.Footer 合并的两种形态：尺寸走弹簧曲线，切换瞬间叠一次果冻形变
+  &.is-docked,
+  &.is-shrunk {
+    transition:
+      transform 0.3s ease,
+      width tokens.$spring-duration tokens.$spring,
+      height tokens.$spring-duration tokens.$spring,
+      background 0.3s ease,
+      padding tokens.$spring-duration tokens.$spring;
+  }
+
+  @include tokens.jelly('.is-docked');
+
+  // 底栏在场时收成紧凑圆钮，只露当前项图标，点一下展开
+  &.is-docked {
+    width: tokens.$bar-compact;
+    height: tokens.$bar-compact;
+    padding: 4px;
+    cursor: pointer;
+
+    .toolbar-indicator {
+      display: none;
+    }
+
+    .toolbar-item-label {
+      max-height: 0;
+      opacity: 0;
+    }
+
+    .toolbar-item {
+      padding: 0;
+      gap: 0;
+      border-radius: 50%;
+    }
+
+    // 滚动收缩时保持圆钮尺寸，只缩放
+    &:global(.is-scrolling) {
+      width: tokens.$bar-compact;
+      padding: 4px;
+    }
+  }
+
+  // 展开导航时给右侧底栏圆钮让位
+  &.is-shrunk {
+    width: calc(100% - #{$toolbar-side * 2} - #{$toolbar-dock-gap} - var(--toolbar-height, 62px));
   }
 
   &:global(.is-scrolling) {
-    width: calc((var(--kne-viewport-width, 100vw) - 32px) / var(--toolbar-count, 4));
+    width: calc((var(--kne-viewport-width, 100vw) - #{$toolbar-side * 2}) / var(--toolbar-count, 4));
     right: auto;
     transform: scale(0.65);
     transform-origin: left bottom;
@@ -130,7 +184,8 @@
 .toolbar-item {
   cursor: pointer;
   border-radius: 999px;
-  padding: 4px 12px;
+  padding: 2px 10px;
+  gap: 2px;
   box-sizing: border-box;
   min-width: 0;
   position: relative;
@@ -140,14 +195,14 @@
 
   .toolbar-item-icon,
   .toolbar-item-label {
-    color: #333;
+    color: var(--sl-text-1);
     transition: color 0.5s ease;
   }
 
   &:global(.is-active) {
     .toolbar-item-icon,
     .toolbar-item-label {
-      color: var(--primary-color);
+      color: var(--sl-primary);
     }
   }
 
@@ -163,10 +218,10 @@
 
 .toolbar-indicator {
   position: absolute;
-  top: 6px;
-  bottom: 6px;
+  top: 5px;
+  bottom: 5px;
   border-radius: 999px;
-  background: rgba(120, 120, 120, 0.22);
+  background: var(--sl-indicator);
   transition:
     left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
@@ -202,9 +257,21 @@
 }
 
 .toolbar-item-label {
-  font-size: 12px;
+  font-size: 11px;
+  line-height: 1.2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  max-height: 14px;
+  transition:
+    opacity 0.2s ease,
+    max-height 0.3s ease;
+}
+
+// 不支持 backdrop-filter 的环境：toolbar 用高实底色兜底，保证图标/文字对比度
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .toolbar-list {
+    background: rgba(249, 249, 249, 0.9);
+  }
 }
