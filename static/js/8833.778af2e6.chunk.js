@@ -1,2 +1,0 @@
-(globalThis.webpackChunk_system_layout_0_2_10||=[]).push([[1214,8833],{559816(e){function o(e){return Promise.resolve().then(()=>{const o=new Error("Cannot find module '"+e+"'");throw o.code="MODULE_NOT_FOUND",o})}o.keys=()=>[],o.resolve=o,o.id=559816,e.exports=o},710972(e){function o(e){return Promise.resolve().then(()=>{const o=new Error("Cannot find module '"+e+"'");throw o.code="MODULE_NOT_FOUND",o})}o.keys=()=>[],o.resolve=o,o.id=710972,e.exports=o}}]);
-//# sourceMappingURL=8833.778af2e6.chunk.js.map
