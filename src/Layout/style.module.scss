@@ -98,6 +98,11 @@
     background: var(--sl-glass-bg-strong) !important;
   }
 
+  // 卡片视图下工具栏后面没有表格，下边缘也要圆角
+  &:not(:has(.ant-table)) .table-page-toolbar-section {
+    border-radius: 12px;
+  }
+
   .ant-table-container table > thead > tr:first-child > * {
     border-radius: 0 !important;
   }
