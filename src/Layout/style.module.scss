@@ -886,10 +886,6 @@
       -webkit-backdrop-filter: blur(30px) saturate(180%);
       overflow: hidden;
 
-      .modal-footer {
-        background: #fff;
-      }
-
       .modal-close {
         top: 6px;
         right: 8px;
@@ -932,6 +928,10 @@
     .ant-input-number-input,
     .ant-mentions > textarea {
       font-size: 16px !important;
+    }
+
+    .ant-modal-container .modal-footer {
+      background: #fff;
     }
 
     .ant-card.part:not(.bordered) {
