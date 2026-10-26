@@ -444,6 +444,22 @@
       }
     }
 
+    // 普通分组内嵌普通分组：外层已是玻璃卡片，内层不再叠卡片和左右内边距，与外层直接子内容左对齐
+    .ant-card.part:not(.bordered) .ant-card.part:not(.bordered) {
+      border: none;
+      border-radius: 0;
+      background: transparent !important;
+      box-shadow: none;
+
+      > .ant-card-head {
+        padding: 12px 0 0;
+      }
+
+      > .ant-card-body {
+        padding: 12px 0 0;
+      }
+    }
+
     // 分页：页码无框圆形，当前页主色，翻页 / 条数 / 跳页为玻璃胶囊
     .ant-pagination {
       .ant-pagination-item,
@@ -925,6 +941,17 @@
 
       > .ant-card-body {
         padding: 12px 16px 0;
+      }
+    }
+
+    // 弹窗不吃 common-style，嵌套分组需在这里同样去掉左右内边距
+    .ant-card.part:not(.bordered) .ant-card.part:not(.bordered) {
+      > .ant-card-head {
+        padding: 12px 0 0;
+      }
+
+      > .ant-card-body {
+        padding: 12px 0 0;
       }
     }
   }
