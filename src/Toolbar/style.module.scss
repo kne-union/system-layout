@@ -22,7 +22,7 @@
 }
 
 // 底距贴合系统安全区：有 Home 指示条时压进安全区一部分，无安全区时只留最小间距
-$toolbar-bottom: max(var(--toolbar-bottom-gap, 8px), calc(var(--safe-area-inset-bottom, 0px) - 12px));
+$toolbar-bottom: max(var(--toolbar-bottom-gap, 8px), calc(var(--safe-area-inset-bottom, 0px) - 20px));
 $toolbar-side: tokens.$bar-side;
 $toolbar-dock-gap: tokens.$bar-gap;
 
