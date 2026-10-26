@@ -85,12 +85,9 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
   }, [location.pathname]);
 
   useLayoutEffect(() => {
-    if (minimal) {
+    if (minimal || activeIndex < 0) {
       firstRenderRef.current = true;
       setIndicator(prev => (prev.visible ? { ...prev, visible: false } : prev));
-      return;
-    }
-    if (activeIndex < 0) {
       return;
     }
     const item = itemRefs.current[activeIndex];

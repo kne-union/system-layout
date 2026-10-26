@@ -405,7 +405,7 @@ $nav-size: 40px;
     // 底栏态整行用紧凑高度；展开导航态右侧圆钮与 Toolbar 同高
     $compact: tokens.$bar-compact;
     $size: var(--toolbar-height, 62px);
-    bottom: max(var(--toolbar-bottom-gap, 8px), calc(var(--safe-area-inset-bottom, 0px) - 12px));
+    bottom: max(var(--toolbar-bottom-gap, 8px), calc(var(--safe-area-inset-bottom, 0px) - 20px));
     left: calc(#{$side} + #{$compact} + #{$gap});
     right: auto;
     width: calc(100% - #{$side * 2} - #{$gap} - #{$compact});
