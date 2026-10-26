@@ -1,4 +1,3 @@
-@use '~@kne/responsive-utils/scss' as resp;
 @use '~@kne/responsive-utils/scss/viewport';
 @use '../styles/tokens';
 
@@ -64,6 +63,9 @@
 // table-page 把搜索框底色挂在 .ant-input-search 上，内部输入框与按钮强制透明
 @mixin table-page-search {
   overflow: hidden;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
   border-radius: 999px !important;
   background: var(--sl-field-bg) !important;
   transition:
@@ -102,7 +104,7 @@
 
   .ant-table-thead > tr > th,
   .ant-table-thead > tr > td {
-    background: var(--sl-primary-1) !important;
+    background: #f3f4f6 !important;
     border-bottom: none !important;
     color: var(--sl-text-2);
     font-weight: 500;
@@ -264,9 +266,12 @@
     }
 
     .ant-segmented {
-      border: 1px solid var(--sl-border);
+      border: 1px solid var(--sl-glass-border-strong);
       border-radius: 999px;
-      background: transparent !important;
+      background: var(--sl-glass-bg-subtle) !important;
+      box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
 
       .ant-segmented-item,
       .ant-segmented-thumb {
@@ -277,10 +282,87 @@
       .ant-segmented-thumb {
         background: var(--sl-primary) !important;
         color: #fff !important;
+        box-shadow: var(--sl-shadow-thumb);
       }
 
       .ant-segmented-item:after {
         background: transparent !important;
+      }
+    }
+
+    .ant-switch {
+      border: 1px solid var(--sl-glass-border-strong);
+      box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+
+      &:not(.ant-switch-checked) {
+        background: var(--sl-glass-bg-faint) !important;
+      }
+
+      &.ant-switch-checked:not(.ant-switch-disabled) {
+        background: var(--sl-primary) !important;
+      }
+
+      .ant-switch-handle {
+        top: 1px;
+      }
+
+      .ant-switch-handle::before {
+        background: #fff;
+        box-shadow: var(--sl-shadow-thumb);
+      }
+    }
+
+    // Input.Search：整体玻璃胶囊，内部输入框与按钮去掉各自的底色和描边
+    .ant-input-search {
+      overflow: hidden;
+      // 白色卡片上白描边不可见，用浅灰描边
+      border: 1px solid rgba(15, 23, 42, 0.12);
+      border-radius: 999px;
+      background: var(--sl-glass-bg-faint);
+      box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition:
+        background var(--sl-transition-fast),
+        border-color var(--sl-transition-fast),
+        box-shadow var(--sl-transition-fast);
+
+      &:hover {
+        border-color: color-mix(in srgb, var(--sl-primary) 40%, transparent);
+      }
+
+      &:focus-within {
+        border-color: var(--sl-primary);
+        background: rgba(255, 255, 255, 0.7);
+        box-shadow:
+          inset 0 1px 1px 0 rgba(255, 255, 255, 0.6),
+          0 0 0 2px var(--sl-primary-2);
+      }
+
+      .ant-input-affix-wrapper,
+      .ant-input {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+
+      .ant-input-affix-wrapper {
+        padding-left: 14px;
+      }
+
+      > .ant-btn,
+      .ant-input-search-btn {
+        height: auto !important;
+        align-self: stretch;
+        border: none !important;
+        backdrop-filter: none !important;
+
+        &:not(.ant-btn-primary) {
+          background: transparent !important;
+          color: var(--sl-primary);
+        }
       }
     }
 
@@ -293,26 +375,6 @@
         max-width: 900px;
         margin: 0 auto;
         width: 100%;
-      }
-
-      // FormInfo 字段自带主题作用域，不吃 Layout 的 componentSize，移动端单独放大到 40px
-      @include resp.mobile-container {
-        .react-form__field-component:not(textarea):not(.ant-radio-group):not(.ant-checkbox-group):not(.ant-switch) {
-          min-height: 40px;
-        }
-      }
-    }
-
-    // 移动端可输入元素字号不低于 16px，否则 iOS 聚焦时会缩放页面（含 TablePage 搜索框等写死 size 的控件）
-    @include resp.mobile-container {
-      input.ant-input,
-      textarea.ant-input,
-      .ant-select-input,
-      .ant-select-content,
-      .ant-picker-input > input,
-      .ant-input-number-input,
-      .ant-mentions > textarea {
-        font-size: 16px !important;
       }
     }
 
@@ -351,24 +413,78 @@
         font-size: 16px;
         font-weight: 600;
       }
+    }
 
-      @include resp.mobile-container {
-        > .ant-card-head {
-          padding: 16px 16px 0;
-        }
+    // bordered 分组内嵌的无边框分组已有外框，不再叠一层玻璃卡片
+    .part.bordered .ant-card.part:not(.bordered) {
+      border: none;
+      border-radius: 0;
+      background: transparent !important;
+      box-shadow: none;
 
-        > .ant-card-body {
-          padding: 12px 16px 0;
-        }
+      > .ant-card-head {
+        padding: 0 0 8px;
+      }
+
+      > .ant-card-body {
+        padding: 0;
       }
     }
 
-    .ant-pagination-options-size-changer {
-      background: var(--sl-glass-bg-panel) !important;
-    }
+    // 分页：页码无框圆形，当前页主色，翻页 / 条数 / 跳页为玻璃胶囊
+    .ant-pagination {
+      .ant-pagination-item,
+      .ant-pagination-prev .ant-pagination-item-link,
+      .ant-pagination-next .ant-pagination-item-link {
+        border-radius: 999px !important;
+        transition:
+          background 0.2s,
+          box-shadow 0.2s;
+      }
 
-    .ant-pagination-item:not(.ant-pagination-item-active) {
-      background-color: transparent !important;
+      .ant-pagination-item:not(.ant-pagination-item-active) {
+        border-color: transparent !important;
+        background: transparent !important;
+
+        &:hover {
+          background: var(--sl-glass-bg-subtle) !important;
+        }
+      }
+
+      .ant-pagination-item-active {
+        border-color: transparent !important;
+        background: var(--sl-primary) !important;
+        box-shadow: var(--sl-shadow-thumb);
+
+        a {
+          color: #fff !important;
+        }
+      }
+
+      .ant-pagination-prev:not(.ant-pagination-disabled) .ant-pagination-item-link,
+      .ant-pagination-next:not(.ant-pagination-disabled) .ant-pagination-item-link,
+      .ant-pagination-options-size-changer,
+      .ant-pagination-options-quick-jumper input {
+        border: 1px solid var(--sl-glass-border-strong) !important;
+        background: var(--sl-glass-bg-subtle) !important;
+        box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .ant-pagination-disabled .ant-pagination-item-link {
+        border-color: transparent !important;
+        background: transparent !important;
+      }
+
+      .ant-pagination-options-size-changer,
+      .ant-pagination-options-quick-jumper input {
+        border-radius: 999px !important;
+      }
+
+      .ant-pagination-options-size-changer .ant-select-content {
+        font-size: inherit !important;
+      }
     }
 
     .ant-tree {
@@ -444,6 +560,12 @@
       &.ant-table-cell-fix-start-shadow-show {
         background: var(--bg-color-grey);
       }
+    }
+
+    // 横向滚动时同侧所有固定列都要不透明（勾选列等不带 shadow-show，只看表格级标记）
+    .ant-table-fix-start-shadow-show .ant-table-cell-fix-start,
+    .ant-table-fix-end-shadow-show .ant-table-cell-fix-end {
+      background: var(--bg-color-grey);
     }
 
     // 键盘可达性：仅键盘聚焦（Tab）时显示焦点环，鼠标点击不触发
@@ -597,12 +719,20 @@
     .ant-btn {
       border-radius: 999px;
 
-      &:not(.ant-btn-primary):not(.ant-btn-dangerous):not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(:disabled) {
-        background: var(--sl-primary-2);
+      // 次要按钮半透明 + 模糊，透出背景，与玻璃面板融合
+      &:not(.ant-btn-primary):not(.ant-btn-dangerous):not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(.ant-input-search-btn):not(:disabled) {
+        background: var(--sl-glass-bg-subtle);
         color: var(--sl-primary);
+        backdrop-filter: blur(16px) saturate(1.4);
+        -webkit-backdrop-filter: blur(16px) saturate(1.4);
+        // 高光边框：亮白描边 + 顶部内高光
+        border-color: var(--sl-glass-border-strong) !important;
+        box-shadow:
+          var(--sl-shadow-md),
+          inset 0 1px 1px 0 rgba(255, 255, 255, 0.7);
       }
 
-      &:not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(:disabled) {
+      &:not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(.ant-input-search-btn):not(:disabled) {
         border: 1px solid var(--sl-glass-border) !important;
         box-shadow: var(--sl-shadow-md);
         backdrop-filter: blur(10px);
@@ -635,6 +765,19 @@
       &.ant-btn-primary:not(:disabled) {
         box-shadow: var(--sl-shadow-md);
       }
+
+      &.ant-btn-dangerous:not(.ant-btn-link):not(.ant-btn-dashed):not(.ant-btn-text):not(:disabled) {
+        box-shadow:
+          0 5px 10px 0 color-mix(in srgb, var(--ant-color-error, #ff4d4f) 12%, transparent),
+          0 15px 30px 0 color-mix(in srgb, var(--ant-color-error, #ff4d4f) 18%, transparent);
+      }
+    }
+
+    // 与输入框拼接的组合按钮（搜索框按钮等）：去阴影、不放大，避免与输入框错位
+    .ant-space-compact .ant-btn,
+    .ant-input-group-addon .ant-btn {
+      box-shadow: none !important;
+      transform: none !important;
     }
 
     // 包一层即可恢复 antd 默认圆角，取消 layout 内胶囊按钮
@@ -693,9 +836,98 @@
   }
 }
 
+// 弹窗：玻璃面板 + 轻遮罩，与 Card / Toolbar 质感一致
+@mixin modal-glass {
+  :global {
+    .ant-modal-mask {
+      background: rgba(15, 23, 42, 0.2);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .ant-modal-container {
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 42%), rgba(255, 255, 255, 0.82);
+      box-shadow:
+        0 24px 64px 0 rgba(78, 96, 139, 0.22),
+        0 4px 16px 0 rgba(78, 96, 139, 0.1),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      overflow: hidden;
+
+      .modal-footer {
+        background: #fff;
+      }
+
+      .modal-close {
+        top: 6px;
+        right: 8px;
+        width: 36px;
+        height: 36px;
+        color: var(--ant-color-text-secondary);
+        transition: background var(--sl-transition-fast);
+
+        &:hover {
+          background: rgba(15, 23, 42, 0.06);
+        }
+
+        &:active {
+          background: rgba(15, 23, 42, 0.1);
+        }
+      }
+    }
+  }
+}
+
+// 移动端规范：跟随 Layout 的移动端状态（与 15px 正文、large 控件同源），不按内容列宽度判断
+@mixin mobile-spec {
+  :global {
+    // FormInfo 字段自带主题作用域，不吃 Layout 的 componentSize，移动端单独放大到 40px
+    .react-form .react-form__field-component:not(textarea):not(.ant-radio-group):not(.ant-checkbox-group):not(.ant-switch) {
+      min-height: 40px;
+    }
+
+    // 可输入元素字号不低于 16px，否则 iOS 聚焦时会缩放页面（含 TablePage 搜索框等写死 size 的控件）
+    input.ant-input,
+    textarea.ant-input,
+    .ant-select-input,
+    .ant-select-content,
+    .ant-picker-input > input,
+    .ant-input-number-input,
+    .ant-mentions > textarea {
+      font-size: 16px !important;
+    }
+
+    .ant-card.part:not(.bordered) {
+      > .ant-card-head {
+        padding: 16px 16px 0;
+      }
+
+      > .ant-card-body {
+        padding: 12px 16px 0;
+      }
+    }
+  }
+}
+
 :global(.kne-system-layout-scope) {
   @include common-style;
   @include layout-buttons;
+  @include modal-glass;
+}
+
+// 弹窗挂在 Layout 外（body 或预览边界），按页面上 Layout 是否处于移动端判断
+:global(.kne-system-layout-scope.is-mobile),
+:global(body:has(.kne-system-layout-scope.is-mobile) .ant-modal-root) {
+  @include mobile-spec;
+}
+
+// 桌面端 useModal 等弹窗挂在 body 下、不在 Layout 作用域内：页面存在 Layout 时同样套用弹窗与按钮样式
+:global(body:has(.kne-system-layout-scope) .ant-modal-root) {
+  @include layout-buttons;
+  @include modal-glass;
 }
 
 .menu {

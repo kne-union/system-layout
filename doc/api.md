@@ -23,7 +23,7 @@
 
 #### 移动端规范
 
-移动端按触控与可读性要求统一尺寸：
+移动端按触控与可读性要求统一尺寸。是否为移动端统一以 Layout 的移动端状态为准（`isMobile` 属性，或视口 / 预览边界宽度 ≤ 768px），不按内容区宽度判断：桌面端即使侧边菜单让内容区窄于 768px，也保持桌面尺寸。
 
 - 正文字号 15px（antd token `fontSize: 15`），标签、辅助说明等次要文字保持 13–14px
 - antd 控件默认 `componentSize="large"`（高 40px），`components-core:FormInfo` 字段同样放大到 40px
