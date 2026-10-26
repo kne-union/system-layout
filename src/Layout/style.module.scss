@@ -114,12 +114,20 @@
     }
   }
 
+  // 行间去边框改斑马纹，条纹须明显浅于表头 #f3f4f6
   .ant-table-tbody > tr > td {
-    border-bottom-color: var(--sl-divider) !important;
+    border-bottom: none !important;
   }
 
-  .ant-table-tbody > tr:last-child > td {
-    border-bottom: none !important;
+  .ant-table-tbody > tr.ant-table-row:nth-child(even of .ant-table-row):not(:hover):not(.ant-table-row-selected) > td {
+    // 固定列自带不透明底，只能叠渐变，改 background-color 会透出滚动内容
+    &:not([class*='ant-table-cell-fix']) {
+      background-color: rgba(17, 24, 39, 0.018);
+    }
+
+    &[class*='ant-table-cell-fix'] {
+      background-image: linear-gradient(rgba(17, 24, 39, 0.018), rgba(17, 24, 39, 0.018));
+    }
   }
 
   .ant-table {
