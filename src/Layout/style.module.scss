@@ -197,8 +197,8 @@
 }
 
 @mixin table-page-mobile-list {
-  // 全选 / 排序条
-  > div:first-child:not(.info-page-table-mobile-card) {
+  // 全选 / 排序条：只认工具栏类名，自定义列表的首个子元素常是包住全部卡片的容器
+  > .info-page-table-mobile-card-toolbar {
     padding: 4px 6px 4px 12px;
     border-radius: 999px;
     background: var(--sl-glass-bg) !important;
