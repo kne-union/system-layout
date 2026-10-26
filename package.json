@@ -1,6 +1,6 @@
 {
   "name": "@kne/system-layout",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "用于一个系统初始化布局",
   "syntax": {
     "esmodules": true
@@ -95,9 +95,10 @@
     "react-dom": "^18.2.0"
   },
   "dependencies": {
-    "@kne/button-group": "^0.1.35",
+    "@kne/button-group": "^0.1.41",
     "@kne/ensure-slash": "^0.1.0",
     "@kne/local-storage": "^0.1.1",
+    "@kne/react-box": "^0.1.13",
     "@kne/react-error-boundary": "^0.1.1",
     "@kne/react-file": "^0.1.29",
     "@kne/react-icon": "^0.1.4",

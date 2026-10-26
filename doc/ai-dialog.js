@@ -1,7 +1,17 @@
-const { default: SystemLayout, Page, BarChartIcon } = _SystemLayout;
+const { default: SystemLayout, Page, BarChartIcon, Card, CARD_THEME } = _SystemLayout;
 const { useState, useRef, useEffect } = React;
-const { Flex, Card, Input, Button, Avatar, Tag, Typography, Alert, Spin } = antd;
+const { Flex, Input, Button, Avatar, Tag, Typography, Spin } = antd;
 const { Text, Paragraph } = Typography;
+
+const BUBBLE_STYLE = { maxWidth: '80%', whiteSpace: 'pre-wrap', wordBreak: 'break-word' };
+const AI_AVATAR_STYLE = { background: 'var(--sl-primary)', flex: '0 0 auto' };
+
+// 对话气泡：AI 用致密玻璃，用户用主色染色玻璃
+const Bubble = ({ role, children }) => (
+  <Card theme={role === 'user' ? CARD_THEME.tint : CARD_THEME.solid} padding="8px 12px" radius={12} hover={false} style={BUBBLE_STYLE}>
+    {children}
+  </Card>
+);
 
 // 模拟招聘助手的知识库应答：根据关键字返回贴近业务的回复
 const answerByKeyword = question => {
@@ -62,29 +72,17 @@ const AIAssistant = () => {
         <Flex vertical gap={16}>
           {messages.map((msg, index) => (
             <Flex key={index} gap={8} align="flex-start" justify={msg.role === 'user' ? 'flex-end' : 'flex-start'}>
-              {msg.role === 'ai' && <Avatar style={{ background: '#1677ff', flex: '0 0 auto' }}>K</Avatar>}
-              <div
-                style={{
-                  maxWidth: '80%',
-                  padding: '8px 12px',
-                  borderRadius: 10,
-                  whiteSpace: 'pre-wrap',
-                  wordBreak: 'break-word',
-                  background: msg.role === 'user' ? '#1677ff' : 'rgba(255,255,255,0.9)',
-                  color: msg.role === 'user' ? '#fff' : 'inherit'
-                }}
-              >
-                {msg.content}
-              </div>
-              {msg.role === 'user' && <Avatar style={{ background: '#52c41a', flex: '0 0 auto' }}>我</Avatar>}
+              {msg.role === 'ai' && <Avatar style={AI_AVATAR_STYLE}>K</Avatar>}
+              <Bubble role={msg.role}>{msg.content}</Bubble>
+              {msg.role === 'user' && <Avatar style={{ flex: '0 0 auto' }}>我</Avatar>}
             </Flex>
           ))}
           {loading && (
             <Flex gap={8} align="center">
-              <Avatar style={{ background: '#1677ff', flex: '0 0 auto' }}>K</Avatar>
-              <div style={{ padding: '8px 12px', borderRadius: 10, background: 'rgba(255,255,255,0.9)' }}>
+              <Avatar style={AI_AVATAR_STYLE}>K</Avatar>
+              <Bubble role="ai">
                 <Spin size="small" /> <Text type="secondary">小 K 正在思考…</Text>
-              </div>
+              </Bubble>
             </Flex>
           )}
         </Flex>
@@ -146,10 +144,9 @@ const BaseExample = () => {
     >
       <Page title="AI 招聘助手">
         <Flex vertical gap={16}>
-          <Alert
-            type="info"
-            showIcon
-            message="如何唤起招聘助手"
+          <Card
+            theme={CARD_THEME.tint}
+            title="如何唤起招聘助手"
             description={
               <span>
                 <b>桌面端</b>：点击左侧菜单<b>底部的 AI 入口图标</b>，对话框支持两种形态：
@@ -160,7 +157,7 @@ const BaseExample = () => {
               </span>
             }
           />
-          <Card title="招聘助手能做什么" styles={{ body: { padding: 20 } }} style={{ background: 'rgba(255,255,255,0.5)' }}>
+          <Card theme={CARD_THEME.glass} title="招聘助手能做什么">
             <Flex vertical gap={12}>
               <Paragraph style={{ margin: 0 }}>
                 招聘助手小 K 内置在布局中，可在任意页面随时调用，帮助 HR 高效处理日常招聘工作：

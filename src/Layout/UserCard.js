@@ -1,11 +1,16 @@
 import { Image } from '@kne/react-file';
-import { Flex } from 'antd';
+import { Flex, Tooltip } from 'antd';
 import classnames from 'classnames';
 import style from './style.module.scss';
 
 const UserCard = ({ name, avatar, email, phone, description, menuOpen, extra }) => {
   if (!menuOpen) {
-    return <Image.Avatar id={avatar} src={avatar} shape="circle" size={40} alt="avatar" />;
+    // 收起态仅剩头像，用 Tooltip 补充身份信息，避免鼠标用户无从得知当前用户
+    return (
+      <Tooltip title={name || '-'} mouseEnterDelay={0.3}>
+        <Image.Avatar id={avatar} src={avatar} shape="circle" size={40} alt="avatar" />
+      </Tooltip>
+    );
   }
   return (
     <Flex gap={12} justify="center">

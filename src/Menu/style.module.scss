@@ -1,3 +1,5 @@
+@use '../styles/tokens';
+
 .menu-list {
   flex: 1;
   min-height: 0;
@@ -19,18 +21,18 @@
 
 .menu-group {
   font-size: 12px;
-  color: var(--font-color-grey);
+  color: var(--sl-text-2);
   line-height: 24px;
   padding: 12px;
 }
 
 .menu-item-icon {
-  color: var(--font-color-grey);
+  color: var(--sl-text-2);
 }
 
 .menu-group-split {
   opacity: 0.6;
-  background: var(--font-color-grey-3);
+  background: var(--font-color-grey-3, var(--sl-text-2));
   height: 1px;
   width: 28px;
   margin: 8px auto;
@@ -59,11 +61,16 @@
   margin: 2px 0;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s;
+  // 只过渡实际变化的属性，避免 transition:all 的合成层开销
+  transition:
+    background var(--sl-transition-normal),
+    transform var(--sl-transition-normal),
+    box-shadow var(--sl-transition-normal);
   white-space: nowrap;
   overflow: visible;
   &:hover {
-    backdrop-filter: brightness(1.1);
+    // 用背景色做 hover 反馈，替代 backdrop-filter: brightness（性能更优、语义更清晰）
+    background: var(--sl-glass-bg-faint);
     transform: scale(1.02);
   }
 

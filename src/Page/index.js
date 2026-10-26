@@ -9,6 +9,9 @@ import { useScrollElement, usePopupContainer, useResponsiveContext, RESPONSIVE_C
 import { useContext } from '../context';
 import style from './style.module.scss';
 import { Image } from '@kne/react-file';
+import FooterOpenIcon from './FooterOpenIcon';
+import MoreIcon from './MoreIcon';
+import useToggleBounce from '../useToggleBounce';
 
 const findFooterMount = anchor => {
   if (!anchor) {
@@ -25,14 +28,23 @@ const findFooterMount = anchor => {
   return null;
 };
 
-const PageFooter = ({ children, className }) => {
+const PageFooter = ({ children, className, icon = <FooterOpenIcon /> }) => {
   const anchorRef = useRef(null);
   const footerRef = useRef(null);
   const [host, setHost] = useState(null);
-  const { deviceIsMobile, toolbarShow, toolbarMinimal } = useContext();
+  const { deviceIsMobile, toolbarShow, toolbarMinimal, setPageFooterShow, bottomBarMode, setBottomBarMode, bottomBarScrolling } = useContext();
   const { mode } = useResponsiveContext();
   const getBoundaryElement = usePopupContainer();
   const hasToolbar = !!toolbarShow;
+  // 移动端有 Toolbar 时与其合并成同一行，二者通过圆钮互相切换
+  const merged = deviceIsMobile && hasToolbar;
+  const docked = merged && bottomBarMode === 'toolbar';
+  const [bouncing, stopBounce] = useToggleBounce(docked);
+  const scrolling = merged && !docked && !!bottomBarScrolling;
+  // 滚动收缩时不叠加果冻形变，避免与缩放 transform 冲突
+  useEffect(() => {
+    bottomBarScrolling && bouncing && stopBounce();
+  }, [bottomBarScrolling, bouncing]);
   const useBoundaryMount = deviceIsMobile && mode === 'container';
   const boundaryTarget = useBoundaryMount ? getBoundaryElement() : null;
   const boundaryReady = useBoundaryMount && !!boundaryTarget;
@@ -42,9 +54,26 @@ const PageFooter = ({ children, className }) => {
     setHost(findFooterMount(anchorRef.current));
   }, []);
 
+  useEffect(() => {
+    if (!setPageFooterShow) {
+      return undefined;
+    }
+    setPageFooterShow(true);
+    setBottomBarMode && setBottomBarMode('footer');
+    return () => setPageFooterShow(false);
+  }, []);
+
   useLayoutEffect(() => {
     const el = footerRef.current;
     if (!host || !el) {
+      return;
+    }
+    if (merged) {
+      // 与 Toolbar 同排，内容区已为 Toolbar 预留底部空间，无需再叠加底栏高度
+      el.style.removeProperty('left');
+      el.style.removeProperty('width');
+      el.style.removeProperty('right');
+      host.style.removeProperty('--page-footer-height');
       return;
     }
     const apply = () => {
@@ -71,7 +100,7 @@ const PageFooter = ({ children, className }) => {
       window.removeEventListener('resize', apply);
       host.style.removeProperty('--page-footer-height');
     };
-  }, [host, hasToolbar, deviceIsMobile, toolbarMinimal, boundaryReady, boundaryTarget]);
+  }, [host, merged, deviceIsMobile, toolbarMinimal, boundaryReady, boundaryTarget]);
 
   const footer = (
     <div
@@ -79,15 +108,36 @@ const PageFooter = ({ children, className }) => {
       className={classnames('page-footer', style['page-footer'], className, {
         'is-mobile': deviceIsMobile,
         [style['is-mobile']]: deviceIsMobile,
-        'has-toolbar': hasToolbar,
-        [style['has-toolbar']]: hasToolbar,
+        'is-merged': merged,
+        [style['is-merged']]: merged,
+        'is-docked': docked,
+        [style['is-docked']]: docked,
+        [style['is-bouncing']]: bouncing && !bottomBarScrolling,
+        'is-scrolling': scrolling,
+        [style['is-scrolling']]: scrolling,
         'is-viewport': useViewportFixed,
         [style['is-viewport']]: useViewportFixed,
         'is-boundary': boundaryReady,
         [style['is-boundary']]: boundaryReady
       })}
+      onAnimationEnd={e => {
+        if (e.target === e.currentTarget && bouncing) {
+          stopBounce();
+        }
+      }}
     >
-      {children}
+      {merged ? (
+        <>
+          <div className={classnames('page-footer-content', style['page-footer-content'])} aria-hidden={docked || undefined}>
+            {children}
+          </div>
+          <button type="button" className={classnames('page-footer-dock', style['page-footer-dock'])} aria-label="展开操作栏" tabIndex={docked ? 0 : -1} onClick={() => setBottomBarMode('footer')}>
+            {typeof icon === 'string' ? <Icon type={icon} fontClassName="system" /> : icon}
+          </button>
+        </>
+      ) : (
+        children
+      )}
     </div>
   );
 
@@ -96,8 +146,8 @@ const PageFooter = ({ children, className }) => {
     <div
       className={classnames('page-footer-boundary-overlay', style['page-footer-boundary-overlay'])}
       style={{
-        '--toolbar-height': hasToolbar ? (toolbarMinimal ? '60px' : '72px') : '0px',
-        '--toolbar-bottom-gap': '16px',
+        '--toolbar-height': hasToolbar ? (toolbarMinimal ? '48px' : '62px') : '0px',
+        '--toolbar-bottom-gap': '8px',
         '--safe-area-inset-bottom': 'env(safe-area-inset-bottom)'
       }}
     >
@@ -194,41 +244,67 @@ const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true
     };
   }, [deviceIsMobile, navbar, getScrollElement, scrollReady]);
 
+  // 移动端右侧：自定义 extra 放玻璃胶囊，buttonProps 全部收进「更多」圆钮；
+  // 头像圆钮始终显示并可打开菜单，保证带返回键的二级页也有菜单入口
+  const extraRef = useRef(null);
+  const [extraEmpty, setExtraEmpty] = useState(false);
+  const hasMobileActions = deviceIsMobile && !extra && !!buttonProps && (buttonProps.list || []).some(item => item && !item.hidden);
   const titleExtraContent = (() => {
-    if (extra) {
-      if (deviceIsMobile && userAvatar) {
-        return (
-          <Flex gap={4} align="center">
+    if (!deviceIsMobile) {
+      return extra || (buttonProps ? <ButtonGroup {...buttonProps} /> : null);
+    }
+    return (
+      <>
+        {extra ? (
+          <div ref={extraRef} className={classnames('page-nav-capsule', style['nav-capsule'], { [style['is-empty']]: extraEmpty })}>
             {extra}
-            <Image.Avatar id={userAvatar} src={userAvatar} shape="circle" size={30} alt="avatar" />
-          </Flex>
-        );
-      }
-      return extra;
-    }
-    if (deviceIsMobile && (buttonProps || userAvatar)) {
-      const actions = buttonProps ? (
-        <div className={classnames('page-title-actions', style['page-title-actions'])}>
-          <ButtonGroup {...Object.assign({}, buttonProps, { showLength: 0, moreType: 'link' })} />
-        </div>
-      ) : null;
-      const avatar = userAvatar ? <Image.Avatar id={userAvatar} src={userAvatar} shape="circle" size={30} alt="avatar" /> : null;
-      // 仅更多按钮时不要套带 gap 的 Flex，否则 ButtonGroup 测宽空节点也会吃 gap，导致不居中
-      if (actions && avatar) {
-        return (
-          <Flex gap={4} align="center">
-            {actions}
-            {avatar}
-          </Flex>
-        );
-      }
-      return actions || avatar;
-    }
-    if (buttonProps) {
-      return <ButtonGroup {...buttonProps} />;
-    }
-    return null;
+          </div>
+        ) : null}
+        {hasMobileActions ? (
+          <ButtonGroup
+            {...buttonProps}
+            showLength={0}
+            placement="bottomRight"
+            getPopupContainer={buttonProps.getPopupContainer || (() => getBoundaryElement() || document.body)}
+            more={<Button type="text" className={classnames('page-nav-circle', style['nav-circle'])} icon={<MoreIcon />} aria-label="more" />}
+          />
+        ) : null}
+        <Button
+          type="text"
+          className={classnames('page-nav-circle', style['nav-circle'], style['nav-avatar'])}
+          aria-label="打开菜单"
+          onClick={() => {
+            setMenuOpen(true);
+          }}
+        >
+          <Image.Avatar id={userAvatar} src={userAvatar} shape="circle" size={34} alt="avatar" />
+        </Button>
+      </>
+    );
   })();
+
+  // nav 左侧是否有内容：移动端始终有菜单/返回键；桌面端无返回键且无标题时左侧为空，
+  // 滚动后 page-title-outer 会显示为胶囊，空内容时不渲染，避免出现空容器
+  const hasNavbarLeft = !!(title || back || deviceIsMobile);
+
+  // 自定义 extra 渲染结果可能为空（包装节点内为 null），胶囊仍带边框/毛玻璃底，实测为空则隐藏
+  useLayoutEffect(() => {
+    const el = extraRef.current;
+    if (!el) {
+      setExtraEmpty(false);
+      return;
+    }
+    // 有文本，或任一直接子节点可见（宽高非 0）即视为非空
+    let hasVisible = !!el.textContent.trim();
+    for (const child of el.children) {
+      const rect = child.getBoundingClientRect();
+      if (rect.width > 1 || rect.height > 1) {
+        hasVisible = true;
+        break;
+      }
+    }
+    setExtraEmpty(!hasVisible);
+  });
 
   const navbarInner = navbar ? (
     <Flex
@@ -245,28 +321,30 @@ const Page = ({ title, extra = null, back, buttonProps, children, toolbar = true
         [style['is-viewport']]: useViewportFixed || (useBoundaryMount && !boundaryTarget)
       })}
     >
-      <Flex className={classnames('page-title-outer', style['page-title-outer'])} align="center" gap={4}>
-        {back && (
-          <Button
-            type="link"
-            icon={<Icon className={style['back-icon']} type="a-Typearrow_forward_ios" fontClassName="system" />}
-            onClick={() => {
-              navigate(-1);
-            }}
-          />
-        )}
-        {!back && deviceIsMobile && (
-          <Button
-            type="link"
-            icon={<Icon className={style['back-icon']} type="a-Typeequal" fontClassName="system" />}
-            onClick={() => {
-              setMenuOpen(open => !open);
-            }}
-          />
-        )}
-        <div className={classnames('page-title', style['page-title'])}>{title}</div>
-      </Flex>
-      {titleExtraContent ? <div className={classnames('page-title-extra', style['page-title-extra'], style['has-float'])}>{titleExtraContent}</div> : null}
+      {hasNavbarLeft ? (
+        <Flex className={classnames('page-title-outer', style['page-title-outer'])} align="center" gap={4}>
+          {back && (
+            <Button
+              type="link"
+              icon={<Icon className={style['back-icon']} type="a-Typearrow_forward_ios" fontClassName="system" />}
+              onClick={() => {
+                navigate(-1);
+              }}
+            />
+          )}
+          {!back && deviceIsMobile && (
+            <Button
+              type="link"
+              icon={<Icon className={style['back-icon']} type="a-Typeequal" fontClassName="system" />}
+              onClick={() => {
+                setMenuOpen(open => !open);
+              }}
+            />
+          )}
+          <div className={classnames('page-title', style['page-title'])}>{title}</div>
+        </Flex>
+      ) : null}
+      {titleExtraContent ? <div className={classnames('page-title-extra', style['page-title-extra'])}>{titleExtraContent}</div> : null}
     </Flex>
   ) : null;
 

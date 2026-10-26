@@ -11,6 +11,7 @@ import { useScrollElement, usePopupContainer, useResponsiveContext, useIsMobile 
 import { useContext } from '../context';
 import { LAYOUT_SCOPE_CLASS } from '../layoutScope';
 import ItemBadge from '../ItemBadge';
+import useToggleBounce from '../useToggleBounce';
 
 const resolveTarget = target => {
   if (!target) {
@@ -39,7 +40,12 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
   const getBoundaryElement = usePopupContainer();
   const { mode } = useResponsiveContext();
   const isMobile = useIsMobile();
-  const { scrollReady } = useContext();
+  const { scrollReady, bottomBarMerged, bottomBarMode, setBottomBarMode, setBottomBarScrolling } = useContext();
+  const docked = !!bottomBarMerged && bottomBarMode === 'footer';
+  const shrunk = !!bottomBarMerged && bottomBarMode === 'toolbar';
+  const [bouncing, stopBounce] = useToggleBounce(docked);
+  const mergedRef = useRef({ docked, shrunk, setBottomBarMode, setBottomBarScrolling });
+  mergedRef.current = { docked, shrunk, setBottomBarMode, setBottomBarScrolling };
   const currentPathname = base ? location.pathname.replace(new RegExp(`^${base}`), '') : location.pathname;
   const toolbarMenu = items.filter(item => item.toolbar);
   const itemRefs = useRef([]);
@@ -120,6 +126,20 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
     };
   }, [activeIndex, show, target, useBoundaryMount, useViewportFixed, minimal, toolbarMenu.length]);
 
+  // 收纳/展开时宽度有过渡，结束后按最终尺寸校准指示器
+  const handleListTransitionEnd = e => {
+    if (minimal || e.target !== listRef.current || e.propertyName !== 'width' || activeIndex < 0) {
+      return;
+    }
+    const item = itemRefs.current[activeIndex];
+    if (!item) {
+      return;
+    }
+    const itemRect = item.getBoundingClientRect();
+    const listRect = listRef.current.getBoundingClientRect();
+    setIndicator(prev => ({ ...prev, left: itemRect.left - listRect.left, width: itemRect.width, scale: 1, visible: true }));
+  };
+
   useEffect(() => {
     const scrollEl = getScrollElement();
     if (!scrollEl) {
@@ -131,23 +151,32 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
     if (!listenTarget || typeof listenTarget.addEventListener !== 'function') {
       return;
     }
+    // 滚动态同步写入 context，与切换底栏模式在同一次渲染生效，避免底栏先展开再收起
+    const updateScrolling = value => {
+      setScrolling(value);
+      const setShared = mergedRef.current.setBottomBarScrolling;
+      setShared && setShared(value);
+    };
     const handleScroll = () => {
       if (Date.now() < suppressCollapseUntilRef.current) {
         return;
       }
       if (readScrollTop(scrollEl) <= 0) {
-        setScrolling(false);
+        updateScrolling(false);
         if (scrollTimerRef.current) {
           clearTimeout(scrollTimerRef.current);
         }
         return;
       }
-      setScrolling(true);
+      // 与底栏合并时展开态一滚动就切回底栏模式，滚动中两侧都收成圆钮，停止后底栏再展开
+      const merged = mergedRef.current;
+      merged.shrunk && merged.setBottomBarMode('footer');
+      updateScrolling(true);
       if (scrollTimerRef.current) {
         clearTimeout(scrollTimerRef.current);
       }
       scrollTimerRef.current = setTimeout(() => {
-        setScrolling(false);
+        updateScrolling(false);
       }, 500);
     };
 
@@ -157,8 +186,15 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
       if (scrollTimerRef.current) {
         clearTimeout(scrollTimerRef.current);
       }
+      const setShared = mergedRef.current.setBottomBarScrolling;
+      setShared && setShared(false);
     };
   }, [getScrollElement, show, scrollReady]);
+
+  // 滚动收缩时不叠加果冻形变：animation 会覆盖缩放的 transform 造成跳动
+  useEffect(() => {
+    scrolling && bouncing && stopBounce();
+  }, [scrolling, bouncing]);
 
   if (!show) {
     return null;
@@ -167,9 +203,15 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
   const toolbarList = (
     <Flex
       ref={listRef}
+      role="navigation"
+      aria-label="主导航"
       className={classnames('toolbar-list', style['toolbar-list'], {
         ['is-clicked']: clicked,
         ['is-scrolling']: scrolling,
+        ['is-docked']: docked,
+        [style['is-docked']]: docked,
+        [style['is-shrunk']]: shrunk,
+        [style['is-bouncing']]: bouncing && !scrolling,
         [style['is-minimal']]: minimal,
         [style['is-boundary']]: useBoundaryMount,
         [style['is-viewport']]: useViewportFixed
@@ -177,14 +219,19 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
       style={{
         '--toolbar-count': toolbarMenu.length || 1
       }}
-      onAnimationEnd={() => {
+      onAnimationEnd={e => {
         if (clicked) {
           setClicked(false);
         }
+        if (e.target === e.currentTarget && bouncing) {
+          stopBounce();
+        }
       }}
+      onTransitionEnd={handleListTransitionEnd}
     >
       {!minimal && indicator.visible && (
         <div
+          aria-hidden="true"
           className={classnames('toolbar-indicator', style['toolbar-indicator'])}
           style={{
             left: `${indicator.left}px`,
@@ -196,6 +243,28 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
       {toolbarMenu.map((item, index) => {
         const active = index === activeIndex;
         const icon = typeof item.icon === 'function' ? item.icon({ active }) : item.icon;
+
+        const handleItemClick = e => {
+          if (docked) {
+            suppressScrollCollapse();
+            setBottomBarMode('toolbar');
+            return;
+          }
+          if (active) {
+            return;
+          }
+          suppressScrollCollapse();
+          setClicked(true);
+          onChange && onChange(item, { base });
+          if (typeof item.onClick === 'function') {
+            item.onClick(item, { base, event: e });
+            return;
+          }
+          if (item.path) {
+            navigate(ensureSlash(`${base}${item.path}`));
+          }
+        };
+
         return (
           <Flex
             key={item.key || item.path || index}
@@ -206,24 +275,19 @@ const Toolbar = ({ show = true, className, items, activeKey, base = '', onChange
             flex={1}
             justify="center"
             align="center"
-            aria-label={item.label}
+            role="link"
+            tabIndex={0}
+            aria-label={docked ? `${item.label}，展开导航` : item.label}
+            aria-current={active ? 'page' : undefined}
             className={classnames('toolbar-item', style['toolbar-item'], {
               ['is-active']: active,
-              [style['is-hidden']]: scrolling && index !== displayIndex
+              [style['is-hidden']]: (scrolling || docked) && index !== displayIndex
             })}
-            onClick={e => {
-              if (active) {
-                return;
-              }
-              suppressScrollCollapse();
-              setClicked(true);
-              onChange && onChange(item, { base });
-              if (typeof item.onClick === 'function') {
-                item.onClick(item, { base, event: e });
-                return;
-              }
-              if (item.path) {
-                navigate(ensureSlash(`${base}${item.path}`));
+            onClick={handleItemClick}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleItemClick(e);
               }
             }}
           >

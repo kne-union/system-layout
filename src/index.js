@@ -6,6 +6,8 @@ export { default as useIsMobile } from './useIsMobile';
 export { useContext as useLayoutContext } from './context';
 export { default as themeToken } from './themeToken';
 export { default as BarChartIcon } from './Toolbar/BarChartIcon';
+export { default as FooterOpenIcon } from './Page/FooterOpenIcon';
+export { default as Card, CARD_THEME } from './Card';
 
 export {
   MOBILE_BREAKPOINT as mobileBreakpoint,

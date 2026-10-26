@@ -1,4 +1,4 @@
-const { default: SystemLayout, Page, useIsMobile, BarChartIcon } = _SystemLayout;
+const { default: SystemLayout, Page, useIsMobile, BarChartIcon, Card, CARD_THEME } = _SystemLayout;
 const { FetchScrollLoader } = _ScrollLoader;
 const { Flex, Avatar, Tag, Typography, Input, Select, Progress, Empty, Divider, Masonry } = antd;
 const { useState } = React;
@@ -82,16 +82,8 @@ const getScoreColor = score => (score >= 90 ? '#52c41a' : score >= 75 ? '#1677ff
 const CandidateRow = ({ item }) => {
   const stageInfo = getStageInfo(item.stage);
   return (
-    <Flex
-      align="center"
-      gap={16}
-      style={{
-        padding: 16,
-        background: 'rgba(255, 255, 255, 0.6)',
-        border: '1px solid rgba(0, 0, 0, 0.06)',
-        borderRadius: 12
-      }}
-    >
+    <Card theme={CARD_THEME.solid}>
+    <Flex align="center" gap={16}>
       <Avatar size={48} style={{ backgroundColor: AVATAR_COLORS[item.id % AVATAR_COLORS.length], flex: 'none' }}>
         {item.name.slice(0, 1)}
       </Avatar>
@@ -132,6 +124,7 @@ const CandidateRow = ({ item }) => {
         </Text>
       </Flex>
     </Flex>
+    </Card>
   );
 };
 
@@ -139,16 +132,8 @@ const CandidateRow = ({ item }) => {
 const CandidateCard = ({ item }) => {
   const stageInfo = getStageInfo(item.stage);
   return (
-    <Flex
-      vertical
-      gap={12}
-      style={{
-        padding: 16,
-        background: 'rgba(255, 255, 255, 0.6)',
-        border: '1px solid rgba(0, 0, 0, 0.06)',
-        borderRadius: 12
-      }}
-    >
+    <Card theme={CARD_THEME.solid}>
+    <Flex vertical gap={12}>
       <Flex align="center" gap={12}>
         <Avatar size={44} style={{ backgroundColor: AVATAR_COLORS[item.id % AVATAR_COLORS.length], flex: 'none' }}>
           {item.name.slice(0, 1)}
@@ -191,6 +176,7 @@ const CandidateCard = ({ item }) => {
         ))}
       </Flex>
     </Flex>
+    </Card>
   );
 };
 
@@ -226,26 +212,27 @@ const BaseExample = () => {
           completeTips="— 已加载全部候选人 —"
           render={({ fetchApi, children }) => (
             <Flex vertical gap={16}>
-              <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
-                <Flex gap={12} align="center" wrap="wrap">
-                  <Input.Search
-                    placeholder="搜索姓名或职位"
-                    allowClear
-                    onSearch={setKeyword}
-                    style={{ width: 220 }}
-                  />
-                  <Select
-                    placeholder="按阶段筛选"
-                    allowClear
-                    value={stage}
-                    onChange={setStage}
-                    style={{ width: 140 }}
-                    options={STAGES.map(({ value, label }) => ({ value, label }))}
-                  />
+              <Card theme={CARD_THEME.glass} padding={12} hover={false}>
+                <Flex justify="space-between" align="center" wrap="wrap" gap={12}>
+                  <Flex gap={12} align="center" wrap="wrap">
+                    <Input.Search
+                      placeholder="搜索姓名或职位"
+                      allowClear
+                      onSearch={setKeyword}
+                      style={{ width: 220 }}
+                    />
+                    <Select
+                      placeholder="按阶段筛选"
+                      allowClear
+                      value={stage}
+                      onChange={setStage}
+                      style={{ width: 140 }}
+                      options={STAGES.map(({ value, label }) => ({ value, label }))}
+                    />
+                  </Flex>
+                  <Text type="secondary">共 {fetchApi.data.totalCount} 位候选人</Text>
                 </Flex>
-                <Text type="secondary">共 {fetchApi.data.totalCount} 位候选人</Text>
-              </Flex>
-              <Divider style={{ margin: 0 }} />
+              </Card>
               {children}
             </Flex>
           )}

@@ -1,5 +1,5 @@
-const { default: SystemLayout, Page, BarChartIcon, NO_CAPSULE_BTN_CLASS } = _SystemLayout;
-const { Flex, Card, Row, Col, Statistic, Progress, Tag, Typography, Switch, Space, Button, Segmented } = antd;
+const { default: SystemLayout, Page, BarChartIcon, NO_CAPSULE_BTN_CLASS, Card, CARD_THEME } = _SystemLayout;
+const { Flex, Row, Col, Statistic, Progress, Tag, Typography, Switch, Space, Button, Segmented, Slider } = antd;
 const { useState } = React;
 const { Text, Title } = Typography;
 
@@ -10,11 +10,13 @@ const STATS = [
   { title: '离职申请', value: 3, suffix: '份', color: '#ff4d4f' }
 ];
 
+const DONE_COLOR = '#52c41a';
+
 const ONBOARDING_STEPS = [
-  { title: '完善个人资料', done: true },
-  { title: '签署入职文件', done: true },
-  { title: '领取办公设备', done: false },
-  { title: '参加新人培训', done: false }
+  { title: '完善个人资料', desc: '头像、紧急联系人与工资卡信息', date: '10/20', done: true },
+  { title: '签署入职文件', desc: '劳动合同与保密协议电子签', date: '10/21', done: true },
+  { title: '领取办公设备', desc: '到 IT 服务台领取电脑与工牌', date: '10/28', done: false },
+  { title: '参加新人培训', desc: '公司文化与制度培训，周五 14:00', date: '10/31', done: false }
 ];
 
 const LOGO_OPTIONS = {
@@ -23,15 +25,31 @@ const LOGO_OPTIONS = {
   broken: { src: 'https://example.invalid/logo.png' }
 };
 
+// 布局留白控制面板：悬浮于 Layout 之外（fixed），实时调节 padding 参数
+const PaddingControl = ({ value, onChange }) => (
+  <Card theme={CARD_THEME.solid} padding={12} hover={false} style={{ position: 'fixed', top: 16, right: 16, zIndex: 1100, width: 220 }}>
+    <Flex vertical gap={4}>
+      <Text type="secondary">
+        布局留白 padding：<Text strong>{value}px</Text>
+      </Text>
+      <Slider min={0} max={64} step={4} value={value} onChange={onChange} tooltip={{ formatter: v => `${v}px` }} />
+    </Flex>
+  </Card>
+);
+
 const BaseExample = () => {
   const [toolbarMinimal, setToolbarMinimal] = useState(false);
   const [logoMode, setLogoMode] = useState('default');
+  const [layoutPadding, setLayoutPadding] = useState(12);
   const doneCount = ONBOARDING_STEPS.filter(step => step.done).length;
   const percent = Math.round((doneCount / ONBOARDING_STEPS.length) * 100);
 
   return (
-    <SystemLayout
-      logo={LOGO_OPTIONS[logoMode]}
+    <>
+      <PaddingControl value={layoutPadding} onChange={setLayoutPadding} />
+      <SystemLayout
+        padding={layoutPadding}
+        logo={LOGO_OPTIONS[logoMode]}
       toolbarMinimal={toolbarMinimal}
       userInfo={{ name: 'Lucy L', email: 'lucy@company.com' }}
       menu={{
@@ -58,7 +76,7 @@ const BaseExample = () => {
         }}
       >
         <Flex vertical gap={16}>
-          <Card styles={{ body: { padding: 20 } }} style={{ background: 'rgba(255,255,255,0.5)' }}>
+          <Card theme={CARD_THEME.tint}>
             <Flex justify="space-between" align="center" wrap="wrap" gap={16}>
               <Flex vertical gap={4}>
                 <Title level={4} style={{ margin: 0 }}>
@@ -87,7 +105,7 @@ const BaseExample = () => {
             </Flex>
           </Card>
 
-          <Card title="按钮圆角" styles={{ body: { padding: 20 } }} style={{ background: 'rgba(255,255,255,0.5)' }}>
+          <Card theme={CARD_THEME.glass} title="按钮圆角">
             <Flex vertical gap={12}>
               <Flex vertical gap={8}>
                 <Text type="secondary">Layout 内默认胶囊按钮</Text>
@@ -115,7 +133,7 @@ const BaseExample = () => {
           <Row gutter={[12, 12]}>
             {STATS.map(stat => (
               <Col xs={12} md={6} key={stat.title}>
-                <Card styles={{ body: { padding: 16 } }} style={{ background: 'rgba(255,255,255,0.5)' }}>
+                <Card theme={CARD_THEME.accent} color={stat.color} padding={16}>
                   <Statistic
                     title={stat.title}
                     value={stat.value}
@@ -127,26 +145,31 @@ const BaseExample = () => {
             ))}
           </Row>
 
-          <Card title="入职清单" styles={{ body: { padding: 20 } }} style={{ background: 'rgba(255,255,255,0.5)' }}>
-            <Flex vertical gap={16}>
-              <Progress percent={percent} strokeColor={{ from: '#1677ff', to: '#52c41a' }} />
-              <Flex vertical gap={10}>
-                {ONBOARDING_STEPS.map(step => (
-                  <Flex key={step.title} align="center" gap={10}>
-                    <Tag color={step.done ? 'success' : 'default'} style={{ margin: 0 }}>
-                      {step.done ? '已完成' : '待办'}
-                    </Tag>
-                    <Text delete={step.done} type={step.done ? 'secondary' : undefined}>
-                      {step.title}
-                    </Text>
-                  </Flex>
-                ))}
-              </Flex>
-            </Flex>
+          <Card
+            theme={CARD_THEME.glass}
+            subtitle="新人入职 · Lucy"
+            title="入职清单"
+            extra={`已完成 ${doneCount}/${ONBOARDING_STEPS.length}`}
+          >
+            <Progress percent={percent} showInfo={false} size="small" strokeColor="var(--sl-primary)" />
+            {ONBOARDING_STEPS.map((step, index) => (
+              <Card
+                key={step.title}
+                theme={CARD_THEME.glass}
+                color={step.done ? DONE_COLOR : undefined}
+                hover={false}
+                padding="12px 16px"
+                prefix={step.done ? '✓' : index + 1}
+                title={step.title}
+                description={step.desc}
+                extra={step.done ? `${step.date} 完成` : `${step.date} 截止`}
+              />
+            ))}
           </Card>
         </Flex>
       </Page>
     </SystemLayout>
+    </>
   );
 };
 

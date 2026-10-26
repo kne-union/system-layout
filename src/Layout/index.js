@@ -1,6 +1,6 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Flex, Row, Col } from 'antd';
+import { Flex, Row, Col, ConfigProvider } from 'antd';
 import classnames from 'classnames';
 import localStorage from '@kne/local-storage';
 import { Image } from '@kne/react-file';
@@ -19,6 +19,9 @@ import { useLocation } from 'react-router-dom';
 import useIsMobile from '../useIsMobile';
 import { ResponsiveProvider, useResponsiveContext, findResponsiveScroll, findScrollParent, getDefaultScrollElement, RESPONSIVE_BOUNDARY_CLASS, RESPONSIVE_CONTAINER_CLASS, RESPONSIVE_SCROLL_CLASS } from '@kne/responsive-utils';
 import 'simplebar-react/dist/simplebar.min.css';
+
+// 正文 15px 提升可读性；large 控件字号固定 16px，避免 iOS 聚焦输入框缩放页面
+const MOBILE_THEME = { token: { fontSize: 15, fontSizeLG: 16 } };
 
 const normalizeMarkedScrollElement = marked => {
   if (!marked) {
@@ -109,6 +112,16 @@ const LayoutMenuOpenKey = 'LAYOUT_MENU_OPEN';
 
 const DRAG_THRESHOLD = 4;
 
+// logo 加载失败探针：react-file 的 Image 组件加载失败时会渲染 error 节点，
+// 借此感知失败并把 logo 置空，使失败态与「不显示」完全一致
+const LogoErrorCatcher = ({ onError }) => {
+  useEffect(() => {
+    onError && onError();
+    return undefined;
+  }, []);
+  return null;
+};
+
 const MobileAiEntry = ({ variant, onOpen }) => {
   const btnRef = useRef(null);
   const dragRef = useRef(null);
@@ -167,6 +180,7 @@ const MobileAiEntry = ({ variant, onOpen }) => {
   return (
     <div
       ref={btnRef}
+      aria-label="打开 AI 助手"
       className={classnames('ai-entry-mobile', style['ai-entry-mobile'], {
         [style['is-viewport']]: variant === 'viewport',
         [style['is-boundary']]: variant !== 'viewport'
@@ -185,6 +199,10 @@ const Layout = ({
   className,
   menu,
   background = 'linear-gradient(0deg, #BBCFE7 0%, #BBCFE7 100%), #FFFFFF',
+  // 布局外层留白宽度（.layout 的 padding），默认 12。
+  // 支持数字（按 px 处理）或任意 CSS 宽度值（如 '16px'、'2vw'）；超过默认值的部分对称分配到最左侧与菜单↔页面间距，
+  // padding 为 0 时页面容器全出血并去掉圆角，移动端固定为 0
+  padding = 12,
   menuMaxWidth = '254px',
   menuMinWidth = '84px',
   logo,
@@ -208,8 +226,28 @@ const Layout = ({
   const [navbarShow, setNavbarShow] = useState(true);
   const [aiType, setAiType] = useState('closed');
   const [scrollReady, setScrollReady] = useState(0);
+  const [logoLoadFailed, setLogoLoadFailed] = useState(false);
+  const [pageFooterShow, setPageFooterShow] = useState(false);
+  // 移动端 Toolbar 与 Page.Footer 共用底部一行：footer 模式 Toolbar 收成圆钮，toolbar 模式底栏收成圆钮
+  const [bottomBarMode, setBottomBarMode] = useState('footer');
+  // 合并态滚动中：Toolbar 圆钮与底栏一起缩小，停止滚动后放开
+  const [bottomBarScrolling, setBottomBarScrolling] = useState(false);
   const openScrollbar = typeof openScrollbarProps === 'boolean' ? openScrollbarProps : !deviceIsMobile && !window.__COMPONENTS_CORE_SIMPLE_BAR_DISABLED;
+  // padding 为 0 时页面容器全出血，去掉圆角
+  const isZeroPadding = (typeof padding === 'number' ? padding : parseFloat(padding)) === 0;
   const userAvatar = userInfo?.avatar;
+  const handleLogoError = useCallback(() => {
+    setLogoLoadFailed(true);
+  }, []);
+  // logo 指向变化时重置失败态（用 src/id 原始值做 key，避免 logo 对象引用不稳定导致重置循环）
+  const logoKey = logo && (logo.src || logo.id);
+  const lastLogoKeyRef = useRef(logoKey);
+  useEffect(() => {
+    if (lastLogoKeyRef.current !== logoKey) {
+      lastLogoKeyRef.current = logoKey;
+      setLogoLoadFailed(false);
+    }
+  }, [logoKey]);
   const contextValue = useMemo(() => {
     return {
       setToolbarShow,
@@ -219,10 +257,16 @@ const Layout = ({
       scrollReady,
       toolbarShow: deviceIsMobile && toolbarShow,
       toolbarMinimal: deviceIsMobile && toolbarShow && toolbarMinimal,
-      logo: logo === undefined ? { src: defaultLogo } : logo && (logo.src || logo.id) ? Object.assign({}, logo) : null,
+      setPageFooterShow,
+      bottomBarMerged: deviceIsMobile && toolbarShow && pageFooterShow,
+      bottomBarMode,
+      setBottomBarMode,
+      bottomBarScrolling,
+      setBottomBarScrolling,
+      logo: logoLoadFailed ? null : logo === undefined ? { src: defaultLogo } : logo && (logo.src || logo.id) ? Object.assign({}, logo, { error: <LogoErrorCatcher onError={handleLogoError} /> }) : null,
       userAvatar
     };
-  }, [deviceIsMobile, logo, userAvatar, scrollReady, toolbarShow, toolbarMinimal]);
+  }, [deviceIsMobile, logo, logoLoadFailed, handleLogoError, userAvatar, scrollReady, toolbarShow, toolbarMinimal, pageFooterShow, bottomBarMode, bottomBarScrolling]);
   const topRef = useRef(null);
   const pageRef = useRef(null);
   const layoutBoundaryRef = useRef(null);
@@ -260,6 +304,20 @@ const Layout = ({
     setMenuPortalTarget(target || null);
   }, [useMenuPortal, responsiveContext, scrollReady]);
 
+  // 移动端抽屉菜单打开时支持 Esc 关闭（外接键盘场景）
+  useEffect(() => {
+    if (!deviceIsMobile || !menuOpen) {
+      return undefined;
+    }
+    const handleKeyDown = event => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [deviceIsMobile, menuOpen]);
+
   useEffect(() => {
     const scrollEl = getPageScrollElement();
     if (scrollEl && typeof scrollEl.scrollTo === 'function') {
@@ -270,6 +328,13 @@ const Layout = ({
   }, [location, getPageScrollElement]);
 
   const userCard = <UserCard menuOpen={menuOpen} {...Object.assign({}, userInfo)} />;
+
+  const toggleMenuOpen = useCallback(() => {
+    setMenuOpen(menuOpen => {
+      localStorage.setItem(LayoutMenuOpenKey, !menuOpen);
+      return !menuOpen;
+    });
+  }, []);
 
   const menuPortalVars = useMenuPortal
     ? {
@@ -287,6 +352,7 @@ const Layout = ({
         [style['is-portaled']]: useMenuPortal
       })}
       style={menuPortalVars}
+      aria-hidden="true"
       onClick={() => {
         setMenuOpen(false);
       }}
@@ -304,17 +370,30 @@ const Layout = ({
     >
       <div className={classnames('logo', style['logo'], { [style['is-empty']]: !contextValue.logo })}>
         {contextValue.logo ? (
-          <span className={classnames('logo-img', style['logo-img'])}>
+          <span
+            className={classnames('logo-img', style['logo-img'])}
+            // 收起态点击 logo 直接展开菜单，解决触屏设备无法发现展开按钮的问题
+            onClick={!menuOpen ? toggleMenuOpen : undefined}
+          >
             <Image {...contextValue.logo} />
           </span>
         ) : null}
         <div
           className={classnames('expand-btn-wrapper', style['expand-btn-wrapper'])}
-          onClick={() => {
-            setMenuOpen(menuOpen => {
-              localStorage.setItem(LayoutMenuOpenKey, !menuOpen);
-              return !menuOpen;
-            });
+          role="button"
+          tabIndex={0}
+          aria-label={menuOpen ? '收起菜单' : '展开菜单'}
+          aria-expanded={menuOpen}
+          onClick={event => {
+            event.stopPropagation();
+            toggleMenuOpen();
+          }}
+          onKeyDown={event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              event.stopPropagation();
+              toggleMenuOpen();
+            }
           }}
         >
           <ExpandIcon className={classnames('expand-btn', style['expand-btn'])} />
@@ -337,8 +416,17 @@ const Layout = ({
         {aiDialog && !deviceIsMobile && (
           <div
             className={classnames('ai-entry', style['ai-entry'])}
+            role="button"
+            tabIndex={0}
+            aria-label="打开 AI 助手"
             onClick={() => {
               setAiType('small');
+            }}
+            onKeyDown={event => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                setAiType('small');
+              }
             }}
           >
             <Icon type="system-prompt" colorful />
@@ -358,6 +446,9 @@ const Layout = ({
           [style['is-mobile-full']]: deviceIsMobile,
           [style['is-viewport']]: deviceIsMobile && !portalMenu
         })}
+        role="dialog"
+        aria-label={aiDialog.title}
+        aria-modal={deviceIsMobile || undefined}
       >
         <Flex className={classnames('ai-dialog-window-title', style['ai-dialog-window-title'])}>
           <div>{aiDialog.title}</div>
@@ -367,6 +458,7 @@ const Layout = ({
                 className="btn"
                 type="icon-a-Typeopen_in_full"
                 fontClassName="system"
+                aria-label="放大"
                 onClick={() => {
                   setAiType('inner');
                 }}
@@ -376,6 +468,7 @@ const Layout = ({
               className="btn"
               type="icon-a-Typeclose"
               fontClassName="system"
+              aria-label="关闭"
               onClick={() => {
                 setAiType('closed');
               }}
@@ -393,7 +486,7 @@ const Layout = ({
   // portal 到 boundary（popup 挂载点）时，layout 上的 CSS 变量不会随 portal 继承，需要显式透传
   const aiPortalVars = {
     '--background': background,
-    '--toolbar-height': deviceIsMobile && toolbarShow ? (toolbarMinimal ? '60px' : '72px') : '0px',
+    '--toolbar-height': deviceIsMobile && toolbarShow ? (toolbarMinimal ? '48px' : '62px') : '0px',
     '--safe-area-inset-top': 'env(safe-area-inset-top)',
     '--safe-area-inset-bottom': 'env(safe-area-inset-bottom)'
   };
@@ -418,94 +511,99 @@ const Layout = ({
       : aiOverlayContent;
 
   return (
-    <LayoutResponsiveScope boundaryRef={layoutBoundaryRef} scrollRef={pageScrollRef} getScrollElement={getPageScrollElement}>
-      <Provider value={contextValue}>
-        <div ref={topRef} />
-        <div
-          ref={layoutBoundaryRef}
-          className={classnames(className, 'layout', style['layout'], LAYOUT_SCOPE_CLASS, RESPONSIVE_BOUNDARY_CLASS, {
-            'is-mobile': deviceIsMobile,
-            [style['is-mobile']]: deviceIsMobile,
-            'has-toolbar': deviceIsMobile && toolbarShow,
-            [style['has-toolbar']]: deviceIsMobile && toolbarShow,
-            'is-toolbar-minimal': deviceIsMobile && toolbarShow && toolbarMinimal,
-            [style['is-toolbar-minimal']]: deviceIsMobile && toolbarShow && toolbarMinimal,
-            'has-navbar': deviceIsMobile && navbarShow,
-            [style['has-navbar']]: deviceIsMobile && navbarShow
-          })}
-          style={{
-            '--menu-max-width': menuMaxWidth,
-            '--menu-min-width': menuMinWidth,
-            '--background': background,
-            ...(deviceIsMobile && toolbarShow ? { '--toolbar-height': toolbarMinimal ? '60px' : '72px' } : null)
-          }}
-        >
-          {!portalMenu && layerMenuNode}
-          <Flex style={{ flex: 1, minHeight: 0, width: '100%', height: 0 }}>
-            {!portalMenu && menuNode}
-            {portalMenu &&
-              createPortal(
-                <div className={classnames(style['menu-boundary-overlay'])} style={menuPortalVars}>
-                  {layerMenuNode}
-                  {menuNode}
-                </div>,
-                menuPortalTarget
-              )}
-            <Flex flex={1} ref={pageRef} className={classnames('page', style['page'])}>
-              <Row className={classnames('page-content', style['page-content'])}>
-                {!deviceIsMobile && aiDialog && aiType === 'inner' && (
-                  <Col span={8} className={classnames('page-dialog-outer', style['page-dialog-outer'])}>
-                    <div className={classnames('page-dialog', style['page-dialog'])}>
-                      <Flex className={classnames('ai-dialog-window-title', style['ai-dialog-window-title'])}>
-                        <div>{aiDialog.title}</div>
-                        <Flex gap={10}>
-                          <Icon
-                            className="btn"
-                            type="icon-a-Typeclose"
-                            fontClassName="system"
-                            onClick={() => {
-                              setAiType('closed');
-                            }}
-                          />
-                        </Flex>
-                      </Flex>
-                      <ErrorBoundary>
-                        <div className={classnames('page-window-content', style['page-window-content'])}>{aiDialog.content}</div>
-                      </ErrorBoundary>
-                    </div>
-                  </Col>
+    // 移动端控件统一 large：高 40px，满足触控尺寸
+    <ConfigProvider componentSize={deviceIsMobile ? 'large' : undefined} theme={deviceIsMobile ? MOBILE_THEME : undefined}>
+      <LayoutResponsiveScope boundaryRef={layoutBoundaryRef} scrollRef={pageScrollRef} getScrollElement={getPageScrollElement}>
+        <Provider value={contextValue}>
+          <div ref={topRef} />
+          <div
+            ref={layoutBoundaryRef}
+            className={classnames(className, 'layout', style['layout'], LAYOUT_SCOPE_CLASS, RESPONSIVE_BOUNDARY_CLASS, {
+              'is-mobile': deviceIsMobile,
+              [style['is-mobile']]: deviceIsMobile,
+              'has-toolbar': deviceIsMobile && toolbarShow,
+              [style['has-toolbar']]: deviceIsMobile && toolbarShow,
+              'is-toolbar-minimal': deviceIsMobile && toolbarShow && toolbarMinimal,
+              [style['is-toolbar-minimal']]: deviceIsMobile && toolbarShow && toolbarMinimal,
+              'has-navbar': deviceIsMobile && navbarShow,
+              [style['has-navbar']]: deviceIsMobile && navbarShow
+            })}
+            style={{
+              '--layout-padding': typeof padding === 'number' ? `${padding}px` : padding,
+              ...(isZeroPadding ? { '--page-radius': '0px' } : null),
+              '--menu-max-width': menuMaxWidth,
+              '--menu-min-width': menuMinWidth,
+              '--background': background,
+              ...(deviceIsMobile && toolbarShow ? { '--toolbar-height': toolbarMinimal ? '48px' : '62px' } : null)
+            }}
+          >
+            {!portalMenu && layerMenuNode}
+            <Flex style={{ flex: 1, minHeight: 0, width: '100%', height: 0 }}>
+              {!portalMenu && menuNode}
+              {portalMenu &&
+                createPortal(
+                  <div className={classnames(style['menu-boundary-overlay'])} style={menuPortalVars}>
+                    {layerMenuNode}
+                    {menuNode}
+                  </div>,
+                  menuPortalTarget
                 )}
-                <Col span={!deviceIsMobile && aiDialog && aiType === 'inner' ? 16 : 24} className={RESPONSIVE_CONTAINER_CLASS}>
-                  <ErrorBoundary>
-                    {openScrollbar ? (
-                      <SimpleBar
-                        ref={handlePageScrollRef}
-                        className={classnames('page-children', style['page-children'], RESPONSIVE_SCROLL_CLASS, {
-                          ['has-left']: aiType === 'inner'
-                        })}
-                      >
-                        {children}
-                      </SimpleBar>
-                    ) : (
-                      <div
-                        ref={handlePageScrollRef}
-                        className={classnames('page-children', style['page-children'], !deviceIsMobile && 'is-scroller', !deviceIsMobile && style['is-scroller'], !deviceIsMobile && RESPONSIVE_SCROLL_CLASS, {
-                          ['has-left']: aiType === 'inner'
-                        })}
-                      >
-                        {children}
+              <Flex flex={1} ref={pageRef} className={classnames('page', style['page'])}>
+                <Row className={classnames('page-content', style['page-content'])}>
+                  {!deviceIsMobile && aiDialog && aiType === 'inner' && (
+                    <Col span={8} className={classnames('page-dialog-outer', style['page-dialog-outer'])}>
+                      <div className={classnames('page-dialog', style['page-dialog'])}>
+                        <Flex className={classnames('ai-dialog-window-title', style['ai-dialog-window-title'])}>
+                          <div>{aiDialog.title}</div>
+                          <Flex gap={10}>
+                            <Icon
+                              className="btn"
+                              type="icon-a-Typeclose"
+                              fontClassName="system"
+                              onClick={() => {
+                                setAiType('closed');
+                              }}
+                            />
+                          </Flex>
+                        </Flex>
+                        <ErrorBoundary>
+                          <div className={classnames('page-window-content', style['page-window-content'])}>{aiDialog.content}</div>
+                        </ErrorBoundary>
                       </div>
-                    )}
-                  </ErrorBoundary>
-                </Col>
-              </Row>
+                    </Col>
+                  )}
+                  <Col span={!deviceIsMobile && aiDialog && aiType === 'inner' ? 16 : 24} className={RESPONSIVE_CONTAINER_CLASS}>
+                    <ErrorBoundary>
+                      {openScrollbar ? (
+                        <SimpleBar
+                          ref={handlePageScrollRef}
+                          className={classnames('page-children', style['page-children'], RESPONSIVE_SCROLL_CLASS, {
+                            ['has-left']: aiType === 'inner'
+                          })}
+                        >
+                          {children}
+                        </SimpleBar>
+                      ) : (
+                        <div
+                          ref={handlePageScrollRef}
+                          className={classnames('page-children', style['page-children'], !deviceIsMobile && 'is-scroller', !deviceIsMobile && style['is-scroller'], !deviceIsMobile && RESPONSIVE_SCROLL_CLASS, {
+                            ['has-left']: aiType === 'inner'
+                          })}
+                        >
+                          {children}
+                        </div>
+                      )}
+                    </ErrorBoundary>
+                  </Col>
+                </Row>
+              </Flex>
             </Flex>
-          </Flex>
-          {aiOverlay}
-          <Toolbar {...menu} className={classnames(style['toolbar'])} show={deviceIsMobile && toolbarShow} target={toolbarTarget} minimal={toolbarMinimal} />
-        </div>
-      </Provider>
-    </LayoutResponsiveScope>
+            {aiOverlay}
+            <Toolbar {...menu} className={classnames(style['toolbar'])} show={deviceIsMobile && toolbarShow} target={toolbarTarget} minimal={toolbarMinimal} />
+          </div>
+        </Provider>
+      </LayoutResponsiveScope>
+    </ConfigProvider>
   );
 };
 
