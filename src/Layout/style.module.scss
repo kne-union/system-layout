@@ -622,7 +622,8 @@
   padding: 0;
   overflow: hidden;
   height: unset;
-  min-height: var(--window-height);
+  // 按大视口撑高，背景铺到 Safari 底部工具栏下方
+  min-height: 100vh;
   --page-height: 100dvh;
   --page-content-height: var(--page-height);
   --page-inner-height: calc(var(--page-height) - var(--nav-height) - var(--toolbar-height));
