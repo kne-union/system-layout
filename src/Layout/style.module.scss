@@ -912,6 +912,208 @@
   }
 }
 
+// SuperSelect 系列移动端半屏选择框。super-select 内部类名是 CSS Modules hash，
+// 这里只依赖全局类：根节点带 kne-is-boundary / kne-is-viewport 且直接包含 .over-content，第一个子节点是标题栏
+@mixin select-sheet {
+  $sheet: ':is(.kne-is-boundary, .kne-is-viewport):has(> .over-content)';
+
+  :global {
+    #{$sheet} + :is(.kne-is-boundary, .kne-is-viewport):empty {
+      background: rgba(15, 23, 42, 0.32);
+    }
+
+    #{$sheet} {
+      border-radius: 20px 20px 0 0 !important;
+      box-shadow: var(--sl-shadow-drawer) !important;
+
+      > :first-child {
+        min-height: 52px;
+        box-sizing: border-box;
+        padding: 8px 16px;
+        border-bottom: none;
+
+        > div {
+          font-size: 17px;
+          font-weight: 600;
+          color: var(--sl-text-1);
+        }
+
+        > button {
+          min-width: 44px;
+          min-height: 36px;
+          color: var(--sl-text-2);
+          text-align: left;
+
+          & + div + button {
+            color: var(--sl-primary);
+            font-weight: 600;
+            text-align: right;
+          }
+        }
+      }
+
+      > .over-content {
+        padding-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom));
+        box-sizing: border-box;
+      }
+
+      // 搜索框：与 TablePage 搜索框一致的灰底无边框
+      .ant-input-affix-wrapper,
+      .ant-input-search .ant-input-affix-wrapper {
+        border-color: transparent;
+        border-radius: 10px;
+        background: var(--sl-field-bg);
+        box-shadow: none;
+
+        &:hover {
+          border-color: transparent;
+        }
+
+        &.ant-input-affix-wrapper-focused,
+        &:focus-within {
+          border-color: var(--sl-primary);
+          background: #fff;
+        }
+
+        .ant-input {
+          background: transparent;
+        }
+
+        .ant-input-prefix {
+          color: var(--sl-text-2);
+        }
+      }
+
+      .ant-input-search-button {
+        border-color: transparent;
+        background: var(--sl-field-bg);
+        box-shadow: none;
+      }
+
+      // 滚动条：细、浅，只作位置提示
+      *::-webkit-scrollbar {
+        width: 3px !important;
+        height: 3px !important;
+      }
+
+      *::-webkit-scrollbar-thumb {
+        background: rgba(17, 24, 39, 0.18) !important;
+        border-radius: 3px !important;
+      }
+
+      *::-webkit-scrollbar-track {
+        background: transparent !important;
+      }
+
+      .simplebar-track.simplebar-vertical {
+        width: 4px !important;
+        right: 1px !important;
+        background: transparent !important;
+      }
+
+      .simplebar-track.simplebar-vertical .simplebar-scrollbar::before {
+        left: 0 !important;
+        right: 0 !important;
+        opacity: 1 !important;
+        background: rgba(17, 24, 39, 0.18) !important;
+      }
+
+      // 列表项：去分割线和斑马纹，按压态
+      .select-list-item,
+      .select-tree-item,
+      .ant-list-item {
+        border-block-end: none !important;
+
+        &:active {
+          background: rgba(17, 24, 39, 0.04);
+        }
+      }
+
+      .select-list-item:nth-child(even):not(.is-selected):not(:active) {
+        background: transparent;
+      }
+
+      // 树节点展开箭头：点击区放大到整行高度
+      .ant-tree .ant-tree-switcher {
+        width: 32px;
+        align-self: stretch;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: none;
+      }
+
+      // 左右分栏选择（城市）：左栏浅灰底，选中项白底主色，右栏不画分割线
+      .ant-row-no-wrap > .ant-col:first-child:has(.ant-tabs) {
+        background: rgba(17, 24, 39, 0.03) !important;
+
+        .ant-tabs-nav::before {
+          display: none;
+        }
+
+        .ant-list {
+          background: transparent;
+        }
+
+        .ant-list-item {
+          border-radius: 0;
+          color: var(--sl-text-1);
+
+          &.selected {
+            background: #fff;
+            color: var(--sl-primary);
+            font-weight: 600;
+          }
+        }
+
+        & + .ant-col {
+          border-left: none;
+        }
+      }
+
+      // 分组标题（热门城市等）：去掉左右分割线，改成小号灰字
+      .ant-divider-with-text {
+        margin: 12px 0 8px;
+
+        &::before,
+        &::after,
+        .ant-divider-rail {
+          display: none;
+        }
+
+        .ant-divider-inner-text {
+          padding: 0;
+          font-size: 13px;
+          font-weight: 400;
+          color: var(--sl-text-2);
+        }
+      }
+
+      // 可选标签（热门城市等）：放大到可点击尺寸
+      .ant-space:has(> .ant-space-item > .ant-tag-checkable) {
+        gap: 8px !important;
+      }
+
+      .ant-tag-checkable {
+        height: 32px;
+        margin: 0;
+        padding: 0 14px;
+        border: none;
+        border-radius: 16px;
+        background: rgba(17, 24, 39, 0.05);
+        color: var(--sl-text-1);
+        font-size: 15px;
+        line-height: 32px;
+
+        &.ant-tag-checkable-checked {
+          background: var(--sl-primary-1);
+          color: var(--sl-primary);
+        }
+      }
+    }
+  }
+}
+
 // 移动端规范：跟随 Layout 的移动端状态（与 15px 正文、large 控件同源），不按内容列宽度判断
 @mixin mobile-spec {
   :global {
@@ -973,6 +1175,11 @@
 :global(.kne-system-layout-scope.is-mobile),
 :global(body:has(.kne-system-layout-scope.is-mobile) .ant-modal-root) {
   @include mobile-spec;
+}
+
+// SuperSelect 半屏挂在 body 或预览边界，同样按页面上 Layout 是否处于移动端判断
+:global(body:has(.kne-system-layout-scope.is-mobile)) {
+  @include select-sheet;
 }
 
 // 桌面端 useModal 等弹窗挂在 body 下、不在 Layout 作用域内：页面存在 Layout 时同样套用弹窗与按钮样式
@@ -1469,6 +1676,11 @@
     min-width: 0;
     box-sizing: border-box;
   }
+}
+
+// 移动端以 Layout 状态为准：桌面端侧边菜单挤窄内容区时，组件不能按 kne-responsive 容器宽度切到移动端布局
+.layout:not(.is-mobile) .page-content * {
+  container-name: none;
 }
 
 .ai-dialog-window-title {

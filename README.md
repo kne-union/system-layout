@@ -931,14 +931,27 @@ render(<BaseExample />);
 ```
 
 - 表格列表页
-- 在 SystemLayout + Page 中接入 @kne/table-page：用 useScrollElement 绑定页面滚动实现 sticky 表头，覆盖 TablePage 自带的 tab / filter / search、分页、排序与批量操作；首页仅第一行操作 disabled，便于对比验收 layout 下 link 禁用无灰底
+- 在 SystemLayout + Page 中接入 @kne/table-page：用 useScrollElement 绑定页面滚动实现 sticky 表头，覆盖 TablePage 自带的 tab / filter / search、分页、排序与批量操作；filter 演示 @kne/react-filter 全部字段类型：输入、数字区间、日期 / 日期范围 / 类型日期范围、SuperSelect 列表 / 树 / 表格 / 级联（id/name 数据用 filterInterceptors 转换）与职能 / 行业 / 城市业务选择器，均可真实过滤模拟数据；首页仅第一行操作 disabled，便于对比验收 layout 下 link 禁用无灰底
 - _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),_TablePage(@kne/table-page)[import * as _TablePage from "@kne/table-page"],(@kne/table-page/dist/index.css),_ReactFilter(@kne/react-filter)[import * as _ReactFilter from "@kne/react-filter"],(@kne/react-filter/dist/index.css),antd(antd)
 
 ```jsx
 const { default: SystemLayout, Page, useScrollElement, useIsMobile, BarChartIcon, Card, CARD_THEME } = _SystemLayout;
 const { default: TablePage, Table } = _TablePage;
-const { fields } = _ReactFilter;
-const { SuperSelectFilterItem } = fields;
+const { fields, filterInterceptors } = _ReactFilter;
+const {
+  InputFilterItem,
+  NumberRangeFilterItem,
+  DatePickerFilterItem,
+  DateRangePickerFilterItem,
+  TypeDateRangePickerFilterItem,
+  SuperSelectFilterItem,
+  SelectTreeFilterItem,
+  SelectTableListFilterItem,
+  SelectCascaderFilterItem,
+  SelectFunctionFilterItem,
+  SelectIndustryFilterItem,
+  SelectAddressFilterItem
+} = fields;
 const { Flex, Tag, message, Button } = antd;
 const { useMemo } = React;
 
@@ -954,13 +967,74 @@ const STAGES = [
 
 const DEPARTMENTS = ['技术部', '产品部', '设计部', '数据部', '运营部'];
 
+// functionCode 取自 @kne/super-select-plus 内置职能数据，供职能筛选按编码前缀匹配
 const POSITIONS = [
-  { title: '高级前端工程师', dept: '技术部' },
-  { title: '产品经理', dept: '产品部' },
-  { title: 'UI/UX 设计师', dept: '设计部' },
-  { title: '数据分析师', dept: '数据部' },
-  { title: '增长运营专员', dept: '运营部' }
+  { title: '高级前端工程师', dept: '技术部', functionCode: '003006041' },
+  { title: '产品经理', dept: '产品部', functionCode: '002002010' },
+  { title: 'UI/UX 设计师', dept: '设计部', functionCode: '004013123' },
+  { title: '数据分析师', dept: '数据部', functionCode: '003009074' },
+  { title: '增长运营专员', dept: '运营部', functionCode: '005020172' }
 ];
+
+// 城市 / 行业编码同样取自 @kne/super-select-plus 内置数据
+const CITIES = [
+  { name: '北京', code: '010' },
+  { name: '上海', code: '020' },
+  { name: '深圳', code: '050090' },
+  { name: '杭州', code: '070020' },
+  { name: '广州', code: '050020' },
+  { name: '成都', code: '280020' }
+];
+
+const INDUSTRY_CODES = ['001001', '001003', '004', '015', '001002'];
+
+const ORG_TREE = [
+  { id: 'rd-center', parentId: null, name: '研发中心' },
+  { id: '技术部', parentId: 'rd-center', name: '技术部' },
+  { id: '数据部', parentId: 'rd-center', name: '数据部' },
+  { id: 'product-center', parentId: null, name: '产品中心' },
+  { id: '产品部', parentId: 'product-center', name: '产品部' },
+  { id: '设计部', parentId: 'product-center', name: '设计部' },
+  { id: 'ops-center', parentId: null, name: '运营中心' },
+  { id: '运营部', parentId: 'ops-center', name: '运营部' }
+];
+
+const RECRUITERS = [
+  { id: 'hr1', name: '赵一鸣', team: '技术招聘组', phone: '13900000001' },
+  { id: 'hr2', name: '孙嘉怡', team: '产品设计招聘组', phone: '13900000002' },
+  { id: 'hr3', name: '周子涵', team: '综合招聘组', phone: '13900000003' },
+  { id: 'hr4', name: '吴思远', team: '校园招聘组', phone: '13900000004' }
+];
+
+const RECRUITER_COLUMNS = [
+  { name: 'name', title: '姓名', span: 8 },
+  { name: 'team', title: '所属小组', span: 16 }
+];
+
+const EDUCATION_TREE = [
+  {
+    id: 'bachelor',
+    name: '本科',
+    children: [
+      { id: 'bachelor-985', name: '985 院校' },
+      { id: 'bachelor-211', name: '211 院校' },
+      { id: 'bachelor-normal', name: '普通院校' }
+    ]
+  },
+  {
+    id: 'master',
+    name: '硕士',
+    children: [
+      { id: 'master-985', name: '985 院校' },
+      { id: 'master-overseas', name: '海外院校' }
+    ]
+  },
+  { id: 'phd', name: '博士' }
+];
+
+const EDUCATION_LEAVES = EDUCATION_TREE.flatMap(item =>
+  (item.children || [item]).map(child => ({ id: child.id, label: item.children ? &#96;${item.name} · ${child.name}&#96; : item.name }))
+);
 
 const FIRST_NAMES = ['伟', '芳', '娜', '秀英', '敏', '静', '强', '磊', '洋', '艳', '勇', '军', '杰', '娟', '涛', '明'];
 const SURNAMES = ['王', '李', '张', '刘', '陈', '杨', '赵', '黄', '周', '吴', '徐', '孙', '马', '朱', '胡', '林'];
@@ -971,11 +1045,14 @@ const stageMap = Object.fromEntries(
 
 const stageOptions = STAGES.map(({ value, label }) => ({ value, label }));
 const departmentOptions = DEPARTMENTS.map(item => ({ value: item, label: item }));
-const locationOptions = ['北京', '上海', '深圳', '杭州', '广州', '成都'].map(item => ({ value: item, label: item }));
+
+const formatDate = date => &#96;${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}&#96;;
 
 const buildCandidate = index => {
   const position = POSITIONS[index % POSITIONS.length];
   const stage = STAGES[index % STAGES.length];
+  const city = CITIES[index % CITIES.length];
+  const education = EDUCATION_LEAVES[index % EDUCATION_LEAVES.length];
   return {
     id: &#96;CAND${String(index + 1).padStart(4, '0')}&#96;,
     name: &#96;${SURNAMES[index % SURNAMES.length]}${FIRST_NAMES[(index * 3) % FIRST_NAMES.length]}&#96;,
@@ -984,7 +1061,15 @@ const buildCandidate = index => {
     stage: stage.value,
     matchScore: 60 + ((index * 7) % 40),
     experience: 1 + (index % 12),
-    location: ['北京', '上海', '深圳', '杭州', '广州', '成都'][index % 6],
+    location: city.name,
+    cityCode: city.code,
+    functionCode: position.functionCode,
+    industryCode: INDUSTRY_CODES[index % INDUSTRY_CODES.length],
+    recruiter: RECRUITERS[index % RECRUITERS.length].id,
+    recruiterName: RECRUITERS[index % RECRUITERS.length].name,
+    education: education.id,
+    educationLabel: education.label,
+    lastContactAt: formatDate(new Date(Date.now() - ((index * 5) % 120) * 24 * 3600 * 1000)),
     // 仅第一行用于禁用态验收，排到列表最前便于对照
     appliedAt: index === 0 ? '2024-12-31' : &#96;2024-${String((index % 12) + 1).padStart(2, '0')}-${String((index % 28) + 1).padStart(2, '0')}&#96;,
     phone: &#96;138${String(index).padStart(8, '0')}&#96;,
@@ -998,6 +1083,32 @@ const normalizeFilterValue = value => {
     return value;
   }
   return Array.isArray(value) ? value[0] : value;
+};
+
+const toList = value => (value == null ? [] : Array.isArray(value) ? value : [value]).filter(item => item != null && item !== '');
+
+const filterByRange = (list, key, range) => {
+  const [min, max] = toList(range).length ? range : [];
+  if (min == null && max == null) {
+    return list;
+  }
+  return list.filter(item => (min == null || item[key] >= min) && (max == null || item[key] <= max));
+};
+
+const filterByDateRange = (list, key, range) => {
+  if (!Array.isArray(range) || !range[0] || !range[1]) {
+    return list;
+  }
+  const [start, end] = range.map(item => formatDate(new Date(item)));
+  return list.filter(item => item[key] >= start && item[key] <= end);
+};
+
+const filterByCodePrefix = (list, key, value) => {
+  const codes = toList(value);
+  if (!codes.length) {
+    return list;
+  }
+  return list.filter(item => codes.some(code => String(item[key]).startsWith(code)));
 };
 
 const applyFilters = (list, data, requestParams) => {
@@ -1016,15 +1127,43 @@ const applyFilters = (list, data, requestParams) => {
     result = result.filter(item => item.stage === stage);
   }
 
-  const department = normalizeFilterValue(params.department);
-  if (department) {
-    result = result.filter(item => item.department === department);
+  const departments = toList(params.department);
+  if (departments.length) {
+    result = result.filter(item => departments.includes(item.department));
   }
 
-  const location = normalizeFilterValue(params.location);
-  if (location) {
-    result = result.filter(item => item.location === location);
+  // 选中中心节点时包含其下所有部门
+  const orgIds = toList(params.org);
+  if (orgIds.length) {
+    const deptSet = new Set(orgIds.flatMap(id => [id, ...ORG_TREE.filter(node => node.parentId === id).map(node => node.id)]));
+    result = result.filter(item => deptSet.has(item.department));
   }
+
+  const keywordName = normalizeFilterValue(params.name);
+  if (keywordName) {
+    result = result.filter(item => item.name.includes(keywordName));
+  }
+
+  result = filterByRange(result, 'matchScore', params.matchScore);
+  result = filterByRange(result, 'experience', params.experience);
+  result = filterByDateRange(result, 'appliedAt', params.appliedAt);
+  result = filterByDateRange(result, 'lastContactAt', params.lastContactAt?.value);
+
+  if (params.appliedMonth) {
+    const month = formatDate(new Date(params.appliedMonth)).slice(0, 7);
+    result = result.filter(item => item.appliedAt.startsWith(month));
+  }
+
+  const recruiters = toList(params.recruiter);
+  if (recruiters.length) {
+    result = result.filter(item => recruiters.includes(item.recruiter));
+  }
+
+  // 编码类筛选按前缀匹配，选父级节点也能命中子级
+  result = filterByCodePrefix(result, 'education', params.education);
+  result = filterByCodePrefix(result, 'cityCode', params.city);
+  result = filterByCodePrefix(result, 'functionCode', params.function);
+  result = filterByCodePrefix(result, 'industryCode', params.industry);
 
   return result;
 };
@@ -1064,7 +1203,10 @@ const columns = [
   },
   { name: 'experience', title: '经验', width: 90, render: value => &#96;${value} 年&#96; },
   { name: 'location', title: '城市', width: 90 },
+  { name: 'educationLabel', title: '学历', width: 140 },
+  { name: 'recruiterName', title: '招聘负责人', width: 110 },
   { name: 'appliedAt', title: '投递日期', width: 120, format: 'date', sort: true },
+  { name: 'lastContactAt', title: '最近沟通', width: 120, format: 'date' },
   { name: 'phone', title: '手机号', width: 140, render: value => value.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3') },
   { name: 'email', title: '邮箱', width: 200, ellipsis: true, hidden: true },
   {
@@ -1131,7 +1273,7 @@ const CandidateTable = () => {
       sticky
       scrollTopInset={isMobile ? PAGE_HEADER_HEIGHT : 0}
       getScrollContainer={getScrollElement}
-      scroll={{ x: 1400 }}
+      scroll={{ x: 1800 }}
       size="large"
       renderMobile
       sortRender={sortRender}
@@ -1156,12 +1298,55 @@ const CandidateTable = () => {
           [
             {
               type: SuperSelectFilterItem,
-              props: { name: 'department', label: '部门', single: true, options: departmentOptions }
+              props: { name: 'department', label: '部门', allowSelectedAll: true, options: departmentOptions }
             },
             {
-              type: SuperSelectFilterItem,
-              props: { name: 'location', label: '城市', single: true, options: locationOptions }
-            }
+              type: SelectTreeFilterItem,
+              props: {
+                name: 'org',
+                label: '组织架构',
+                options: ORG_TREE,
+                valueKey: 'id',
+                labelKey: 'name',
+                interceptor: filterInterceptors.multi
+              }
+            },
+            { type: SelectAddressFilterItem, props: { name: 'city', label: '城市' } },
+            { type: NumberRangeFilterItem, props: { name: 'matchScore', label: '匹配度', unit: '%', min: 0, max: 100 } }
+          ],
+          [
+            { type: InputFilterItem, props: { name: 'name', label: '姓名' } },
+            { type: DateRangePickerFilterItem, props: { name: 'appliedAt', label: '投递日期' } },
+            { type: DatePickerFilterItem, props: { name: 'appliedMonth', label: '投递月份', picker: 'month' } },
+            { type: TypeDateRangePickerFilterItem, props: { name: 'lastContactAt', label: '最近沟通' } }
+          ],
+          [
+            {
+              type: SelectTableListFilterItem,
+              props: {
+                name: 'recruiter',
+                label: '招聘负责人',
+                options: RECRUITERS,
+                columns: RECRUITER_COLUMNS,
+                valueKey: 'id',
+                labelKey: 'name',
+                interceptor: filterInterceptors.multi
+              }
+            },
+            {
+              type: SelectCascaderFilterItem,
+              props: {
+                name: 'education',
+                label: '学历',
+                options: EDUCATION_TREE,
+                valueKey: 'id',
+                labelKey: 'name',
+                interceptor: filterInterceptors.multi
+              }
+            },
+            { type: SelectFunctionFilterItem, props: { name: 'function', label: '职能', interceptor: filterInterceptors.multi } },
+            { type: SelectIndustryFilterItem, props: { name: 'industry', label: '行业', interceptor: filterInterceptors.multi } },
+            { type: NumberRangeFilterItem, props: { name: 'experience', label: '工作年限', unit: '年', min: 0 } }
           ]
         ],
         displayLine: 1
@@ -1242,7 +1427,7 @@ const BaseExample = () => {
             description={
               <>
                 通过 <code>useScrollElement</code> 绑定 Layout 滚动容器；使用 TablePage 自带的 <code>tab</code> / <code>filter</code> /{' '}
-                <code>search</code> 与分页。首页第一行操作禁用（其余正常），用于对比验收 link 禁用无灰底
+                <code>search</code> 与分页。filter 覆盖输入、数字区间、日期 / 日期范围 / 类型日期范围、SuperSelect 列表 / 树 / 表格 / 级联，以及职能 / 行业 / 城市业务选择器，点「更多」查看全部。首页第一行操作禁用（其余正常），用于对比验收 link 禁用无灰底
               </>
             }
           />
@@ -1258,12 +1443,13 @@ render(<BaseExample />);
 ```
 
 - 表单页
-- 在 Page 中使用 components-core:FormInfo 搭建新员工入职表单：FormInfo 分组展示字段，移动端单列、PC 端两列；必填校验与 SubmitButton / CancelButton 放在 Page.Footer 中，移动端与 Toolbar 合并为同一行
-- _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),remoteLoader(@kne/remote-loader),antd(antd)
+- 在 Page 中使用 components-core:FormInfo 搭建新员工入职表单：FormInfo 分组展示字段，移动端单列、PC 端两列；演示 SuperSelect 系列字段（SuperSelect / SuperSelectTree / SuperSelectUser / SuperSelectTableList）与 SuperSelectPlus 业务选择器（职能 / 行业 / 城市），手机预览下选择面板从底部弹出；必填校验与 SubmitButton / CancelButton 放在 Page.Footer 中，移动端与 Toolbar 合并为同一行
+- _SystemLayout(@kne/current-lib_system-layout)[import * as _SystemLayout from "@kne/system-layout"],(@kne/current-lib_system-layout/dist/index.css),_SuperSelectPlus(@kne/super-select-plus)[import * as _SuperSelectPlus from "@kne/super-select-plus"],(@kne/super-select/dist/index.css),(@kne/super-select-plus/dist/index.css),remoteLoader(@kne/remote-loader),antd(antd)
 
 ```jsx
 const { default: SystemLayout, Page, BarChartIcon, Card, CARD_THEME, useIsMobile } = _SystemLayout;
 const { createWithRemoteLoader } = remoteLoader;
+const { SelectFunction, SelectIndustry, SelectAddress } = _SuperSelectPlus;
 const { App, Flex } = antd;
 
 const menu = {
@@ -1289,12 +1475,62 @@ const PROBATION_OPTIONS = [
   { label: '6 个月', value: '6' }
 ];
 
+const SKILL_OPTIONS = ['React', 'Vue', 'Node.js', 'TypeScript', 'Go', 'Java', 'Python', 'Figma', '数据分析', '项目管理'].map(label => ({ label, value: label }));
+
+const ORG_OPTIONS = [
+  { value: 'hq', parentId: null, label: '集团总部' },
+  { value: 'tech', parentId: 'hq', label: '技术中心' },
+  { value: 'tech-fe', parentId: 'tech', label: '前端开发组' },
+  { value: 'tech-be', parentId: 'tech', label: '后端开发组' },
+  { value: 'tech-qa', parentId: 'tech', label: '质量保障组' },
+  { value: 'product', parentId: 'hq', label: '产品中心' },
+  { value: 'product-design', parentId: 'product', label: '产品设计组' },
+  { value: 'product-pm', parentId: 'product', label: '项目管理组' },
+  { value: 'hr', parentId: 'hq', label: '人力资源部' }
+];
+
+const USER_OPTIONS = [
+  { value: 'u1', label: '王子豪', description: '技术中心 · 前端负责人' },
+  { value: 'u2', label: '李思琪', description: '技术中心 · 后端负责人' },
+  { value: 'u3', label: '陈雨桐', description: '产品中心 · 产品总监' },
+  { value: 'u4', label: '赵一鸣', description: '人力资源部 · HRBP' },
+  { value: 'u5', label: '孙嘉怡', description: '产品中心 · 设计主管' }
+];
+
+const COURSE_OPTIONS = [
+  { value: 'c1', label: '新员工入职引导', category: '通用', duration: '2 课时' },
+  { value: 'c2', label: '信息安全与合规', category: '通用', duration: '1 课时' },
+  { value: 'c3', label: '前端工程化实践', category: '技术', duration: '6 课时' },
+  { value: 'c4', label: '微服务架构入门', category: '技术', duration: '8 课时' },
+  { value: 'c5', label: '产品需求分析', category: '产品', duration: '4 课时' }
+];
+
+const COURSE_COLUMNS = [
+  { name: 'label', title: '课程名称', span: 12 },
+  { name: 'category', title: '类别', span: 6 },
+  { name: 'duration', title: '课时', span: 6 }
+];
+
+// super-select-plus 不在 FormInfo.fields 中，需通过 FormInfo.hooks.useOnChange 接入 Form
+const createPlusField = Component =>
+  createWithRemoteLoader({
+    modules: ['components-core:FormInfo']
+  })(({ remoteModules, ...props }) => {
+    const [FormInfo] = remoteModules;
+    const render = FormInfo.hooks.useOnChange(Object.assign({ placeholder: &#96;请选择${props.label || ''}&#96; }, props));
+    return render(Component);
+  });
+
+const FunctionField = createPlusField(SelectFunction);
+const IndustryField = createPlusField(SelectIndustry);
+const AddressField = createPlusField(SelectAddress);
+
 const OnboardingForm = createWithRemoteLoader({
   modules: ['components-core:FormInfo', 'components-core:FormInfo@formModule']
 })(({ remoteModules }) => {
   const [FormInfo, formModule] = remoteModules;
   const { Form, SubmitButton, CancelButton } = formModule;
-  const { Input, Select, DatePicker, RadioGroup, Switch, TextArea } = FormInfo.fields;
+  const { Input, Select, DatePicker, RadioGroup, Switch, TextArea, SuperSelect, SuperSelectTree, SuperSelectUser, SuperSelectTableList } = FormInfo.fields;
   const { message } = App.useApp();
   const column = useIsMobile() ? 1 : 2;
 
@@ -1334,6 +1570,26 @@ const OnboardingForm = createWithRemoteLoader({
               <DatePicker name="joinDate" label="入职日期" rule="REQ" />,
               <Select name="probation" label="试用期" options={PROBATION_OPTIONS} />,
               <Switch name="remote" label="远程办公" />
+            ]}
+          />
+          <FormInfo
+            title="组织与协作（SuperSelect）"
+            column={column}
+            list={[
+              <SuperSelectTree name="org" label="所属组织" rule="REQ" single options={ORG_OPTIONS} />,
+              <SuperSelectUser name="leader" label="直属上级" rule="REQ" single options={USER_OPTIONS} />,
+              <SuperSelectUser name="mentors" label="入职导师" options={USER_OPTIONS} maxLength={2} />,
+              <SuperSelect name="skills" label="技能标签" options={SKILL_OPTIONS} />,
+              <SuperSelectTableList name="courses" label="培训课程" options={COURSE_OPTIONS} columns={COURSE_COLUMNS} />
+            ]}
+          />
+          <FormInfo
+            title="职业背景（SuperSelectPlus）"
+            column={column}
+            list={[
+              <FunctionField name="function" label="职能" rule="REQ" single />,
+              <IndustryField name="industries" label="过往行业" />,
+              <AddressField name="city" label="工作城市" rule="REQ" single />
             ]}
           />
           <FormInfo title="补充说明" column={1} list={[<TextArea name="remark" label="备注" />]} />

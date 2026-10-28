@@ -233,6 +233,9 @@ const Layout = ({
   // 合并态滚动中：Toolbar 圆钮与底栏一起缩小，停止滚动后放开
   const [bottomBarScrolling, setBottomBarScrolling] = useState(false);
   const openScrollbar = typeof openScrollbarProps === 'boolean' ? openScrollbarProps : !deviceIsMobile && !window.__COMPONENTS_CORE_SIMPLE_BAR_DISABLED;
+  // 移动端页面不在 layout 内滚动，layout 会被内容撑高，不能作为弹层 boundary：
+  // 带上 boundary class 会被 responsive-utils 当成示例手机框，弹层按 absolute 挂到 layout 底部而跑出可视区
+  const layoutIsBoundary = !(deviceIsMobile && !openScrollbar);
   // padding 为 0 时页面容器全出血，去掉圆角
   const isZeroPadding = (typeof padding === 'number' ? padding : parseFloat(padding)) === 0;
   const userAvatar = userInfo?.avatar;
@@ -513,12 +516,13 @@ const Layout = ({
   return (
     // 移动端控件统一 large：高 40px，满足触控尺寸
     <ConfigProvider componentSize={deviceIsMobile ? 'large' : undefined} theme={deviceIsMobile ? MOBILE_THEME : undefined}>
-      <LayoutResponsiveScope boundaryRef={layoutBoundaryRef} scrollRef={pageScrollRef} getScrollElement={getPageScrollElement}>
+      <LayoutResponsiveScope boundaryRef={layoutIsBoundary ? layoutBoundaryRef : undefined} scrollRef={pageScrollRef} getScrollElement={getPageScrollElement}>
         <Provider value={contextValue}>
           <div ref={topRef} />
           <div
             ref={layoutBoundaryRef}
-            className={classnames(className, 'layout', style['layout'], LAYOUT_SCOPE_CLASS, RESPONSIVE_BOUNDARY_CLASS, {
+            className={classnames(className, 'layout', style['layout'], LAYOUT_SCOPE_CLASS, {
+              [RESPONSIVE_BOUNDARY_CLASS]: layoutIsBoundary,
               'is-mobile': deviceIsMobile,
               [style['is-mobile']]: deviceIsMobile,
               'has-toolbar': deviceIsMobile && toolbarShow,

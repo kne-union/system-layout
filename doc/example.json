@@ -87,7 +87,7 @@
     },
     {
       "title": "表格列表页",
-      "description": "在 SystemLayout + Page 中接入 @kne/table-page：用 useScrollElement 绑定页面滚动实现 sticky 表头，覆盖 TablePage 自带的 tab / filter / search、分页、排序与批量操作；首页仅第一行操作 disabled，便于对比验收 layout 下 link 禁用无灰底",
+      "description": "在 SystemLayout + Page 中接入 @kne/table-page：用 useScrollElement 绑定页面滚动实现 sticky 表头，覆盖 TablePage 自带的 tab / filter / search、分页、排序与批量操作；filter 演示 @kne/react-filter 全部字段类型：输入、数字区间、日期 / 日期范围 / 类型日期范围、SuperSelect 列表 / 树 / 表格 / 级联（id/name 数据用 filterInterceptors 转换）与职能 / 行业 / 城市业务选择器，均可真实过滤模拟数据；首页仅第一行操作 disabled，便于对比验收 layout 下 link 禁用无灰底",
       "code": "./table-page.js",
       "scope": [
         {
@@ -122,7 +122,7 @@
     },
     {
       "title": "表单页",
-      "description": "在 Page 中使用 components-core:FormInfo 搭建新员工入职表单：FormInfo 分组展示字段，移动端单列、PC 端两列；必填校验与 SubmitButton / CancelButton 放在 Page.Footer 中，移动端与 Toolbar 合并为同一行",
+      "description": "在 Page 中使用 components-core:FormInfo 搭建新员工入职表单：FormInfo 分组展示字段，移动端单列、PC 端两列；演示 SuperSelect 系列字段（SuperSelect / SuperSelectTree / SuperSelectUser / SuperSelectTableList）与 SuperSelectPlus 业务选择器（职能 / 行业 / 城市），手机预览下选择面板从底部弹出；必填校验与 SubmitButton / CancelButton 放在 Page.Footer 中，移动端与 Toolbar 合并为同一行",
       "code": "./form.js",
       "scope": [
         {
@@ -132,6 +132,17 @@
         },
         {
           "packageName": "@kne/current-lib_system-layout/dist/index.css"
+        },
+        {
+          "name": "_SuperSelectPlus",
+          "packageName": "@kne/super-select-plus",
+          "importStatement": "import * as _SuperSelectPlus from \"@kne/super-select-plus\""
+        },
+        {
+          "packageName": "@kne/super-select/dist/index.css"
+        },
+        {
+          "packageName": "@kne/super-select-plus/dist/index.css"
         },
         {
           "name": "remoteLoader",
