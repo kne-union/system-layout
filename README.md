@@ -1916,11 +1916,11 @@ render(<BaseExample />);
 
 ### API
 
-### SystemLayout
+#### SystemLayout
 
 系统初始化布局组件，提供页面整体结构，包含侧边菜单、用户信息、页面内容区和移动端工具栏。支持桌面端和移动端两种模式。
 
-#### 属性
+##### 属性
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
@@ -1939,7 +1939,7 @@ render(<BaseExample />);
 | `toolbarMinimal` | `boolean` | `false` | 移动端底部工具栏是否使用极简模式。`false` 为普通模式（展示标题与选中背景），`true` 为极简模式（仅图标） |
 | `children` | `ReactNode` | - | 页面内容，通常为 Page 组件 |
 
-#### 移动端规范
+##### 移动端规范
 
 移动端按触控与可读性要求统一尺寸。是否为移动端统一以 Layout 的移动端状态为准（`isMobile` 属性，或视口 / 预览边界宽度 ≤ 768px），不按内容区宽度判断：桌面端即使侧边菜单让内容区窄于 768px，也保持桌面尺寸。
 
@@ -1950,7 +1950,7 @@ render(<BaseExample />);
 - FormInfo / InfoPage 的分组（`.ant-card.part`）渲染为玻璃卡片，移动端内边距 16px
 - 底部 Toolbar 高 62px、左右边距 20px；与 Page.Footer 合并时，底栏态（左侧圆钮 + 底栏）整行 48px，展开导航态右侧圆钮与 Toolbar 同为 62px，圆钮与底栏间距 12px
 
-#### userInfo 配置
+##### userInfo 配置
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
@@ -1961,7 +1961,7 @@ render(<BaseExample />);
 | `description` | `string` | 描述信息 |
 | `extra` | `ReactNode` | 额外展示内容 |
 
-#### aiDialog 配置
+##### aiDialog 配置
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
@@ -1974,11 +1974,11 @@ render(<BaseExample />);
 
 ---
 
-### Menu 配置
+#### Menu 配置
 
 Menu 组件由 SystemLayout 的 `menu` 属性配置，不需要单独使用。
 
-#### 属性
+##### 属性
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
@@ -1987,7 +1987,7 @@ Menu 组件由 SystemLayout 的 `menu` 属性配置，不需要单独使用。
 | `activeKey` | `string` \| `function` | - | 当前激活项的 key，函数形式为 `(item, { menuOpen, base }) => boolean` |
 | `onChange` | `function` | - | 菜单项点击回调 `(item, { menuOpen, base }) => void` |
 
-#### menu items 配置
+##### menu items 配置
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
@@ -2001,7 +2001,7 @@ Menu 组件由 SystemLayout 的 `menu` 属性配置，不需要单独使用。
 | `badge` | `number` \| `boolean` \| `object` | - | 徽标。数字为数量，`true` 为圆点，对象透传给 antd `Badge`（如 `{ count, dot, overflowCount, showZero }`）。展开菜单时显示在文字右侧，收起菜单和 Toolbar 显示在图标角上 |
 | `onClick` | `function` | - | 自定义点击回调 `(item, { menuOpen, base, event }) => void`，设置后不会自动导航 |
 
-#### icon 配置
+##### icon 配置
 
 icon 支持多种格式：
 
@@ -2012,11 +2012,11 @@ icon 支持多种格式：
 
 ---
 
-### Page
+#### Page
 
 页面内容区组件，作为 SystemLayout 的子组件使用，提供标题栏、操作按钮、返回按钮等功能。
 
-#### 属性
+##### 属性
 
 | 属性 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
@@ -2029,7 +2029,7 @@ icon 支持多种格式：
 | `noPadding` | `boolean` | - | 是否移除内容区内边距 |
 | `children` | `ReactNode` \| `function` | - | 页面内容 |
 
-#### children 为函数时
+##### children 为函数时
 
 当 `children` 为函数时，Page 将渲染控制权交给子组件，函数接收以下参数：
 
@@ -2040,7 +2040,7 @@ icon 支持多种格式：
 | `render` | `function` | 标准渲染函数，`({ children, className }) => ReactElement`，用于包裹自定义内容以保持标准页面结构 |
 | `pageLoading` | `ReactElement` | 加载状态元素（含骨架屏），可直接返回以显示加载状态 |
 
-#### buttonProps 配置
+##### buttonProps 配置
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
@@ -2048,7 +2048,7 @@ icon 支持多种格式：
 | `list` | `array` | 按钮配置数组，每项为 antd Button 的 props |
 | `moreType` | `string` | "更多"按钮的类型 |
 
-#### 移动端导航栏右侧
+##### 移动端导航栏右侧
 
 移动端右侧由独立的玻璃圆钮组成，常态与滚动后的胶囊态形态一致：
 
@@ -2056,16 +2056,16 @@ icon 支持多种格式：
 - `extra`：放在玻璃胶囊内，渲染结果为空时自动隐藏
 - 用户头像：始终显示头像圆钮（未配置 `userInfo.avatar` 时为默认头像），点击打开左侧菜单
 
-#### 移动端菜单入口
+##### 移动端菜单入口
 
 - 一级页面（不传 `back`）：左上角为菜单按钮，右侧头像圆钮同样可打开菜单
 - 二级页面（传 `back`）：左上角只放返回按钮，通过右侧头像圆钮打开菜单；`back` 只用于从上级页面进入的页面
 
-#### Page.PageLoading
+##### Page.PageLoading
 
 加载状态子组件，展示 Skeleton 骨架屏。
 
-#### Page.Footer
+##### Page.Footer
 
 贴在 Page 内容列底部的操作栏。宽度等于内容列，不吃 `.page-children` / `.page-inner` 的内边距。用它包住按钮或其他操作内容；同一页只放一个。
 
@@ -2095,7 +2095,7 @@ icon 支持多种格式：
 
 ---
 
-### useLayoutContext
+#### useLayoutContext
 
 获取 Layout 上下文的 Hook，在 SystemLayout 内部的子组件中使用。
 
@@ -2104,7 +2104,7 @@ import { useLayoutContext } from '@kne/system-layout';
 const { setToolbarShow, setNavbarShow, setMenuOpen, deviceIsMobile, logo, userAvatar } = useLayoutContext();
 ```
 
-#### 返回值
+##### 返回值
 
 | 属性 | 类型 | 说明 |
 |------|------|------|
@@ -2119,7 +2119,7 @@ const { setToolbarShow, setNavbarShow, setMenuOpen, deviceIsMobile, logo, userAv
 
 ---
 
-### isMobile
+#### isMobile
 
 同步检测当前设备是否为移动端，基于 `window.matchMedia` 和移动端断点（768px）判断。
 
@@ -2128,7 +2128,7 @@ import { isMobile } from '@kne/system-layout';
 const mobile = isMobile(); // boolean
 ```
 
-### useIsMobile
+#### useIsMobile
 
 响应式移动端检测 Hook，窗口尺寸变化时自动更新。
 
@@ -2137,7 +2137,7 @@ import { useIsMobile } from '@kne/system-layout';
 const mobile = useIsMobile(); // boolean
 ```
 
-### MOBILE_BREAKPOINT
+#### MOBILE_BREAKPOINT
 
 移动端断点常量（`768px`），可与 `@kne/responsive-utils` 配合使用。
 
@@ -2147,7 +2147,7 @@ import { MOBILE_BREAKPOINT } from '@kne/system-layout';
 
 ---
 
-### themeToken
+#### themeToken
 
 Ant Design 主题 Token 配置对象，将 `Input`、`InputNumber`、`Card`、`Tree`、`Select`、`DatePicker` 组件的背景色设为透明，适配 SystemLayout 的半透明背景风格。
 
@@ -2161,7 +2161,7 @@ import { themeToken } from '@kne/system-layout';
 
 ---
 
-### Card / CARD_THEME
+#### Card / CARD_THEME
 
 页面卡片使用 `@kne/react-box` 的 `Card`，本库在其上注册了一组贴合 SystemLayout 风格的主题。业务直接从本库引入 `Card`，通过 `theme` 选择主题，不要再自己写卡片背景、边框、阴影。
 
@@ -2185,7 +2185,7 @@ import { Card, CARD_THEME } from '@kne/system-layout';
 
 ---
 
-### 响应式工具
+#### 响应式工具
 
 从 `@kne/responsive-utils` 透传的响应式工具，可通过 SystemLayout 直接引入：
 
