@@ -602,13 +602,6 @@
       background: var(--bg-color-grey);
     }
 
-    // 键盘可达性：仅键盘聚焦（Tab）时显示焦点环，鼠标点击不触发
-    :focus-visible {
-      outline: 2px solid var(--sl-primary);
-      outline-offset: 2px;
-      border-radius: 8px;
-    }
-
     // 尊重系统「减弱动效」偏好，无障碍降级
     @media (prefers-reduced-motion: reduce) {
       *,
@@ -843,14 +836,17 @@
         box-shadow: none !important;
         backdrop-filter: none;
 
-        &:hover:not(:disabled):not(.ant-btn-loading) {
+        // 浅底 hover 只适用于下拉里的「菜单项」按钮；实色主按钮（如 Filter 的「确定」）
+        // 被刷成 --sl-primary-1 会让白字失去对比，表现为「hover 颜色太浅」。
+        // primary / dangerous 交回 antd 自身的 hover 色，非实色的 dangerous 由下方规则处理。
+        &:hover:not(.ant-btn-primary):not(.ant-btn-dangerous):not(:disabled):not(.ant-btn-loading) {
           background: var(--sl-primary-1) !important;
           backdrop-filter: none;
           transform: none;
         }
       }
 
-      &.ant-btn-dangerous:hover:not(:disabled):not(.ant-btn-loading) {
+      &.ant-btn-dangerous:not(.ant-btn-primary):hover:not(:disabled):not(.ant-btn-loading) {
         background: var(--sl-danger-1) !important;
       }
 
