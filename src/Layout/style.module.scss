@@ -88,6 +88,56 @@
   }
 }
 
+// 所有 TablePage（.info-page-table）单元格统一：盖过 table-view 默认 vertical-align:top / 底边框
+@mixin table-page-cells {
+  // table-view 列内容 flex 默认 flex-start，与 th 的 middle 对齐
+  --col-align: center;
+  // 未传 size 时与 size="large" 同高（14+22+14≈50），避免 Tenant 默认表 38px、列表页 50px 两套表头
+  --kne-table-cell-padding-default: 14px 8px;
+
+  .ant-table-container table > thead > tr:first-child > * {
+    border-radius: 0 !important;
+  }
+
+  .ant-table-thead > tr > th,
+  .ant-table-thead > tr > td,
+  .ant-table-thead > tr > .ant-table-cell {
+    background: #f3f4f6 !important;
+    border-bottom: none !important;
+    color: var(--sl-text-2);
+    font-weight: 500;
+    vertical-align: middle !important;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  .ant-table-tbody > tr > td,
+  .ant-table-tbody > tr > .ant-table-cell {
+    border-bottom: none !important;
+    vertical-align: middle !important;
+    font-size: 14px;
+  }
+
+  .ant-table-tbody .ant-btn.btn-no-padding,
+  .ant-table-tbody .ant-btn-link {
+    font-size: inherit;
+  }
+
+  .ant-table-tbody > tr.ant-table-row:nth-child(even of .ant-table-row):not(:hover):not(.ant-table-row-selected) > td,
+  .ant-table-tbody > tr.ant-table-row:nth-child(even of .ant-table-row):not(:hover):not(.ant-table-row-selected) > .ant-table-cell {
+    // 固定列自带不透明底，只能叠渐变，改 background-color 会透出滚动内容
+    &:not([class*='ant-table-cell-fix']) {
+      background-color: rgba(17, 24, 39, 0.018);
+    }
+
+    &[class*='ant-table-cell-fix'] {
+      background-image: linear-gradient(rgba(17, 24, 39, 0.018), rgba(17, 24, 39, 0.018));
+    }
+  }
+}
+
 @mixin table-page-desktop {
   border: none !important;
   border-radius: 12px;
@@ -106,38 +156,6 @@
   // table-page 卡片模式把工具栏 padding-inline 置 0，这里有玻璃底色，内容会贴边
   &:not(:has(.ant-table)) .table-page-toolbar {
     padding-inline: 16px;
-  }
-
-  .ant-table-container table > thead > tr:first-child > * {
-    border-radius: 0 !important;
-  }
-
-  .ant-table-thead > tr > th,
-  .ant-table-thead > tr > td {
-    background: #f3f4f6 !important;
-    border-bottom: none !important;
-    color: var(--sl-text-2);
-    font-weight: 500;
-
-    &::before {
-      display: none;
-    }
-  }
-
-  // 行间去边框改斑马纹，条纹须明显浅于表头 #f3f4f6
-  .ant-table-tbody > tr > td {
-    border-bottom: none !important;
-  }
-
-  .ant-table-tbody > tr.ant-table-row:nth-child(even of .ant-table-row):not(:hover):not(.ant-table-row-selected) > td {
-    // 固定列自带不透明底，只能叠渐变，改 background-color 会透出滚动内容
-    &:not([class*='ant-table-cell-fix']) {
-      background-color: rgba(17, 24, 39, 0.018);
-    }
-
-    &[class*='ant-table-cell-fix'] {
-      background-image: linear-gradient(rgba(17, 24, 39, 0.018), rgba(17, 24, 39, 0.018));
-    }
   }
 
   .ant-table {
@@ -394,12 +412,36 @@
         margin: 0 auto;
         width: 100%;
       }
+
+      // 加在 Form / 包裹层 / 单个 FormInfo Card 上，强制取消 900px 限宽
+      &.system-no-max-width .ant-card,
+      .system-no-max-width .ant-card,
+      .ant-card.system-no-max-width {
+        max-width: none;
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      // Select 占位与 Input/DatePicker 的浅灰 placeholder 对齐
+      .ant-select-placeholder,
+      .ant-select-selection-placeholder {
+        color: var(--ant-color-text-quaternary, rgba(0, 0, 0, 0.25)) !important;
+      }
     }
 
     .max-width-info-page {
       max-width: 900px;
       margin: 0 auto;
       width: 100%;
+    }
+
+    .max-width-info-page.system-no-max-width,
+    .system-max-width-900.system-no-max-width,
+    .system-no-max-width .max-width-info-page,
+    .system-no-max-width .system-max-width-900 {
+      max-width: none;
+      margin-left: 0;
+      margin-right: 0;
     }
 
     .part.bordered {
@@ -410,12 +452,12 @@
       }
     }
 
-    // FormInfo / InfoPage 分组：默认 Card 内边距为 0，字段贴边；统一成与 Card 主题一致的玻璃卡片
+    // FormInfo / InfoPage 分组：玻璃卡片，无阴影（避免盒中盒）
     .ant-card.part:not(.bordered) {
       border: 1px solid rgba(255, 255, 255, 0.7);
       border-radius: 12px;
       background: linear-gradient(135deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 42%), linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.72) 100%) !important;
-      box-shadow: var(--sl-shadow-card);
+      box-shadow: none;
 
       > .ant-card-head {
         min-height: 0;
@@ -542,9 +584,9 @@
       --ant-tabs-card-bg: transparent;
     }
 
-    // TablePage 头部：Tab 改胶囊分段，去掉 Tab 底线；桌面端为 Tab 后紧跟表格容器，移动端 Tab 在工具栏区内
-    div:has(> .ant-tabs):has(+ div > .react-filter) > .ant-tabs,
-    .table-page-toolbar-section > div > .ant-tabs {
+    // TablePage 头部：仅桌面端 Tab 改胶囊分段；移动端保持 antd 默认 Tabs
+    div:has(> .ant-tabs):has(+ div > .react-filter:not(.is-mobile)) > .ant-tabs,
+    .react-filter:not(.is-mobile) .table-page-toolbar-section > div > .ant-tabs {
       @include table-page-tabs;
     }
 
@@ -553,14 +595,14 @@
       @include table-page-search;
     }
 
-    // TablePage 桌面端：工具栏 / 表头 / 表体三层分色，去掉外框与分隔线
+    // TablePage 桌面端：工具栏玻璃外壳（仅有 toolbar 时套容器圆角，避免过宽 :has 打乱布局）
     div:has(> .react-filter:not(.is-mobile) > .table-page-toolbar-section) {
       @include table-page-desktop;
     }
 
-    // TablePage 移动端：Tab 轨道、筛选条、全选条与卡片列表
-    .react-filter.is-mobile .table-page-toolbar-section > div > .ant-tabs {
-      @include table-page-mobile-tabs;
+    // 所有 TablePage 表格单元格统一（不依赖是否有 search/filter toolbar）
+    .info-page-table {
+      @include table-page-cells;
     }
 
     // 搜索 / Tab / 筛选三行统一 8px 左右的间距
@@ -864,6 +906,11 @@
         box-shadow: none;
       }
     }
+
+    // react-filter 弹层底部「取消 / 确定」仍用布局胶囊圆角
+    .ant-dropdown .ant-row .ant-btn {
+      border-radius: 999px;
+    }
   }
 }
 
@@ -910,8 +957,9 @@
 
 // SuperSelect 系列移动端半屏选择框。super-select 内部类名是 CSS Modules hash，
 // 这里只依赖全局类：根节点带 kne-is-boundary / kne-is-viewport 且直接包含 .over-content，第一个子节点是标题栏
+// 排除 react-filter-field-mobile-popup：筛选条下方下拉，不是贴底半屏（圆角交给 react-filter 自己）
 @mixin select-sheet {
-  $sheet: ':is(.kne-is-boundary, .kne-is-viewport):has(> .over-content)';
+  $sheet: ':is(.kne-is-boundary, .kne-is-viewport):has(> .over-content):not(.react-filter-field-mobile-popup)';
 
   :global {
     #{$sheet} + :is(.kne-is-boundary, .kne-is-viewport):empty {

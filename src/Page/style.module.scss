@@ -24,6 +24,8 @@
 // 移动端尺寸：左右边距 16px，导航控件 40px（与 antd large 控件同高）
 $mobile-gutter: 16px;
 $nav-size: 40px;
+// 移动端 page-top 占位（不含安全区），page-inner 的 min-height 须按它扣，不能按 --nav-height
+$mobile-page-top: 52px;
 
 @mixin page-header-mobile {
   height: 48px;
@@ -252,11 +254,13 @@ $nav-size: 40px;
   }
 
   .page-top {
-    padding-top: calc(52px + var(--safe-area-inset-top, 0px));
+    padding-top: calc(#{$mobile-page-top} + var(--safe-area-inset-top, 0px));
   }
   .page-inner {
     box-sizing: border-box;
     --content-height: calc(var(--page-inner-height) - #{$mobile-gutter * 2});
+    // page-top + page-inner + page-bottom 恰好一屏，短内容不产生外层滚动
+    min-height: calc(var(--page-height) - #{$mobile-page-top} - var(--safe-area-inset-top, 0px) - var(--safe-area-inset-bottom, 0px));
     padding: $mobile-gutter;
 
     &:after {
