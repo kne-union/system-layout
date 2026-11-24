@@ -122,7 +122,7 @@
     },
     {
       "title": "表单页",
-      "description": "在 Page 中使用 components-core:FormInfo 搭建新员工入职表单：FormInfo 分组展示字段，移动端单列、PC 端两列；演示 SuperSelect 系列字段（SuperSelect / SuperSelectTree / SuperSelectUser / SuperSelectTableList）与 SuperSelectPlus 业务选择器（职能 / 行业 / 城市），手机预览下选择面板从底部弹出；必填校验与 SubmitButton / CancelButton 放在 Page.Footer 中，移动端与 Toolbar 合并为同一行",
+      "description": "在 Page 中使用 components-core:FormInfo 搭建新员工入职表单：FormInfo 分组展示字段，移动端单列、PC 端两列；演示 SuperSelect 系列字段（SuperSelect / SuperSelectTree / SuperSelectUser / SuperSelectTableList）与 SuperSelectPlus 业务选择器（职能 / 行业 / 城市），手机预览下选择面板从底部弹出；useFormModal 打开独立表单弹窗录入紧急联系人并回填列表（需挂载 ModalContextHolder）；必填校验与 SubmitButton / CancelButton 放在 Page.Footer 中，移动端与 Toolbar 合并为同一行",
       "code": "./form.js",
       "scope": [
         {

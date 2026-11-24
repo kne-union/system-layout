@@ -1,7 +1,8 @@
 const { default: SystemLayout, Page, BarChartIcon, Card, CARD_THEME, useIsMobile } = _SystemLayout;
 const { createWithRemoteLoader } = remoteLoader;
 const { SelectFunction, SelectIndustry, SelectAddress } = _SuperSelectPlus;
-const { App, Flex } = antd;
+const { App, Flex, Button } = antd;
+const { useState } = React;
 
 const menu = {
   base: '/SystemLayout',
@@ -76,81 +77,120 @@ const FunctionField = createPlusField(SelectFunction);
 const IndustryField = createPlusField(SelectIndustry);
 const AddressField = createPlusField(SelectAddress);
 
+const RELATION_OPTIONS = [
+  { label: '父母', value: '父母' },
+  { label: '配偶', value: '配偶' },
+  { label: '子女', value: '子女' },
+  { label: '朋友', value: '朋友' }
+];
+
 const OnboardingForm = createWithRemoteLoader({
-  modules: ['components-core:FormInfo', 'components-core:FormInfo@formModule']
+  modules: ['components-core:FormInfo', 'components-core:FormInfo@formModule', 'components-core:FormInfo@useFormModal', 'components-core:Modal@ModalContextHolder']
 })(({ remoteModules }) => {
-  const [FormInfo, formModule] = remoteModules;
+  const [FormInfo, formModule, useFormModal, ModalContextHolder] = remoteModules;
   const { Form, SubmitButton, CancelButton } = formModule;
   const { Input, Select, DatePicker, RadioGroup, Switch, TextArea, SuperSelect, SuperSelectTree, SuperSelectUser, SuperSelectTableList } = FormInfo.fields;
   const { message } = App.useApp();
   const column = useIsMobile() ? 1 : 2;
+  const formModal = useFormModal();
+  const [contacts, setContacts] = useState([]);
+
+  const openContactModal = () => {
+    const modalApi = formModal({
+      title: '添加紧急联系人',
+      size: 'small',
+      formProps: {
+        onSubmit: data => {
+          setContacts(list => [...list, data]);
+          message.success(`已添加紧急联系人 ${data.contactName}`);
+          modalApi.close();
+        }
+      },
+      children: (
+        <FormInfo
+          column={1}
+          list={[<Input name="contactName" label="姓名" rule="REQ LEN-2-20" />, <Select name="relation" label="关系" rule="REQ" options={RELATION_OPTIONS} />, <Input name="contactPhone" label="手机号" rule="REQ PHONE" />]}
+        />
+      )
+    });
+  };
 
   return (
-    <Form
-      data={{ probation: '3', remote: false }}
-      onSubmit={data => {
-        message.success(`已提交 ${data.name} 的入职信息`);
-      }}
-    >
-      <Page title="新员工入职" back>
-        <Flex vertical gap={16}>
-          <Card theme={CARD_THEME.tint} title="填写入职信息" description="带 * 为必填项。手机预览下，底部操作栏与导航合并为同一行，可通过左右圆钮切换。" />
-          <FormInfo
-            title="基本信息"
-            column={column}
-            list={[
-              <Input name="name" label="姓名" rule="REQ LEN-2-20" />,
-              <Input name="phone" label="手机号" rule="REQ PHONE" />,
-              <Input name="email" label="邮箱" rule="REQ EMAIL" />,
-              <RadioGroup
-                name="gender"
-                label="性别"
-                options={[
-                  { label: '男', value: 'male' },
-                  { label: '女', value: 'female' }
-                ]}
-              />
-            ]}
-          />
-          <FormInfo
-            title="岗位信息"
-            column={column}
-            list={[
-              <Select name="department" label="部门" rule="REQ" options={DEPARTMENT_OPTIONS} />,
-              <Input name="position" label="职位" rule="REQ" />,
-              <DatePicker name="joinDate" label="入职日期" rule="REQ" />,
-              <Select name="probation" label="试用期" options={PROBATION_OPTIONS} />,
-              <Switch name="remote" label="远程办公" />
-            ]}
-          />
-          <FormInfo
-            title="组织与协作（SuperSelect）"
-            column={column}
-            list={[
-              <SuperSelectTree name="org" label="所属组织" rule="REQ" single options={ORG_OPTIONS} />,
-              <SuperSelectUser name="leader" label="直属上级" rule="REQ" single options={USER_OPTIONS} />,
-              <SuperSelectUser name="mentors" label="入职导师" options={USER_OPTIONS} maxLength={2} />,
-              <SuperSelect name="skills" label="技能标签" options={SKILL_OPTIONS} />,
-              <SuperSelectTableList name="courses" label="培训课程" options={COURSE_OPTIONS} columns={COURSE_COLUMNS} />
-            ]}
-          />
-          <FormInfo
-            title="职业背景（SuperSelectPlus）"
-            column={column}
-            list={[
-              <FunctionField name="function" label="职能" rule="REQ" single />,
-              <IndustryField name="industries" label="过往行业" />,
-              <AddressField name="city" label="工作城市" rule="REQ" single />
-            ]}
-          />
-          <FormInfo title="补充说明" column={1} list={[<TextArea name="remark" label="备注" />]} />
-        </Flex>
-        <Page.Footer>
-          <CancelButton>重置</CancelButton>
-          <SubmitButton type="primary">提交</SubmitButton>
-        </Page.Footer>
-      </Page>
-    </Form>
+    <>
+      <ModalContextHolder />
+      <Form
+        data={{ probation: '3', remote: false }}
+        onSubmit={data => {
+          message.success(`已提交 ${data.name} 的入职信息`);
+        }}
+      >
+        <Page title="新员工入职" back>
+          <Flex vertical gap={16}>
+            <Card theme={CARD_THEME.tint} title="填写入职信息" description="带 * 为必填项。手机预览下，底部操作栏与导航合并为同一行，可通过左右圆钮切换。" />
+            <FormInfo
+              title="基本信息"
+              column={column}
+              list={[
+                <Input name="name" label="姓名" rule="REQ LEN-2-20" />,
+                <Input name="phone" label="手机号" rule="REQ PHONE" />,
+                <Input name="email" label="邮箱" rule="REQ EMAIL" />,
+                <RadioGroup
+                  name="gender"
+                  label="性别"
+                  options={[
+                    { label: '男', value: 'male' },
+                    { label: '女', value: 'female' }
+                  ]}
+                />
+              ]}
+            />
+            <FormInfo
+              title="岗位信息"
+              column={column}
+              list={[
+                <Select name="department" label="部门" rule="REQ" options={DEPARTMENT_OPTIONS} />,
+                <Input name="position" label="职位" rule="REQ" />,
+                <DatePicker name="joinDate" label="入职日期" rule="REQ" />,
+                <Select name="probation" label="试用期" options={PROBATION_OPTIONS} />,
+                <Switch name="remote" label="远程办公" />
+              ]}
+            />
+            <FormInfo
+              title="组织与协作（SuperSelect）"
+              column={column}
+              list={[
+                <SuperSelectTree name="org" label="所属组织" rule="REQ" single options={ORG_OPTIONS} />,
+                <SuperSelectUser name="leader" label="直属上级" rule="REQ" single options={USER_OPTIONS} />,
+                <SuperSelectUser name="mentors" label="入职导师" options={USER_OPTIONS} maxLength={2} />,
+                <SuperSelect name="skills" label="技能标签" options={SKILL_OPTIONS} />,
+                <SuperSelectTableList name="courses" label="培训课程" options={COURSE_OPTIONS} columns={COURSE_COLUMNS} />
+              ]}
+            />
+            <FormInfo
+              title="职业背景（SuperSelectPlus）"
+              column={column}
+              list={[<FunctionField name="function" label="职能" rule="REQ" single />, <IndustryField name="industries" label="过往行业" />, <AddressField name="city" label="工作城市" rule="REQ" single />]}
+            />
+            <FormInfo
+              key={contacts.map(item => item.contactPhone).join('|') || 'empty'}
+              title="紧急联系人（useFormModal）"
+              extra={<Button onClick={openContactModal}>添加紧急联系人</Button>}
+              column={1}
+              list={
+                contacts.length
+                  ? contacts.map((item, index) => <Input key={`${item.contactPhone}-${index}`} name={`_emergency_${index}`} label={`${item.contactName}（${item.relation}）`} disabled defaultValue={item.contactPhone} />)
+                  : [<Input name="_emergency_empty" label="联系人" disabled placeholder="暂未添加，点击右上角通过 useFormModal 添加" />]
+              }
+            />
+            <FormInfo title="补充说明" column={1} list={[<TextArea name="remark" label="备注" />]} />
+          </Flex>
+          <Page.Footer>
+            <CancelButton>重置</CancelButton>
+            <SubmitButton type="primary">提交</SubmitButton>
+          </Page.Footer>
+        </Page>
+      </Form>
+    </>
   );
 });
 
