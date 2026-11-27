@@ -1,3 +1,0 @@
-/*! For license information please see 5140.ee6bd580.chunk.js.LICENSE.txt */
-"use strict";(Array.isArray(globalThis.webpackChunk_system_layout_0_2_17)?globalThis.webpackChunk_system_layout_0_2_17:globalThis.webpackChunk_system_layout_0_2_17=[]).push([[5140],{278054(e,r){var a=Symbol.for("react.transitional.element"),s=Symbol.for("react.fragment");function t(e,r,s){var t=null;if(void 0!==s&&(t=""+s),void 0!==r.key&&(t=""+r.key),"key"in r)for(var o in s={},r)"key"!==o&&(s[o]=r[o]);else s=r;return r=s.ref,{$$typeof:a,type:e,key:t,ref:void 0!==r?r:null,props:s}}r.Fragment=s,r.jsx=t,r.jsxs=t},35140(e,r,a){e.exports=a(278054)}}]);
-//# sourceMappingURL=5140.ee6bd580.chunk.js.map
